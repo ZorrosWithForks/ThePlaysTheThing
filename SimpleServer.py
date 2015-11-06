@@ -7,24 +7,24 @@ import _thread
 #import time
 
 def listener(client, address):
-    print("Accepted connection from: ", address)
-    with clients_lock:
-        clients.add(client) #Array of clients
-    try:
-        while True:
-            data = client.recv(1024).decode() #block waiting for data from a client
-            if not data:
-                break
-            else:
-                print(repr(data))
-                with clients_lock:
-                    for c in clients:
+   print("Accepted connection from: ", address)
+   with clients_lock:
+      clients.add(client) #Array of clients
+   try:
+      while True:
+         data = client.recv(1024).decode() #block waiting for data from a client
+         if not data:
+            break
+         else:
+            print(repr(data))
+            #with clients_lock:
+               #for c in clients:
 						#do something for every client
                         #c.sendall(data.encode('ascii'))
-    finally:
-        with clients_lock:
-            clients.remove(client)
-            client.close()
+   finally:
+      with clients_lock:
+         clients.remove(client)
+         client.close()
 
 # create a socket object
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
