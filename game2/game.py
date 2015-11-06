@@ -79,9 +79,49 @@ DISPLAYSURF = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE + 5
 
 #add a font for our inventory
 INVFONT = pygame.font.Font('comic.ttf', 18)
-
+SEED_SPACE_ROW = MAPHEIGHT - 13
+SEED_SPACE_COL = MAPWIDTH - 8
 TOP_HALF = MAPHEIGHT - 5
 
+#fill all with water
+for row in range (MAPHEIGHT):
+   for col in range (MAPWIDTH):
+      tilemap[row][col] = WATER
+      
+y = random.randint(0, MAPHEIGHT - 1)
+x = random.randint(0, MAPWIDTH - 1)
+print(y)
+print(x)
+for row2 in range (5, 10):
+   for col2 in range (10, 15):
+      if random.randint(0,1) == True:
+         tilemap[row2][col2] = GRASS
+
+tilemap[SEED_SPACE_ROW][SEED_SPACE_COL] = GRASS
+if tilemap[SEED_SPACE_ROW][SEED_SPACE_COL-1] == WATER:
+   if random.randint(0,1) > 0:
+         tilemap[SEED_SPACE_ROW][SEED_SPACE_COL-1] = GRASS
+         
+if tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL] == WATER:
+   if random.randint(0,3) > 0:
+         tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL] = GRASS
+         
+if tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL-1] == WATER:
+   if random.randint(0,2) > 0:
+         tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL-1] = GRASS
+         
+if tilemap[SEED_SPACE_ROW][SEED_SPACE_COL+1] == WATER:
+   if random.randint(0,4) > 0:
+         tilemap[SEED_SPACE_ROW][SEED_SPACE_COL+1] = GRASS
+         
+if tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL] == WATER:
+   if random.randint(0,5) > 0:
+         tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL] = GRASS
+         
+if tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL+1] == WATER:
+   if random.randint(0,7) > 0:
+         tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL+1] = GRASS
+'''
 #TRY TO GET JUST CERTAIN TYPES ON BOTTOM HALF
 for row in range(BOTTOM_HALF_START, MAPHEIGHT):
     for col in range(MAPWIDTH):
@@ -109,7 +149,7 @@ for rw in range(TOP_HALF):
             tile = WOOD
         if rw <= 8 and rw >= 3 and cl <= (MAPWIDTH - 2) and cl >= (MAPWIDTH - 8):
             tile = LEAVES
-        '''
+
         elif randomNumber >= 0 and randomNumber <= 3:
             tile = COAL
         #water if the random number is a 1 or a 2
@@ -123,10 +163,10 @@ for rw in range(TOP_HALF):
             tile = DIAMOND
         else:
             tile = DIRT
-        '''
+
         #set the position in the tilemap to the randomly chosen tile
         tilemap[rw][cl] = tile
-        
+'''     
         
 #main()
 while True:
@@ -138,6 +178,7 @@ while True:
             pygame.quit()
             sys.exit()
         pygame.mouse.set_visible(True)
+        '''
         if event.type == pygame.MOUSEMOTION:
             x, y = pygame.mouse.get_pos()
             print("x is " + str(x))
@@ -147,7 +188,8 @@ while True:
             print("x is " + str(x))
             print("y is " + str(y))
             tilemap[y][x] =  LAVA
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        '''
+        if event.type == pygame.MOUSEBUTTONDOWN:
             x, y = pygame.mouse.get_pos()
             print("x is " + str(x))
             print("y is " + str(y))
@@ -155,8 +197,8 @@ while True:
             y = int(y / TILESIZE)
             print("x is " + str(x))
             print("y is " + str(y))
-            tilemap[y][x] =  WATER
-           
+            tilemap[y][x] =  GRASS
+
         #if a key is pressed
         if event.type == KEYDOWN:
             #if the right arrow is pressed

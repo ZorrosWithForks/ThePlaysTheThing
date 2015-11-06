@@ -4,12 +4,17 @@ import os
 import threading
 from threading import Thread
 import _thread
+
 #import time
+
+clients = set()
+clients_lock = threading.Lock()
+th = []
 
 def listener(client, address):
    print("Accepted connection from: ", address)
    with clients_lock:
-      clients.add(client) #Array of clients
+      clients.add(client)#Array of clients
    try:
       while True:
          data = client.recv(1024).decode() #block waiting for data from a client
@@ -40,9 +45,7 @@ serversocket.bind((host, port))
 # queue up to 5 requests
 serversocket.listen(5)                                           
 
-clients = set()
-clients_lock = threading.Lock()
-th = []
+
 
 while True:
     print("Server is listening for connections...")
