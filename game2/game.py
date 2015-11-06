@@ -88,39 +88,43 @@ for row in range (MAPHEIGHT):
    for col in range (MAPWIDTH):
       tilemap[row][col] = WATER
       
-y = random.randint(0, MAPHEIGHT - 1)
-x = random.randint(0, MAPWIDTH - 1)
-print(y)
-print(x)
 for row2 in range (5, 10):
    for col2 in range (10, 15):
       if random.randint(0,1) == True:
          tilemap[row2][col2] = GRASS
 
 tilemap[SEED_SPACE_ROW][SEED_SPACE_COL] = GRASS
+
+#LEFT OF TILE
 if tilemap[SEED_SPACE_ROW][SEED_SPACE_COL-1] == WATER:
    if random.randint(0,1) > 0:
-         tilemap[SEED_SPACE_ROW][SEED_SPACE_COL-1] = GRASS
-         
+         tilemap[SEED_SPACE_ROW][SEED_SPACE_COL-1] = LEAVES
+		 
+#ABOVE TILE
 if tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL] == WATER:
    if random.randint(0,3) > 0:
-         tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL] = GRASS
-         
+         tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL] = LAVA
+		 
+#TOP LEFT OF TILE
 if tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL-1] == WATER:
    if random.randint(0,2) > 0:
-         tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL-1] = GRASS
-         
+         tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL-1] = COAL
+		 
+#RIGHT OF TILE
 if tilemap[SEED_SPACE_ROW][SEED_SPACE_COL+1] == WATER:
    if random.randint(0,4) > 0:
-         tilemap[SEED_SPACE_ROW][SEED_SPACE_COL+1] = GRASS
-         
+         tilemap[SEED_SPACE_ROW][SEED_SPACE_COL+1] = DIRT
+		 
+#BELOW TILE
 if tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL] == WATER:
    if random.randint(0,5) > 0:
-         tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL] = GRASS
-         
+         tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL] = DIAMOND
+		 
+#BOTTOM RIGHT OF TILE
 if tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL+1] == WATER:
    if random.randint(0,7) > 0:
-         tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL+1] = GRASS
+         tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL+1] = WOOD
+		 
 '''
 #TRY TO GET JUST CERTAIN TYPES ON BOTTOM HALF
 for row in range(BOTTOM_HALF_START, MAPHEIGHT):
