@@ -62,7 +62,7 @@ MAPHEIGHT = 20
 BOTTOM_HALF_START = 15
 
 #add a font for our inventory
-#INVFONT = pygame.font.Font('comic.ttf', 18)
+INVFONT = pygame.font.Font('comic.ttf', 18)
 SEED_SPACE_ROW = MAPHEIGHT - 13
 SEED_SPACE_COL = MAPWIDTH - 8
 TOP_HALF = MAPHEIGHT - 5
@@ -70,6 +70,10 @@ TOP_HALF = MAPHEIGHT - 5
 #cloud position
 cloud_x = -200
 cloud_y = 0
+
+#set up the display
+pygame.init()
+DISPLAYSURF = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE + 50))
 
 #plane position
 plane_x = MAPWIDTH*TILESIZE
@@ -84,10 +88,6 @@ playerPos = [0,0]
 resources = [DIRT,GRASS,WATER,COAL,DIAMOND,LAVA]
 #use list comprehension to create our tilemap
 tilemap = [ [DIRT for w in range(MAPWIDTH)] for h in range(MAPHEIGHT) ]
-
-#set up the display
-pygame.init()
-DISPLAYSURF = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE + 50))
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

@@ -6,6 +6,7 @@ from threading import Thread
 import _thread
 import pygame, sys, random
 from pygame.locals import *
+import pickle
 
 #import time
 
