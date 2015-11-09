@@ -50,17 +50,17 @@ class Application(tk.Frame):
             print("It broke")
 
 # create a socket object
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # get local machine name
-host = socket.gethostname()                           
+host = socket.gethostname()
 print("test1")
 port = 9999
 
 # connection to hostname on the port.
-s.connect((host, port))                               
+s.connect((host, port))
 print("test2")
-# Receive no more than 1024 bytes                                    
+# Receive no more than 1024 bytes
 
 #print("The time got from the server is %s" % tm.decode('ascii'))
 
