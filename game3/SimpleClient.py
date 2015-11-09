@@ -61,6 +61,10 @@ MAPWIDTH  = 30
 MAPHEIGHT = 20
 BOTTOM_HALF_START = 15
 
+#set up the display
+pygame.init()
+DISPLAYSURF = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE + 50))
+
 #add a font for our inventory
 INVFONT = pygame.font.Font('comic.ttf', 18)
 SEED_SPACE_ROW = MAPHEIGHT - 13
@@ -70,10 +74,6 @@ TOP_HALF = MAPHEIGHT - 5
 #cloud position
 cloud_x = -200
 cloud_y = 0
-
-#set up the display
-pygame.init()
-DISPLAYSURF = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE + 50))
 
 #plane position
 plane_x = MAPWIDTH*TILESIZE
@@ -100,9 +100,6 @@ port = 9999
 s.connect((host, port))                               
 print("test2")
 # Receive no more than 1024 bytes
-buf = 4096
-#data, addr = s.recvfrom(buf)
-#tilemap = pickle.loads(data)
 pickledResponse = s.recv(4096)
 tilemap = pickle.loads(pickledResponse)
 
@@ -117,7 +114,7 @@ while True:
             sys.exit()
         pygame.mouse.set_visible(True)
         
-        if event.type == pygame.MOUSEBUTTONDOWN or True:
+        if event.type == pygame.MOUSEBUTTONDOWN:
             x, y = pygame.mouse.get_pos()
             print("x is " + str(x))
             print("y is " + str(y))
