@@ -6,7 +6,9 @@ class unitCounts:
       self.archers   = archers
       self.cannons   = cannons
       self.champions = champions
-      
+   
+   def __repr__(self):
+      return "{infantry:" + str(self.infantry) + ", archers:" + str(self.archers) + ", cannons:" + str(self.cannons) + ", champions:" + str(self.champions) + "}"
 
 class Country:
    def __init__(self):
@@ -24,11 +26,4 @@ class Country:
       self.unit_counts = unitCounts(random.randint(1, 5), random.randint(0, 2), 0, 0)
 
    def __repr__(self):
-      return "{name:" + self.name + ", owner:" + str(self.owner) + ", attack_bonus:" + str(self.attack_bonus) + ", defense_bonus:" + str(self.defense_bonus) + ", unit_counts:" + str(self.unit_counts) + ", unit_production" + str(self.unit_production)
-      
-country = Country()
-print (country.name)
-print (country.owner)
-print ("attack bonus =" + str(country.attack_bonus))
-print ("defense bonus =" + str(country.defense_bonus))
-print ("unit counts =" + str(country.unit_counts))
+      return "{name:" + self.name + ", owner:" + str(self.owner) + ", attack_bonus:" + str(self.attack_bonus) + ", defense_bonus:" + str(self.defense_bonus) + ", unit_counts:" + str(self.unit_counts) + ", unit_production" + str(self.unit_production) + "}"

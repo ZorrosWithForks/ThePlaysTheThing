@@ -7,6 +7,7 @@ import _thread
 import pygame, sys, random
 from pygame.locals import *
 import pickle
+import Maps
 
 #import time
 
@@ -74,43 +75,14 @@ def listener(client, address):
 for row in range (MAPHEIGHT):
    for col in range (MAPWIDTH):
       tilemap[row][col] = WATER
-     
-for row2 in range (5, 10):
-   for col2 in range (10, 15):
-      if random.randint(0,1) == True:
-         tilemap[row2][col2] = GRASS
 
-tilemap[SEED_SPACE_ROW][SEED_SPACE_COL] = GRASS
-
-#LEFT OF TILE
-if tilemap[SEED_SPACE_ROW][SEED_SPACE_COL-1] == WATER:
-   if random.randint(0,1) > 0:
-      tilemap[SEED_SPACE_ROW][SEED_SPACE_COL-1] = LEAVES
-       
-#ABOVE TILE
-if tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL] == WATER:
-   if random.randint(0,3) > 0:
-      tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL] = LAVA
-       
-#TOP LEFT OF TILE
-if tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL-1] == WATER:
-   if random.randint(0,2) > 0:
-      tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL-1] = COAL
-       
-#RIGHT OF TILE
-if tilemap[SEED_SPACE_ROW][SEED_SPACE_COL+1] == WATER:
-   if random.randint(0,4) > 0:
-      tilemap[SEED_SPACE_ROW][SEED_SPACE_COL+1] = DIRT
-       
-#BELOW TILE
-if tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL] == WATER:
-   if random.randint(0,5) > 0:
-      tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL] = DIAMOND
-       
-#BOTTOM RIGHT OF TILE
-if tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL+1] == WATER:
-   if random.randint(0,7) > 0:
-      tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL+1] = WOOD
+#assemble the map
+player_count = int(input("Just for sake of argument, enter the number of players: "))
+country_count = player_count * 5 + 3
+countries = []
+for country in range(0, country_count):
+   countries.append(Maps.Country())
+   print(countries[country])
 # create a socket object
 
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
