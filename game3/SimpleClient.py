@@ -21,6 +21,7 @@ WHITE = (255, 255, 255)
 DIRT  = 0
 GRASS = 1
 WATER = 2
+DEEP_WATER = 11
 COAL  = 3
 DIAMOND = 4
 LAVA = 5
@@ -29,12 +30,15 @@ CLOUD = 7
 PLANE = 8
 WOOD = 9
 LEAVES = 10
+OVERLAY = 12
+
 
 #a dictionary linking resources to textures
 textures =   {
                 DIRT   : pygame.image.load('dirt.png'),
                 GRASS  : pygame.image.load('grass.png'),
                 WATER  : pygame.image.load('water.png'),
+                DEEP_WATER : pygame.image.load ('deep_water.png'),
                 COAL   : pygame.image.load('coal.png'),
                 DIAMOND : pygame.image.load('diamond.png'),
                 LAVA : pygame.image.load('lava.png'),
@@ -42,7 +46,8 @@ textures =   {
                 CLOUD : pygame.image.load('cloud.png'),
                 PLANE : pygame.image.load('plane.png'),
                 WOOD : pygame.image.load('wood.png'),
-                LEAVES : pygame.image.load('leaves.png')
+                LEAVES : pygame.image.load('leaves.png'),
+                OVERLAY : pygame.image.load('overlay.png')
             }
 
 inventory =   {
@@ -56,6 +61,7 @@ inventory =   {
             }
             
 #useful game dimensions
+MARGIN = 5
 TILESIZE  = 20
 MAPWIDTH  = 30
 MAPHEIGHT = 20
@@ -163,6 +169,23 @@ while True:
         for column in range(MAPWIDTH):
             #draw the resource at that position in the tilemap, using the correct colour
             DISPLAYSURF.blit(textures[tilemap[row][column]], (column * TILESIZE, row * TILESIZE))
+
+            #loop through each row
+    for row in range(MAPHEIGHT):
+        #loop through each column in the row
+        for column in range(MAPWIDTH):
+            #draw the resource at that position in the tilemap, using the correct colour
+            if (tilemap[row][column] == WATER):
+               DISPLAYSURF.blit(textures[WATER], (column * TILESIZE - MARGIN, row * TILESIZE - MARGIN))
+            
+#loop through each row
+    for row in range(MAPHEIGHT):
+        #loop through each column in the row
+        for column in range(MAPWIDTH):
+            #draw the resource at that position in the tilemap, using the correct colour
+            if (tilemap[row][column] == WATER):
+               DISPLAYSURF.blit(textures[DEEP_WATER], (column * TILESIZE - MARGIN, row * TILESIZE - MARGIN))
+    DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
             
     #display the player at the correct position 
     DISPLAYSURF.blit(PLAYER,(playerPos[0]*TILESIZE,playerPos[1]*TILESIZE))

@@ -39,6 +39,11 @@ class Map:
       #########################
       # Populate the map next #
       #########################
+      # Assemble each continent
+      for continent in self.l_continent_names:
+         for country in self.d_continents[continent]:
+            None #Will fill in later
+            
 
 class UnitCounts:
    def __init__(self, infantry, archers, cannons, champions):
