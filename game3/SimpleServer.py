@@ -15,40 +15,6 @@ clients = set()
 clients_lock = threading.Lock()
 th = []
 
-#useful game dimensions
-TILESIZE  = 20
-MAPWIDTH  = 30
-MAPHEIGHT = 20
-BOTTOM_HALF_START = 15
-
-#constants representing colours
-BLACK = (0,   0,   0  )
-BROWN = (153, 76,  0  )
-GREEN = (0,   255, 0  )
-BLUE  = (0,   0,   255)
-WHITE = (255, 255, 255)
-
-#constants representing the different resources
-DIRT  = 0
-GRASS = 1
-WATER = 2
-COAL  = 3
-DIAMOND = 4
-LAVA = 5
-SKY = 6
-CLOUD = 7
-PLANE = 8
-WOOD = 9
-LEAVES = 10
-
-#add a font for our inventory
-SEED_SPACE_ROW = MAPHEIGHT - 13
-SEED_SPACE_COL = MAPWIDTH - 8
-TOP_HALF = MAPHEIGHT - 5
-
-#a list of resources
-resources = [DIRT,GRASS,WATER,COAL,DIAMOND,LAVA]
-#use list comprehension to create our tilemap
 tilemap = [ [DIRT for w in range(MAPWIDTH)] for h in range(MAPHEIGHT) ]
 
 def listener(client, address):
@@ -78,11 +44,7 @@ for row in range (MAPHEIGHT):
 
 #assemble the map
 player_count = int(input("Just for sake of argument, enter the number of players: "))
-country_count = player_count * 5 + 3
-countries = []
-for country in range(0, country_count):
-   countries.append(Maps.Country())
-   print(countries[country])
+
 # create a socket object
 
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
