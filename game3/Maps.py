@@ -2,15 +2,16 @@ import random
 
 class Map:
    def __init__(self, player_count):
+      self.COUNTRY_COUNT = player_count * 6 + 5
       self.WIDTH = 11
       self.HEIGHT = 8
-      self.WATER = 0 #Constant representing water in map, If a particular tile is not water, it's a country
+      self.WATER = (0, 0) #Constant representing water in map, If a particular tile is not water, it's a country
       
-      self.ll_map = [[self.WATER for x in range(self.WIDTH)] for x in range(self.HEIGHT)]
+      self.ll_map = [[self.WATER for x in range(self.WIDTH)] for y in range(self.HEIGHT)]
       
       # Generate list of countries
       l_countries = []
-      for country in range(0, player_count * 6 + 5):
+      for country in range(0, self.COUNTRY_COUNT):
          l_countries.append(Country())
          print(l_countries[country]) #Remove!
       
@@ -39,11 +40,46 @@ class Map:
       #########################
       # Populate the map next #
       #########################
-      # Assemble each continent
       for continent in self.l_continent_names:
          for country in self.d_continents[continent]:
-            None #Will fill in later
+            valid_tiles_c3 = []
+            valid_tiles_c2 = []
+            valid_tiles_c1 = []
+            valid_tiles_c0 = []
+            #Search map for water tiles that neighbor 3 or more countries of the same continent
+            for x in range(self.WIDTH):
+               for y in range(self.HEIGHT):
+                  neighbor_count = 0
+                  neighbor_count += 1 if str(self.ll_map[(y + 1) % self.HEIGHT][(x + 1) % self.WIDTH][0]) == continent else 0
+                  neighbor_count += 1 if str(self.ll_map[(y + 1) % self.HEIGHT][(x - 1) % self.WIDTH][0]) == continent else 0
+                  neighbor_count += 1 if str(self.ll_map[(y + 1) % self.HEIGHT][(x) % self.WIDTH][0]) == continent else 0
+                  neighbor_count += 1 if str(self.ll_map[(y - 1) % self.HEIGHT][(x + 1) % self.WIDTH][0]) == continent else 0
+                  neighbor_count += 1 if str(self.ll_map[(y - 1) % self.HEIGHT][(x - 1) % self.WIDTH][0]) == continent else 0
+                  neighbor_count += 1 if str(self.ll_map[(y - 1) % self.HEIGHT][(x) % self.WIDTH][0]) == continent else 0
+                  neighbor_count += 1 if str(self.ll_map[(y) % self.HEIGHT][(x + 1) % self.WIDTH][0]) == continent else 0
+                  neighbor_count += 1 if str(self.ll_map[(y) % self.HEIGHT][(x - 1) % self.WIDTH][0]) == continent else 0
+                  
+                  if self.ll_map[y][x] == self.WATER and neighbor_count >= 3:
+                     valid_tiles_c3.append((y, x))
+                  elif self.ll_map[y][x] == self.WATER and neighbor_count == 2:
+                     valid_tiles_c2.append((y, x))
+                  elif self.ll_map[y][x] == self.WATER and neighbor_count == 1:
+                     valid_tiles_c1.append((y, x))
+                  elif self.ll_map[y][x] == self.WATER and neighbor_count == 0:
+                     valid_tiles_c0.append((y, x))
             
+            if valid_tiles_c3.length() > 0:
+               temp_tile = random.choice(valid_tiles_c3)
+               self.ll_map[temp_tile[0]][temp_tile[1]] = (continent, country.name)
+            elif valid_tiles_c2.length() > 0:
+               temp_tile = random.choice(valid_tiles_c2)
+               self.ll_map[temp_tile[0]][temp_tile[1]] = (continent, country.name)
+            elif valid_tiles_c1.length() > 0:
+               temp_tile = random.choice(valid_tiles_c1)
+               self.ll_map[temp_tile[0]][temp_tile[1]] = (continent, country.name)
+            else:
+               temp_tile = random.choice(valid_tiles_c0)
+               self.ll_map[temp_tile[0]][temp_tile[1]] = (continent, country.name)
 
 class UnitCounts:
    def __init__(self, infantry, archers, cannons, champions):
