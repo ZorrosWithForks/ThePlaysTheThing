@@ -8,5 +8,6 @@ client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 data = "Request"
 client_socket.sendto(data.encode('ascii'), address)
 while True:
-    recv_data, addr = client_socket.recvfrom(4096)
-    print (recv_data)
+   recv_data, addr = client_socket.recvfrom(4096)
+   print (recv_data)
+   print (addr)
