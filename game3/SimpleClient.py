@@ -32,6 +32,7 @@ WOOD = 9
 LEAVES = 10
 OVERLAY = 12
 
+
 #a dictionary linking resources to textures
 textures =   {
                 DIRT   : pygame.image.load('dirt.png'),
@@ -162,9 +163,6 @@ while True:
                     #swap the item that was there before
                     inventory[currentTile] += 1
 
-                    
-    
-               
     #loop through each row
     for row in range(MAPHEIGHT):
         #loop through each column in the row

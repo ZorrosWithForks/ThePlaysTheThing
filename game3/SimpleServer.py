@@ -7,6 +7,8 @@ import _thread
 import pygame, sys, random
 from pygame.locals import *
 import pickle
+import Maps
+
 
 #import time
 
@@ -111,6 +113,10 @@ if tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL] == WATER:
 if tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL+1] == WATER:
    if random.randint(0,7) > 0:
       tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL+1] = WOOD
+
+#assemble the map
+player_count = int(input("Just for sake of argument, enter the number of players: "))
+
 # create a socket object
 
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
