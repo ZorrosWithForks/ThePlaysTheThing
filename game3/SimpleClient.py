@@ -61,15 +61,15 @@ inventory =   {
             }
             
 #useful game dimensions
-MARGIN = 20
-TILESIZE  = 40
-MAPWIDTH  = 15
-MAPHEIGHT = 10
+MARGIN = 50
+TILESIZE  = 100
+MAPWIDTH  = 11
+MAPHEIGHT = 8
 BOTTOM_HALF_START = 15
 
 #set up the display
 pygame.init()
-DISPLAYSURF = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE + 50))
+DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 
 #add a font for our inventory
 INVFONT = pygame.font.Font('comic.ttf', 18)
@@ -132,6 +132,10 @@ while True:
 
         #if a key is pressed
         if event.type == KEYDOWN:
+            if event.key == K_Q:
+                #and the game and close the window
+                pygame.quit()
+                sys.exit()
             #if the right arrow is pressed
             if event.key == K_RIGHT and playerPos[0] < MAPWIDTH - 1:
                 #change the player's x position
@@ -172,13 +176,13 @@ while True:
                DISPLAYSURF.blit(textures[tilemap[row][column]], (column * TILESIZE, row * TILESIZE))
 
        
-#    #loop through each row
-#    for row in range(MAPHEIGHT):
-#        #loop through each column in the row
-#        for column in range(MAPWIDTH):
-#            #draw the resource at that position in the tilemap, using the correct colour
-#            if (tilemap[row][column] == WATER):
-#               DISPLAYSURF.blit(textures[WATER], (column * TILESIZE - MARGIN, row * TILESIZE - MARGIN))
+    #loop through each row
+    for row in range(MAPHEIGHT):
+        #loop through each column in the row
+        for column in range(MAPWIDTH):
+            #draw the resource at that position in the tilemap, using the correct colour
+            if (tilemap[row][column] == WATER):
+               DISPLAYSURF.blit(textures[WATER], (column * TILESIZE - MARGIN, row * TILESIZE - MARGIN))
           
 #loop through each row
     for row in range(MAPHEIGHT):
@@ -192,18 +196,6 @@ while True:
             
     #display the player at the correct position 
     DISPLAYSURF.blit(PLAYER,(playerPos[0]*TILESIZE,playerPos[1]*TILESIZE))
-    
-    #display the inventory, starting 10 pixels in
-    placePosition = 10
-    for item in resources:
-        #add the image
-        DISPLAYSURF.blit(textures[item],(placePosition,MAPHEIGHT*TILESIZE+20))
-        placePosition += 30
-        #add the text showing the amount in the inventory
-        textObj = INVFONT.render(str(inventory[item]), True, WHITE, BLACK)
-        DISPLAYSURF.blit(textObj,(placePosition,MAPHEIGHT*TILESIZE+20)) 
-        placePosition += 50
-    
 
     #update the display
     pygame.display.update()
