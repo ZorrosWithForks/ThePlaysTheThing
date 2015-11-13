@@ -29,7 +29,7 @@ CONTINENT_6 = 6
 CONTINENT_7 = 7
 CONTINENT_8 = 8
 GRASS = 12
-WATER = 11
+WATER = (0,0)
 DEEP_WATER = 10
 OVERLAY = 9
 
@@ -38,15 +38,15 @@ textures =   {
                 GRASS  : pygame.image.load('grass.png'),
                 WATER  : pygame.image.load('water.png'),
                 DEEP_WATER : pygame.image.load ('deep_water.png'),
-                OVERLAY : pygame.image.load('overlay.png')
-                CONTINENT_1 : pygame.image.load('continent_1'),
-                CONTINENT_2 : pygame.image.load('continent_2'),
-                CONTINENT_3 : pygame.image.load('continent_3'),
-                CONTINENT_4 : pygame.image.load('continent_4'),
-                CONTINENT_5 : pygame.image.load('continent_5'),
-                CONTINENT_6 : pygame.image.load('continent_6'),
-                CONTINENT_7 : pygame.image.load('continent_7'),
-                CONTINENT_8 : pygame.image.load('continent_8')
+                OVERLAY : pygame.image.load('overlay.png'),
+                CONTINENT_1 : pygame.image.load('continent_1.png'),
+                CONTINENT_2 : pygame.image.load('continent_2.png'),
+                CONTINENT_3 : pygame.image.load('continent_3.png'),
+                CONTINENT_4 : pygame.image.load('continent_4.png'),
+                CONTINENT_5 : pygame.image.load('continent_5.png'),
+                CONTINENT_6 : pygame.image.load('continent_6.png'),
+                CONTINENT_7 : pygame.image.load('continent_7.png'),
+                CONTINENT_8 : pygame.image.load('continent_8.png')
             }
 
 
@@ -75,8 +75,6 @@ PLAYER = pygame.image.load('player2.png')
 #the position of the player [x,y]
 playerPos = [0,0]
 
-#a list of resources
-resources = [DIRT,GRASS,WATER,COAL,DIAMOND,LAVA]
 #use list comprehension to create our tilemap
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -102,16 +100,6 @@ while True:
             pygame.quit()
             sys.exit()
         pygame.mouse.set_visible(True)
-        
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            x, y = pygame.mouse.get_pos()
-            print("x is " + str(x))
-            print("y is " + str(y))
-            x = int(x / TILESIZE)
-            y = int(y / TILESIZE)
-            print("x is " + str(x))
-            print("y is " + str(y))
-            map.ll_map[y][x] =  GRASS
 
         #if a key is pressed
         if event.type == KEYDOWN:
