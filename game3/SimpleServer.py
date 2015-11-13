@@ -18,8 +18,8 @@ th = []
 
 #useful game dimensions
 TILESIZE  = 20
-MAPWIDTH  = 11
-MAPHEIGHT = 8
+MAPWIDTH  = 10
+MAPHEIGHT = 7
 BOTTOM_HALF_START = 15
 
 #constants representing colours
@@ -42,15 +42,7 @@ PLANE = 8
 WOOD = 9
 LEAVES = 10
 
-#add a font for our inventory
-SEED_SPACE_ROW = MAPHEIGHT - 13
-SEED_SPACE_COL = MAPWIDTH - 8
-TOP_HALF = MAPHEIGHT - 5
 
-#a list of resources
-resources = [DIRT,GRASS,WATER,COAL,DIAMOND,LAVA]
-#use list comprehension to create our tilemap
-tilemap = [ [DIRT for w in range(MAPWIDTH)] for h in range(MAPHEIGHT) ]
 
 def listener(client, address):
    print("Accepted connection from: ", address)

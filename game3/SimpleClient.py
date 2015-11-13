@@ -54,8 +54,8 @@ textures =   {
 #useful game dimensions
 MARGIN = 50
 TILESIZE  = 100
-MAPWIDTH  = 11
-MAPHEIGHT = 8
+MAPWIDTH  = 10
+MAPHEIGHT = 7
 BOTTOM_HALF_START = 15
 
 #set up the display
@@ -91,6 +91,7 @@ print("test2")
 pickledResponse = s.recv(8192)
 map = pickle.loads(pickledResponse)
 
+# Map continent names to tiles
 d_continent_tiles = {}
 incrementor = 0
 for continent in map.l_continent_names:
@@ -117,16 +118,16 @@ while True:
             #if the right arrow is pressed
             if event.key == K_RIGHT and playerPos[0] < MAPWIDTH - 1:
                 #change the player's x position
-                playerPos[0] += 1
+                None
             if event.key == K_LEFT and playerPos[0] > 0:
                 #change the player's x position
-                playerPos[0] -= 1
+                None
             if event.key == K_UP and playerPos[1] > 0:
                 #change the player's x position
-                playerPos[1] -= 1
+                None
             if event.key == K_DOWN and playerPos[1] < MAPHEIGHT -1:
                 #change the player's x position
-                playerPos[1] += 1
+                None
 
     #loop through each row
     for row in range(MAPHEIGHT):
@@ -134,7 +135,7 @@ while True:
         for column in range(MAPWIDTH):
             #draw the resource at that position in the tilemap, using the correct colour
             if (map.ll_map[row][column] != WATER):
-               DISPLAYSURF.blit(textures[GRASS], (column * TILESIZE, row * TILESIZE))
+               DISPLAYSURF.blit(textures[d_continent_tiles[map.ll_map[row][column][0]]], (column * TILESIZE, row * TILESIZE))
 
        
     #loop through each row
@@ -155,9 +156,6 @@ while True:
 
     DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
             
-    #display the player at the correct position 
-    DISPLAYSURF.blit(PLAYER,(playerPos[0]*TILESIZE,playerPos[1]*TILESIZE))
-
     #update the display
     pygame.display.update()
     fpsClock.tick(10)
