@@ -7,6 +7,7 @@ import _thread
 import pygame, sys, random
 from pygame.locals import *
 import pickle
+from Maps import *
 
 fpsClock = pygame.time.Clock()
 
@@ -20,7 +21,7 @@ WHITE = (255, 255, 255)
 #constants representing the different resources
 DIRT  = 0
 GRASS = 1
-WATER = 2
+WATER = (0, 0)
 DEEP_WATER = 11
 COAL  = 3
 DIAMOND = 4
@@ -93,8 +94,6 @@ playerPos = [0,0]
 #a list of resources
 resources = [DIRT,GRASS,WATER,COAL,DIAMOND,LAVA]
 #use list comprehension to create our tilemap
-tilemap = [ [DIRT for w in range(MAPWIDTH)] for h in range(MAPHEIGHT) ]
-
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # get local machine name
@@ -107,7 +106,7 @@ s.connect((host, port))
 print("test2")
 # Receive no more than 1024 bytes
 pickledResponse = s.recv(4096)
-tilemap = pickle.loads(pickledResponse)
+map = pickle.loads(pickledResponse)
 
 #main()
 while True:
@@ -128,11 +127,11 @@ while True:
             y = int(y / TILESIZE)
             print("x is " + str(x))
             print("y is " + str(y))
-            tilemap[y][x] =  GRASS
+            map.ll_map[y][x] =  GRASS
 
         #if a key is pressed
         if event.type == KEYDOWN:
-            if event.key == K_Q:
+            if event.key == K_ESCAPE:
                 #and the game and close the window
                 pygame.quit()
                 sys.exit()
@@ -151,19 +150,19 @@ while True:
                 playerPos[1] += 1
             if event.key == K_SPACE:
                 #what resource is the player standing on?
-                currentTile = tilemap[playerPos[1]][playerPos[0]]
+                currentTile = map.ll_map[playerPos[1]][playerPos[0]]
                 #player now has 1 more of this resource
                 inventory[currentTile] += 1
 
             #placing dirt
             if (event.key == K_1):
                 #get the tile to swap with the dirt
-                currentTile = tilemap[playerPos[1]][playerPos[0]]
+                currentTile = map.ll_map[playerPos[1]][playerPos[0]]
                 #if we have dirt in our inventory
                 if inventory[DIRT] > 0:
                     #remove one dirt and place it
                     inventory[DIRT] -= 1
-                    tilemap[playerPos[1]][playerPos[0]] = DIRT
+                    map.ll_map[playerPos[1]][playerPos[0]] = DIRT
                     #swap the item that was there before
                     inventory[currentTile] += 1
 
@@ -172,8 +171,8 @@ while True:
         #loop through each column in the row
         for column in range(MAPWIDTH):
             #draw the resource at that position in the tilemap, using the correct colour
-            if (tilemap[row][column] != WATER):
-               DISPLAYSURF.blit(textures[tilemap[row][column]], (column * TILESIZE, row * TILESIZE))
+            if (map.ll_map[row][column] != WATER):
+               DISPLAYSURF.blit(textures[GRASS], (column * TILESIZE, row * TILESIZE))
 
        
     #loop through each row
@@ -181,7 +180,7 @@ while True:
         #loop through each column in the row
         for column in range(MAPWIDTH):
             #draw the resource at that position in the tilemap, using the correct colour
-            if (tilemap[row][column] == WATER):
+            if (map.ll_map[row][column] == WATER):
                DISPLAYSURF.blit(textures[WATER], (column * TILESIZE - MARGIN, row * TILESIZE - MARGIN))
           
 #loop through each row
@@ -189,7 +188,7 @@ while True:
         #loop through each column in the row
         for column in range(MAPWIDTH):
             #draw the resource at that position in the tilemap, using the correct colour
-            if (tilemap[row][column] == WATER):
+            if (map.ll_map[row][column] == WATER):
                DISPLAYSURF.blit(textures[DEEP_WATER], (column * TILESIZE - MARGIN, row * TILESIZE - MARGIN))
 
     DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)

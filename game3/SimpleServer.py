@@ -7,7 +7,7 @@ import _thread
 import pygame, sys, random
 from pygame.locals import *
 import pickle
-import Maps
+from Maps import *
 
 
 #import time
@@ -18,8 +18,8 @@ th = []
 
 #useful game dimensions
 TILESIZE  = 20
-MAPWIDTH  = 30
-MAPHEIGHT = 20
+MAPWIDTH  = 11
+MAPHEIGHT = 8
 BOTTOM_HALF_START = 15
 
 #constants representing colours
@@ -71,14 +71,14 @@ def listener(client, address):
       with clients_lock:
          clients.remove(client)
          client.close()
-
+'''
 #fill all with water
 for row in range (MAPHEIGHT):
    for col in range (MAPWIDTH):
       tilemap[row][col] = WATER
      
-for row2 in range (5, 10):
-   for col2 in range (10, 15):
+for row2 in range (2, 5):
+   for col2 in range (2, 5):
       if random.randint(0,1) == True:
          tilemap[row2][col2] = GRASS
 
@@ -113,9 +113,10 @@ if tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL] == WATER:
 if tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL+1] == WATER:
    if random.randint(0,7) > 0:
       tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL+1] = WOOD
-
+'''
 #assemble the map
 player_count = int(input("Just for sake of argument, enter the number of players: "))
+map = Map(player_count)
 
 # create a socket object
 
@@ -137,7 +138,7 @@ serversocket.listen(5)
 while True:
    print("Server is listening for connections...")
    client, address = serversocket.accept()
-   packet = pickle.dumps(tilemap)
+   packet = pickle.dumps(map)
    client.sendto(packet, addr)
    th.append(Thread(target=listener, args = (client,address)).start()) #spin another thread for the new client
    
