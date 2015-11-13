@@ -56,6 +56,7 @@ def listener(client, address):
    print("Accepted connection from: ", address)
    with clients_lock:
       clients.add(client)#Array of clients
+   
    try:
       while True:
          data = client.recv(1024).decode() #block waiting for data from a client

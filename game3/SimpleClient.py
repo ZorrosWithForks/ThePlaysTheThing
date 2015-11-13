@@ -105,7 +105,7 @@ port = 9999
 s.connect((host, port))                               
 print("test2")
 # Receive no more than 1024 bytes
-pickledResponse = s.recv(4096)
+pickledResponse = s.recv(8192)
 map = pickle.loads(pickledResponse)
 
 #main()
