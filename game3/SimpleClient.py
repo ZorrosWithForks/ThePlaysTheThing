@@ -61,10 +61,10 @@ inventory =   {
             }
             
 #useful game dimensions
-MARGIN = 5
-TILESIZE  = 20
-MAPWIDTH  = 30
-MAPHEIGHT = 20
+MARGIN = 20
+TILESIZE  = 40
+MAPWIDTH  = 15
+MAPHEIGHT = 10
 BOTTOM_HALF_START = 15
 
 #set up the display
@@ -189,25 +189,6 @@ while True:
             
     #display the player at the correct position 
     DISPLAYSURF.blit(PLAYER,(playerPos[0]*TILESIZE,playerPos[1]*TILESIZE))
-    
-    #display the cloud
-    DISPLAYSURF.blit(textures[CLOUD].convert_alpha(),(cloud_x, cloud_y))
-    #move the cloud to the left
-    cloud_x+=1
-    #if the cloud has moved passed the map
-    if cloud_x + 50 > MAPWIDTH*TILESIZE:
-        #pick a new position
-        cloud_y = random.randint(0, MAPHEIGHT*TILESIZE)
-        cloud_x = -200
-        
-    #display the plane
-    DISPLAYSURF.blit(textures[PLANE].convert_alpha(),(plane_x, plane_y))
-    #move the plane to the right
-    plane_x-=1
-    #if cloud has moved passed map on left
-    if plane_x < 0:
-        plane_y = random.randint(0, MAPHEIGHT*TILESIZE)
-        plane_x = MAPWIDTH*TILESIZE
     
     #display the inventory, starting 10 pixels in
     placePosition = 10
