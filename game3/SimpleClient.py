@@ -168,16 +168,18 @@ while True:
         #loop through each column in the row
         for column in range(MAPWIDTH):
             #draw the resource at that position in the tilemap, using the correct colour
-            DISPLAYSURF.blit(textures[tilemap[row][column]], (column * TILESIZE, row * TILESIZE))
+            if (tilemap[row][column] != WATER):
+               DISPLAYSURF.blit(textures[tilemap[row][column]], (column * TILESIZE, row * TILESIZE))
 
-            #loop through each row
-    for row in range(MAPHEIGHT):
-        #loop through each column in the row
-        for column in range(MAPWIDTH):
-            #draw the resource at that position in the tilemap, using the correct colour
-            if (tilemap[row][column] == WATER):
-               DISPLAYSURF.blit(textures[WATER], (column * TILESIZE - MARGIN, row * TILESIZE - MARGIN))
-            
+       
+#    #loop through each row
+#    for row in range(MAPHEIGHT):
+#        #loop through each column in the row
+#        for column in range(MAPWIDTH):
+#            #draw the resource at that position in the tilemap, using the correct colour
+#            if (tilemap[row][column] == WATER):
+#               DISPLAYSURF.blit(textures[WATER], (column * TILESIZE - MARGIN, row * TILESIZE - MARGIN))
+          
 #loop through each row
     for row in range(MAPHEIGHT):
         #loop through each column in the row
@@ -185,6 +187,7 @@ while True:
             #draw the resource at that position in the tilemap, using the correct colour
             if (tilemap[row][column] == WATER):
                DISPLAYSURF.blit(textures[DEEP_WATER], (column * TILESIZE - MARGIN, row * TILESIZE - MARGIN))
+
     DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
             
     #display the player at the correct position 
