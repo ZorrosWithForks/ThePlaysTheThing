@@ -19,48 +19,37 @@ BLUE  = (0,   0,   255)
 WHITE = (255, 255, 255)
 
 #constants representing the different resources
-DIRT  = 0
-GRASS = 1
-WATER = (0, 0)
-DEEP_WATER = 11
-COAL  = 3
-DIAMOND = 4
-LAVA = 5
-SKY = 6
-CLOUD = 7
-PLANE = 8
-WOOD = 9
-LEAVES = 10
-OVERLAY = 12
 
+CONTINENT_1 = 1
+CONTINENT_2 = 2
+CONTINENT_3 = 3
+CONTINENT_4 = 4
+CONTINENT_5 = 5
+CONTINENT_6 = 6
+CONTINENT_7 = 7
+CONTINENT_8 = 8
+GRASS = 12
+WATER = (0,0)
+DEEP_WATER = 10
+OVERLAY = 9
 
 #a dictionary linking resources to textures
 textures =   {
-                DIRT   : pygame.image.load('dirt.png'),
                 GRASS  : pygame.image.load('grass.png'),
                 WATER  : pygame.image.load('water.png'),
                 DEEP_WATER : pygame.image.load ('deep_water.png'),
-                COAL   : pygame.image.load('coal.png'),
-                DIAMOND : pygame.image.load('diamond.png'),
-                LAVA : pygame.image.load('lava.png'),
-                SKY : pygame.image.load('sky.png'),
-                CLOUD : pygame.image.load('cloud.png'),
-                PLANE : pygame.image.load('plane.png'),
-                WOOD : pygame.image.load('wood.png'),
-                LEAVES : pygame.image.load('leaves.png'),
-                OVERLAY : pygame.image.load('overlay.png')
+                OVERLAY : pygame.image.load('overlay.png'),
+                CONTINENT_1 : pygame.image.load('continent_1.png'),
+                CONTINENT_2 : pygame.image.load('continent_2.png'),
+                CONTINENT_3 : pygame.image.load('continent_3.png'),
+                CONTINENT_4 : pygame.image.load('continent_4.png'),
+                CONTINENT_5 : pygame.image.load('continent_5.png'),
+                CONTINENT_6 : pygame.image.load('continent_6.png'),
+                CONTINENT_7 : pygame.image.load('continent_7.png'),
+                CONTINENT_8 : pygame.image.load('continent_8.png')
             }
 
-inventory =   {
-                DIRT    : 0,
-                GRASS   : 0,
-                WATER   : 0,
-                COAL    : 0,
-                DIAMOND : 0,
-                LAVA    : 0,
-                SKY     : 0
-            }
-            
+
 #useful game dimensions
 MARGIN = 50
 TILESIZE  = 100
@@ -72,11 +61,6 @@ BOTTOM_HALF_START = 15
 pygame.init()
 DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 
-#add a font for our inventory
-INVFONT = pygame.font.Font('comic.ttf', 18)
-SEED_SPACE_ROW = MAPHEIGHT - 13
-SEED_SPACE_COL = MAPWIDTH - 8
-TOP_HALF = MAPHEIGHT - 5
 
 #cloud position
 cloud_x = -200
@@ -91,8 +75,6 @@ PLAYER = pygame.image.load('player2.png')
 #the position of the player [x,y]
 playerPos = [0,0]
 
-#a list of resources
-resources = [DIRT,GRASS,WATER,COAL,DIAMOND,LAVA]
 #use list comprehension to create our tilemap
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -118,16 +100,6 @@ while True:
             pygame.quit()
             sys.exit()
         pygame.mouse.set_visible(True)
-        
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            x, y = pygame.mouse.get_pos()
-            print("x is " + str(x))
-            print("y is " + str(y))
-            x = int(x / TILESIZE)
-            y = int(y / TILESIZE)
-            print("x is " + str(x))
-            print("y is " + str(y))
-            map.ll_map[y][x] =  GRASS
 
         #if a key is pressed
         if event.type == KEYDOWN:
@@ -148,23 +120,6 @@ while True:
             if event.key == K_DOWN and playerPos[1] < MAPHEIGHT -1:
                 #change the player's x position
                 playerPos[1] += 1
-            if event.key == K_SPACE:
-                #what resource is the player standing on?
-                currentTile = map.ll_map[playerPos[1]][playerPos[0]]
-                #player now has 1 more of this resource
-                inventory[currentTile] += 1
-
-            #placing dirt
-            if (event.key == K_1):
-                #get the tile to swap with the dirt
-                currentTile = map.ll_map[playerPos[1]][playerPos[0]]
-                #if we have dirt in our inventory
-                if inventory[DIRT] > 0:
-                    #remove one dirt and place it
-                    inventory[DIRT] -= 1
-                    map.ll_map[playerPos[1]][playerPos[0]] = DIRT
-                    #swap the item that was there before
-                    inventory[currentTile] += 1
 
     #loop through each row
     for row in range(MAPHEIGHT):
