@@ -50,6 +50,7 @@ textures =   {
             }
 
 
+
 #useful game dimensions
 MARGIN = 50
 TILESIZE  = 100
@@ -89,6 +90,12 @@ print("test2")
 # Receive no more than 1024 bytes
 pickledResponse = s.recv(8192)
 map = pickle.loads(pickledResponse)
+
+d_continent_tiles = {}
+incrementor = 0
+for continent in map.l_continent_names:
+   incrementor += 1
+   d_continent_tiles[continent] = incrementor
 
 #main()
 while True:
