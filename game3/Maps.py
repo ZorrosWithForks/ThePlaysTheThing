@@ -3,8 +3,8 @@ import random
 class Map:
    def __init__(self, player_count):
       self.COUNTRY_COUNT = player_count * 6 + 5
-      self.WIDTH = 11
-      self.HEIGHT = 8
+      self.WIDTH = 10
+      self.HEIGHT = 7
       self.WATER = (0, 0) #Constant representing water in map, If a particular tile is not water, it's a country
       
       self.ll_map = [[self.WATER for x in range(self.WIDTH)] for y in range(self.HEIGHT)]
