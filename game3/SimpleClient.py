@@ -95,6 +95,13 @@ for continent in map.l_continent_names:
    incrementor += 1
    d_continent_tiles[continent] = incrementor
 
+def moveMap(x_offset, y_offset):
+   ll_temp_map = [[map.WATER for x in range(map.WIDTH)] for y in range(map.HEIGHT)]
+   for row in range(map.HEIGHT):
+      for column in range(map.WIDTH):
+         ll_temp_map[row][column] = map.ll_map[(row + y_offset) % map.HEIGHT][(column + x_offset) % map.WIDTH]
+   map.ll_map = ll_temp_map
+   
 #main()
 while True:
     #get all the user events
@@ -109,22 +116,26 @@ while True:
         #if a key is pressed
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
-                #and the game and close the window
-                pygame.quit()
-                sys.exit()
+               #and the game and close the window
+               pygame.quit()
+               sys.exit()
             #if the right arrow is pressed
             if event.key == K_RIGHT:
-                #Change the map render offset
-                map_X_offset = (map_X_offset + 1) % map.WIDTH
+               #Change the map render offset
+               map_X_offset = (map_X_offset + 1) % map.WIDTH
+               moveMap(-1, 0)
             if event.key == K_LEFT:
-                #Change the map render offset
-                map_X_offset = (map_X_offset - 1) % map.WIDTH
+               #Change the map render offset
+               map_X_offset = (map_X_offset - 1) % map.WIDTH
+               moveMap(1, 0)
             if event.key == K_UP:
-                #Change the map render offset
-                map_Y_offset = (map_Y_offset - 1) % map.HEIGHT
+               #Change the map render offset
+               map_Y_offset = (map_Y_offset - 1) % map.HEIGHT
+               moveMap(0, 1)
             if event.key == K_DOWN:
-                #Change the map render offset
-                map_Y_offset = (map_Y_offset + 1) % map.HEIGHT
+               #Change the map render offset
+               map_Y_offset = (map_Y_offset + 1) % map.HEIGHT
+               moveMap(0, -1)
 
     #loop through each row
     for row in range(map.HEIGHT):
@@ -132,7 +143,7 @@ while True:
         for column in range(map.WIDTH):
             #draw the resource at that position in the tilemap, using the correct colour
             if (map.ll_map[row][column] != WATER):
-               DISPLAYSURF.blit(textures[d_continent_tiles[map.ll_map[row][column][0]]], (((column + map_X_offset) % map.WIDTH) * TILESIZE, ((row + map_Y_offset) % map.HEIGHT) * TILESIZE))
+               DISPLAYSURF.blit(textures[d_continent_tiles[map.ll_map[row][column][0]]], (((column) % map.WIDTH) * TILESIZE, ((row) % map.HEIGHT) * TILESIZE))
   
     #loop through each row
     for row in range(map.HEIGHT):
@@ -140,7 +151,7 @@ while True:
         for column in range(map.WIDTH):
             #draw the resource at that position in the tilemap, using the correct colour
             if (map.ll_map[row][column] == WATER):
-               DISPLAYSURF.blit(textures[WATER], (((column + map_X_offset) % map.WIDTH) * TILESIZE - MARGIN, ((row + map_Y_offset) % map.HEIGHT) * TILESIZE - MARGIN))
+               DISPLAYSURF.blit(textures[WATER], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
           
     #loop through each row
     for row in range(map.HEIGHT):
@@ -148,7 +159,7 @@ while True:
         for column in range(map.WIDTH):
             #draw the resource at that position in the tilemap, using the correct colour
             if (map.ll_map[row][column] == WATER):
-               DISPLAYSURF.blit(textures[DEEP_WATER], (((column + map_X_offset) % map.WIDTH) * TILESIZE - MARGIN, ((row + map_Y_offset) % map.HEIGHT) * TILESIZE - MARGIN))
+               DISPLAYSURF.blit(textures[DEEP_WATER], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
 
     DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
     DISPLAYSURF.blit(source=pygame.image.load("InfoMarque.png"), dest=(map.WIDTH * TILESIZE, 0))
@@ -164,6 +175,5 @@ while True:
     #update the display
     pygame.display.update()
     fpsClock.tick(10)
-
 
 s.close()
