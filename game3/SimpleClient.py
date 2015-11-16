@@ -6,8 +6,11 @@ from threading import Thread
 import _thread
 import pygame, sys, random
 from pygame.locals import *
+from pygame import font
 import pickle
 from Maps import *
+
+pygame.font.init()
 
 fpsClock = pygame.time.Clock()
 
@@ -19,7 +22,8 @@ BLUE  = (0,   0,   255)
 WHITE = (255, 255, 255)
 
 #constants representing the different resources
-
+CONTINENT_FONT = pygame.font.SysFont("couriernew", 40, bold=True)
+COUNTRY_FONT = pygame.font.SysFont("couriernew", 25, bold=True)
 CONTINENT_1 = 1
 CONTINENT_2 = 2
 CONTINENT_3 = 3
@@ -32,6 +36,10 @@ GRASS = 12
 WATER = (0,0)
 DEEP_WATER = 10
 OVERLAY = 9
+
+# Map offset variables
+map_X_offset = 0
+map_Y_offset = 0
 
 #a dictionary linking resources to textures
 textures =   {
@@ -54,22 +62,11 @@ textures =   {
 #useful game dimensions
 MARGIN = 50
 TILESIZE  = 100
-MAPWIDTH  = 10
-MAPHEIGHT = 7
 BOTTOM_HALF_START = 15
 
 #set up the display
 pygame.init()
 DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
-
-
-#cloud position
-cloud_x = -200
-cloud_y = 0
-
-#plane position
-plane_x = MAPWIDTH*TILESIZE
-plane_y = 50
 
 #the player image
 PLAYER = pygame.image.load('player2.png')
@@ -116,46 +113,54 @@ while True:
                 pygame.quit()
                 sys.exit()
             #if the right arrow is pressed
-            if event.key == K_RIGHT and playerPos[0] < MAPWIDTH - 1:
-                #change the player's x position
-                None
-            if event.key == K_LEFT and playerPos[0] > 0:
-                #change the player's x position
-                None
-            if event.key == K_UP and playerPos[1] > 0:
-                #change the player's x position
-                None
-            if event.key == K_DOWN and playerPos[1] < MAPHEIGHT -1:
-                #change the player's x position
-                None
+            if event.key == K_RIGHT:
+                #Change the map render offset
+                map_X_offset = (map_X_offset + 1) % map.WIDTH
+            if event.key == K_LEFT:
+                #Change the map render offset
+                map_X_offset = (map_X_offset - 1) % map.WIDTH
+            if event.key == K_UP:
+                #Change the map render offset
+                map_Y_offset = (map_Y_offset - 1) % map.HEIGHT
+            if event.key == K_DOWN:
+                #Change the map render offset
+                map_Y_offset = (map_Y_offset + 1) % map.HEIGHT
 
     #loop through each row
-    for row in range(MAPHEIGHT):
+    for row in range(map.HEIGHT):
         #loop through each column in the row
-        for column in range(MAPWIDTH):
+        for column in range(map.WIDTH):
             #draw the resource at that position in the tilemap, using the correct colour
             if (map.ll_map[row][column] != WATER):
-               DISPLAYSURF.blit(textures[d_continent_tiles[map.ll_map[row][column][0]]], (column * TILESIZE, row * TILESIZE))
-
-       
+               DISPLAYSURF.blit(textures[d_continent_tiles[map.ll_map[row][column][0]]], (((column + map_X_offset) % map.WIDTH) * TILESIZE, ((row + map_Y_offset) % map.HEIGHT) * TILESIZE))
+  
     #loop through each row
-    for row in range(MAPHEIGHT):
+    for row in range(map.HEIGHT):
         #loop through each column in the row
-        for column in range(MAPWIDTH):
+        for column in range(map.WIDTH):
             #draw the resource at that position in the tilemap, using the correct colour
             if (map.ll_map[row][column] == WATER):
-               DISPLAYSURF.blit(textures[WATER], (column * TILESIZE - MARGIN, row * TILESIZE - MARGIN))
+               DISPLAYSURF.blit(textures[WATER], (((column + map_X_offset) % map.WIDTH) * TILESIZE - MARGIN, ((row + map_Y_offset) % map.HEIGHT) * TILESIZE - MARGIN))
           
-#loop through each row
-    for row in range(MAPHEIGHT):
+    #loop through each row
+    for row in range(map.HEIGHT):
         #loop through each column in the row
-        for column in range(MAPWIDTH):
+        for column in range(map.WIDTH):
             #draw the resource at that position in the tilemap, using the correct colour
             if (map.ll_map[row][column] == WATER):
-               DISPLAYSURF.blit(textures[DEEP_WATER], (column * TILESIZE - MARGIN, row * TILESIZE - MARGIN))
+               DISPLAYSURF.blit(textures[DEEP_WATER], (((column + map_X_offset) % map.WIDTH) * TILESIZE - MARGIN, ((row + map_Y_offset) % map.HEIGHT) * TILESIZE - MARGIN))
 
     DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
-            
+    DISPLAYSURF.blit(source=pygame.image.load("InfoMarque.png"), dest=(map.WIDTH * TILESIZE, 0))
+    
+    #Highlight country mouse is over and display country info
+    curr_x, curr_y = pygame.mouse.get_pos()
+    if (curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE and map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)] != map.WATER):
+      DISPLAYSURF.blit(pygame.image.load('MouseOver.png'), (int(curr_x / TILESIZE) * TILESIZE - MARGIN, int(curr_y / TILESIZE) * TILESIZE - MARGIN), special_flags=BLEND_ADD)
+      current_tile = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)]
+      DISPLAYSURF.blit(CONTINENT_FONT.render("Continent: " + current_tile[0], True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 120))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Country: " + map.d_continents[current_tile[0]][current_tile[1]].name, True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 170))
+      
     #update the display
     pygame.display.update()
     fpsClock.tick(10)
