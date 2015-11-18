@@ -22,8 +22,8 @@ BLUE  = (0,   0,   255)
 WHITE = (255, 255, 255)
 
 #constants representing the different resources
-CONTINENT_FONT = pygame.font.SysFont("couriernew", 40, bold=True)
-COUNTRY_FONT = pygame.font.SysFont("couriernew", 25, bold=True)
+CONTINENT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 40)
+COUNTRY_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 25)
 CONTINENT_1 = 1
 CONTINENT_2 = 2
 CONTINENT_3 = 3
@@ -32,7 +32,6 @@ CONTINENT_5 = 5
 CONTINENT_6 = 6
 CONTINENT_7 = 7
 CONTINENT_8 = 8
-GRASS = 12
 WATER = (0,0)
 DEEP_WATER = 10
 OVERLAY = 9
@@ -43,7 +42,6 @@ map_Y_offset = 0
 
 #a dictionary linking resources to textures
 textures =   {
-                GRASS  : pygame.image.load('grass.png'),
                 WATER  : pygame.image.load('water.png'),
                 DEEP_WATER : pygame.image.load ('deep_water.png'),
                 OVERLAY : pygame.image.load('overlay.png'),
@@ -67,11 +65,6 @@ BOTTOM_HALF_START = 15
 #set up the display
 pygame.init()
 DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
-
-#the player image
-PLAYER = pygame.image.load('player2.png')
-#the position of the player [x,y]
-playerPos = [0,0]
 
 #use list comprehension to create our tilemap
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -165,6 +158,7 @@ while True:
 
     DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
     DISPLAYSURF.blit(source=pygame.image.load("InfoMarque.png"), dest=(map.WIDTH * TILESIZE, 0))
+    DISPLAYSURF.blit(source=pygame.image.load("BaseBoard.png"), dest=(0, map.HEIGHT * TILESIZE))
     
     #Highlight country mouse is over and display country info
     curr_x, curr_y = pygame.mouse.get_pos()
@@ -173,6 +167,20 @@ while True:
       current_tile = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)]
       DISPLAYSURF.blit(CONTINENT_FONT.render("Continent: " + current_tile[0], True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 120))
       DISPLAYSURF.blit(COUNTRY_FONT.render("Country: " + map.d_continents[current_tile[0]][current_tile[1]].name, True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 170))
+      
+      # Unit counts by type
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Infantry: "  + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.infantry), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 225))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Archers: "   + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.archers), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 250))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Cannons: "   + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.cannons), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 275))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Champions: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.champions), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 300))
+      
+      # Country bonuses
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Attack Bonus: " + str(map.d_continents[current_tile[0]][current_tile[1]].attack_bonus), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 350))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Defense Bonus: " + str(map.d_continents[current_tile[0]][current_tile[1]].defense_bonus), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 375))
+      
+      # Owner
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Owner: " + str(map.d_continents[current_tile[0]][current_tile[1]].owner if map.d_continents[current_tile[0]][current_tile[1]].owner != None else "Neutral"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 425))
+      
       
     #update the display
     pygame.display.update()
