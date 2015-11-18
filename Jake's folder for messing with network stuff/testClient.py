@@ -1,6 +1,6 @@
 #UDP client broadcasts to server(s)
 import socket
-
+import pygame
 '''
 address = ('<broadcast>', 54545)
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -22,8 +22,16 @@ import socket
 import threading
 from threading import Thread
 import _thread
+from pygame import font
+pygame.init()
+pygame.font.init()
+
+
+SURFACE = pygame.display.set_mode((640, 400))
+FONT = pygame.font.SysFont("couriernew", 40, bold=True)
 
 class Application(tk.Frame):
+
    def __init__(self, master=None):
       tk.Frame.__init__(self, master)
       self.pack()
@@ -33,6 +41,9 @@ class Application(tk.Frame):
       t.start()
 
    def createWidgets(self):
+      SURFACE.blit(pygame.image.load('games_background.png'),(0,0))
+      SURFACE.blit(pygame.image.load('games_background2.png'),(0,0))
+      
       self.text_box = tkst.ScrolledText(self, height = 20, width = 50)
       self.text_box.pack(side="top")
     
@@ -42,16 +53,25 @@ class Application(tk.Frame):
       self.hi_there.pack(side="right")
 
    def find_servers(self):
-     
       self.text_box.delete('1.0', tk.END)
       client_socket.sendto(data.encode('ascii'), address)
 
+
    def listener(self):
       print("Back in again")
+      new_game_pos_x = 50
+      new_game_pos_y = 50
+      game_number    = 1
       try:
          while True:
             recv_data, addr = client_socket.recvfrom(4096)
             self.text_box.insert(tk.END, addr[0] + "\n")
+            if (addr != None):
+               SURFACE.blit(pygame.image.load('game.png'), (new_game_pos_x,new_game_pos_y))
+               SURFACE.blit(FONT.render("GAME: " + str(game_number), True, (0,0,0)), (new_game_pos_x, new_game_pos_y))
+               new_game_pos_y += 50
+               game_number += 1
+               pygame.display.update()
             self.text_box.mark_set(tk.INSERT, '1.0')
             self.text_box.focus()
       finally:
@@ -77,4 +97,6 @@ root = tk.Tk()
 app = Application(master=root)
 app.mainloop()
 
+
+pygame.display.update()
 s.close()
