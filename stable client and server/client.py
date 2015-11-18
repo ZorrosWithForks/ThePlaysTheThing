@@ -53,7 +53,7 @@ class Application(tk.Frame):
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # get local machine name
-host = socket.gethostname()
+host = "172.16.222.201"
 print("test1")
 port = 9999
 
