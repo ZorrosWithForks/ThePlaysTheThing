@@ -64,49 +64,7 @@ def listener(client, address):
       with clients_lock:
          clients.remove(client)
          client.close()
-'''
-#fill all with water
-for row in range (MAPHEIGHT):
-   for col in range (MAPWIDTH):
-      tilemap[row][col] = WATER
-     
-for row2 in range (2, 5):
-   for col2 in range (2, 5):
-      if random.randint(0,1) == True:
-         tilemap[row2][col2] = GRASS
 
-tilemap[SEED_SPACE_ROW][SEED_SPACE_COL] = GRASS
-
-#LEFT OF TILE
-if tilemap[SEED_SPACE_ROW][SEED_SPACE_COL-1] == WATER:
-   if random.randint(0,1) > 0:
-      tilemap[SEED_SPACE_ROW][SEED_SPACE_COL-1] = LEAVES
-       
-#ABOVE TILE
-if tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL] == WATER:
-   if random.randint(0,3) > 0:
-      tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL] = LAVA
-       
-#TOP LEFT OF TILE
-if tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL-1] == WATER:
-   if random.randint(0,2) > 0:
-      tilemap[SEED_SPACE_ROW-1][SEED_SPACE_COL-1] = COAL
-       
-#RIGHT OF TILE
-if tilemap[SEED_SPACE_ROW][SEED_SPACE_COL+1] == WATER:
-   if random.randint(0,4) > 0:
-      tilemap[SEED_SPACE_ROW][SEED_SPACE_COL+1] = DIRT
-       
-#BELOW TILE
-if tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL] == WATER:
-   if random.randint(0,5) > 0:
-      tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL] = DIAMOND
-       
-#BOTTOM RIGHT OF TILE
-if tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL+1] == WATER:
-   if random.randint(0,7) > 0:
-      tilemap[SEED_SPACE_ROW+1][SEED_SPACE_COL+1] = WOOD
-'''
 #assemble the map
 player_count = int(input("Just for sake of argument, enter the number of players: "))
 map = Map(player_count)
