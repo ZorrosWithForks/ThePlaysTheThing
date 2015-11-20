@@ -18,6 +18,7 @@ while True:
 import tkinter as tk
 import tkinter.scrolledtext as tkst
 import tkinter.messagebox as tkmb
+from tkinter import *
 import socket
 import threading
 from threading import Thread
@@ -27,8 +28,8 @@ pygame.init()
 pygame.font.init()
 
 
-SURFACE = pygame.display.set_mode((640, 400))
-FONT = pygame.font.SysFont("couriernew", 40, bold=True)
+#SURFACE = pygame.display.set_mode((640, 400))
+#FONT = pygame.font.SysFont("couriernew", 40, bold=True)
 
 class Application(tk.Frame):
 
@@ -41,8 +42,8 @@ class Application(tk.Frame):
       t.start()
 
    def createWidgets(self):
-      SURFACE.blit(pygame.image.load('games_background.png'),(0,0))
-      SURFACE.blit(pygame.image.load('games_background2.png'),(0,0))
+      #SURFACE.blit(pygame.image.load('games_background.png'),(0,0))
+      #SURFACE.blit(pygame.image.load('games_background2.png'),(0,0))
       
       self.text_box = tkst.ScrolledText(self, height = 20, width = 50)
       self.text_box.pack(side="top")
@@ -67,13 +68,20 @@ class Application(tk.Frame):
             recv_data, addr = client_socket.recvfrom(4096)
             self.text_box.insert(tk.END, addr[0] + "\n")
             if (addr != None):
-               SURFACE.blit(pygame.image.load('game.png'), (new_game_pos_x,new_game_pos_y))
-               SURFACE.blit(FONT.render("GAME: " + str(game_number), True, (0,0,0)), (new_game_pos_x, new_game_pos_y))
+               CANVAS.create_image(new_game_pos_x, new_game_pos_y, anchor=NW, image=game_banner)
+               CANVAS.create_text(new_game_pos_x + 5, new_game_pos_y + 5, anchor=NW, text="Game " + str(game_number))
+               #SURFACE.blit(pygame.image.load('game.png'), (new_game_pos_x,new_game_pos_y))
+               #SURFACE.blit(FONT.render("GAME: " + str(game_number), True, (0,0,0)), (new_game_pos_x, new_game_pos_y))
                new_game_pos_y += 50
                game_number += 1
-               pygame.display.update()
+               #pygame.display.update()
             self.text_box.mark_set(tk.INSERT, '1.0')
             self.text_box.focus()
+            password_label = Label(root, text="Password")
+            password_label.pack()
+            password_entry = Entry(root, 500, 100)
+            password_entry.pack()
+            
       finally:
          print("It broke")
 
@@ -94,9 +102,18 @@ port = 54545
 #print("The time got from the server is %s" % tm.decode('ascii'))
 
 root = tk.Tk()
+CANVAS = Canvas(root, width = 640, height = 400)
+CANVAS.pack()
+background = PhotoImage(file="games_background.png")
+background2 = PhotoImage(file="games_background2.png")
+game_banner = PhotoImage(file="game.png")
+CANVAS.create_image(0,0, anchor=NW, image=background)
+CANVAS.create_image(0,0, anchor=NW, image=background2)
+password_entry_box = tkst.ScrolledText(master = root, height = 2, width = 5)
+password_entry_box.pack(anchor = NW)
 app = Application(master=root)
 app.mainloop()
 
 
-pygame.display.update()
+#pygame.display.update()
 s.close()
