@@ -36,6 +36,8 @@ class Map:
       for continent in self.l_continent_names:
          self.d_bonuses[continent] = len(self.d_continents[continent]) + random.randint(0, 2)
          
+      start = True
+      temp_valid_tiles = []
       # Populate the map next
       for continent in self.l_continent_names:
          for country in range(len(self.d_continents[continent])):
@@ -74,10 +76,14 @@ class Map:
             elif len(valid_tiles_c1) > 0:
                temp_tile = random.choice(valid_tiles_c1)
                self.ll_map[temp_tile[0]][temp_tile[1]] = (continent, country)
-            else:
+            elif start:
                temp_tile = random.choice(valid_tiles_c0)
                self.ll_map[temp_tile[0]][temp_tile[1]] = (continent, country)
-
+               start = False
+            else:
+               temp_tile = random.choice(temp_valid_tiles)
+               self.ll_map[temp_tile[0]][temp_tile[1]] = (continent, country)
+            temp_valid_tiles = valid_tiles_c1
 
 class UnitCounts:
    def __init__(self, infantry, archers, cannons, champions):

@@ -108,6 +108,8 @@ while True:
 
         #if a key is pressed
         if event.type == KEYDOWN:
+            if event.key == K_i:
+               pygame.display.iconify()
             if event.key == K_ESCAPE:
                #and the game and close the window
                pygame.quit()
