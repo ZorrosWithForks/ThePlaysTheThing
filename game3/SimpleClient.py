@@ -32,6 +32,7 @@ CONTINENT_5 = 5
 CONTINENT_6 = 6
 CONTINENT_7 = 7
 CONTINENT_8 = 8
+
 WATER = (0,0)
 DEEP_WATER = 10
 OVERLAY = 9
@@ -52,9 +53,18 @@ textures =   {
                 CONTINENT_5 : pygame.image.load('continent_5.png'),
                 CONTINENT_6 : pygame.image.load('continent_6.png'),
                 CONTINENT_7 : pygame.image.load('continent_7.png'),
-                CONTINENT_8 : pygame.image.load('continent_8.png')
+                CONTINENT_8 : pygame.image.load('continent_8.png'),
             }
 
+playerLogos = [
+                pygame.image.load('Player1.png'),
+                pygame.image.load('Player2.png'),
+                pygame.image.load('Player3.png'),
+                pygame.image.load('Player4.png'),
+                pygame.image.load('Player5.png'),
+                pygame.image.load('Player6.png'),
+                pygame.image.load('Player7.png')
+              ]
 
 
 #useful game dimensions
