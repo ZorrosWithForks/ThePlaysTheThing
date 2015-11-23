@@ -23,64 +23,64 @@ import socket
 import threading
 from threading import Thread
 import _thread
-from pygame import font
-pygame.init()
-pygame.font.init()
 
+l_servers = []
 
-#SURFACE = pygame.display.set_mode((640, 400))
-#FONT = pygame.font.SysFont("couriernew", 40, bold=True)
+#CANVAS.create_image(new_game_pos_x, new_game_pos_y, anchor=NW, image=game_banner)
+#CANVAS.create_text(new_game_pos_x + 5, new_game_pos_y + 5, anchor=NW, text=str(recv_data.decode()))
+#new_game_pos_y += 50
+#game_number += 1
+   
+def displayServerList(CANVAS, l_servers):
+   CANVAS.create_image(0,0, anchor=NW, image=background)
+   new_game_pos_y = 50
+   new_game_pos_x = 50
+   for server in l_servers:
+      CANVAS.create_image(new_game_pos_x, new_game_pos_y, anchor=NW, image=game_banner)
+      CANVAS.create_text(new_game_pos_x + 5, new_game_pos_y + 5, anchor=NW, text=str(server[0]))
+      new_game_pos_y += 50
 
 class Application(tk.Frame):
 
    def __init__(self, master=None):
       tk.Frame.__init__(self, master)
       self.pack()
-      self.createWidgets()
+      self.createWidgets(l_servers)
       t = threading.Thread(target=self.listener)
       t.daemon = True # thread dies when main thread (only non-daemon thread) exits.
       t.start()
+      password_label = Label(root, text="Password")
+      password_label.pack()
+      password_entry = Entry(root)
+      password_entry.pack()
 
-   def createWidgets(self):
-      #SURFACE.blit(pygame.image.load('games_background.png'),(0,0))
-      #SURFACE.blit(pygame.image.load('games_background2.png'),(0,0))
+   def createWidgets(self, l_servers):
       
-      self.text_box = tkst.ScrolledText(self, height = 20, width = 50)
+      self.text_box = tkst.ScrolledText(self, height = 3, width = 20)
       self.text_box.pack(side="top")
     
       self.hi_there = tk.Button(self)
       self.hi_there["text"] = "Refresh"
-      self.hi_there["command"] = self.find_servers
+      self.hi_there["command"] = self.find_servers(l_servers)
       self.hi_there.pack(side="right")
 
-   def find_servers(self):
+   def find_servers(self, l_servers):
+      print("Clicked refresh")
       self.text_box.delete('1.0', tk.END)
+      l_servers = []
       client_socket.sendto(data.encode('ascii'), address)
-
 
    def listener(self):
       print("Back in again")
-      new_game_pos_x = 50
-      new_game_pos_y = 50
-      game_number    = 1
       try:
          while True:
             recv_data, addr = client_socket.recvfrom(4096)
-            self.text_box.insert(tk.END, addr[0] + "\n")
-            if (addr != None):
-               CANVAS.create_image(new_game_pos_x, new_game_pos_y, anchor=NW, image=game_banner)
-               CANVAS.create_text(new_game_pos_x + 5, new_game_pos_y + 5, anchor=NW, text="Game " + str(game_number))
-               #SURFACE.blit(pygame.image.load('game.png'), (new_game_pos_x,new_game_pos_y))
-               #SURFACE.blit(FONT.render("GAME: " + str(game_number), True, (0,0,0)), (new_game_pos_x, new_game_pos_y))
-               new_game_pos_y += 50
-               game_number += 1
-               #pygame.display.update()
+            l_servers.append(addr)
+            print("added a server")
+            self.text_box.insert(tk.END, recv_data.decode() + "\n")
+            displayServerList(CANVAS, l_servers)
             self.text_box.mark_set(tk.INSERT, '1.0')
             self.text_box.focus()
-            password_label = Label(root, text="Password")
-            password_label.pack()
-            password_entry = Entry(root, 500, 100)
-            password_entry.pack()
             
       finally:
          print("It broke")
