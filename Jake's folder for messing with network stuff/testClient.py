@@ -1,6 +1,7 @@
 #UDP client broadcasts to server(s)
 import socket
 import pygame
+import Image, ImageTk
 '''
 address = ('<broadcast>', 54545)
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -44,14 +45,7 @@ class Application(tk.Frame):
    def createWidgets(self):
       #SURFACE.blit(pygame.image.load('games_background.png'),(0,0))
       #SURFACE.blit(pygame.image.load('games_background2.png'),(0,0))
-      
-      self.text_box = tkst.ScrolledText(self, height = 20, width = 50)
-      self.text_box.pack(side="top")
-    
-      self.hi_there = tk.Button(self)
-      self.hi_there["text"] = "Refresh"
-      self.hi_there["command"] = self.find_servers
-      self.hi_there.pack(side="right")
+      self.find_servers
 
    def find_servers(self):
       self.text_box.delete('1.0', tk.END)
@@ -66,7 +60,6 @@ class Application(tk.Frame):
       try:
          while True:
             recv_data, addr = client_socket.recvfrom(4096)
-            self.text_box.insert(tk.END, addr[0] + "\n")
             if (addr != None):
                CANVAS.create_image(new_game_pos_x, new_game_pos_y, anchor=NW, image=game_banner)
                CANVAS.create_text(new_game_pos_x + 5, new_game_pos_y + 5, anchor=NW, text="Game " + str(game_number))
@@ -75,12 +68,6 @@ class Application(tk.Frame):
                new_game_pos_y += 50
                game_number += 1
                #pygame.display.update()
-            self.text_box.mark_set(tk.INSERT, '1.0')
-            self.text_box.focus()
-            password_label = Label(root, text="Password")
-            password_label.pack()
-            password_entry = Entry(root, 500, 100)
-            password_entry.pack()
             
       finally:
          print("It broke")
@@ -107,10 +94,19 @@ CANVAS.pack()
 background = PhotoImage(file="games_background.png")
 background2 = PhotoImage(file="games_background2.png")
 game_banner = PhotoImage(file="game.png")
+image = Image.open(r'\\csmain\Classes\SE_Project\Developement\16-DiningPhilosophers\Caleb\Jake''s folder for messing with network stuff\games_background2.png')
+#photo image object
+tkimage = ImageTk.PhotoImage(background2)
+players_label = Label(root, text="Players")
+players_label.pack(side=LEFT)
 CANVAS.create_image(0,0, anchor=NW, image=background)
 CANVAS.create_image(0,0, anchor=NW, image=background2)
-password_entry_box = tkst.ScrolledText(master = root, height = 2, width = 5)
-password_entry_box.pack(anchor = NW)
+Tkinter.Label(root, image=tkimage, text="Players", compound=Tkinter.CENTER).pack()
+
+password_label = Label(root, text="Password")
+password_label.pack(side = LEFT)
+password = password_entry = Entry(root)
+password_entry.pack(side = LEFT)
 app = Application(master=root)
 app.mainloop()
 
