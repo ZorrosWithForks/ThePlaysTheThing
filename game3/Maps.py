@@ -95,6 +95,9 @@ class UnitCounts:
    def __repr__(self):
       return "{infantry:" + str(self.infantry) + ",\n archers:" + str(self.archers) + ",\n cannons:" + str(self.cannons) + ",\n champions:" + str(self.champions) + "}"
 
+   def getSummaryCount(self):
+      return self.infantry + self.archers + self.cannons + self.champions
+   
 class Country:
    def __init__(self):
       self.name =  random.choice("PKBWLTCMNDL")
@@ -105,7 +108,7 @@ class Country:
       self.name += random.choice("pbwltcmndts")
       vowel = random.choice("aeiou")
       self.name += random.choice(["ingt" + vowel + "n", "f" + vowel + "rd", "st" + vowel + "n", "b" + vowel + "rgh", "mark", vowel + "nia", "m" + vowel + "th"])
-      self.owner = None
+      self.owner = "Unoccupied"
       self.attack_bonus = random.randint(1, 10)
       self.defense_bonus = random.randint(1, 15)
       self.unit_production = 1
