@@ -9,33 +9,16 @@ import _thread
 
 def data():
 
-    for i in range(42):
-       c = Canvas(frame, width=200, height = 25)
+    for i in range(50):
+       c = Canvas(frame, width=200, height = 50, bg = "white")
        c.pack(side="top")
-       l = Label(c,text="Rodrick")
-       c.create_window (0,0, anchor=NW, window = l)
-       bootButton = tk.Button(c, anchor=NW)
-       bootButton["text"] = "Boot"
-       c.create_window (150, 0, anchor=NW, window=bootButton)
+       text_id = c.create_text(10, 10, anchor="nw", text="LEEEE " + str(i))
+       #Label(CANVAS,text=i).grid(row=i,column=0)
+       #Label(frame,text="my text"+str(i)).grid(row=i,column=1)
+       #Label(frame,text="..........").grid(row=i,column=2)
 
 def myfunction(event):
     canvas.configure(scrollregion=canvas.bbox("all"),width=200,height=200)
-    
-def broadcast():
-   while True:
-      print("Listening")
-      recv_data, addr = server_socket.recvfrom(4096)
-      print (recv_data)
-      server_socket.sendto(server_name.encode(), addr)
-
-address = ('', 54545)
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
-server_socket.bind(address)
-server_name = input("The name of the server is: ")
-t = threading.Thread(target=broadcast)
-t.daemon = True
-t.start()
 
 root=Tk()
 sizex = 800
