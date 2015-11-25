@@ -24,6 +24,7 @@ WHITE = (255, 255, 255)
 #constants representing the different resources
 CONTINENT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 40)
 COUNTRY_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 25)
+UNIT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 35)
 CONTINENT_1 = 1
 CONTINENT_2 = 2
 CONTINENT_3 = 3
@@ -32,6 +33,7 @@ CONTINENT_5 = 5
 CONTINENT_6 = 6
 CONTINENT_7 = 7
 CONTINENT_8 = 8
+UNOCCUPIED = "Unoccupied"
 WATER = (0,0)
 DEEP_WATER = 10
 OVERLAY = 9
@@ -52,10 +54,21 @@ textures =   {
                 CONTINENT_5 : pygame.image.load('continent_5.png'),
                 CONTINENT_6 : pygame.image.load('continent_6.png'),
                 CONTINENT_7 : pygame.image.load('continent_7.png'),
-                CONTINENT_8 : pygame.image.load('continent_8.png')
+                CONTINENT_8 : pygame.image.load('continent_8.png'),
             }
 
+playerLogos = [
+                pygame.image.load('NoPlayer.png'),
+                pygame.image.load('Player1.png'),
+                pygame.image.load('Player2.png'),
+                pygame.image.load('Player3.png'),
+                pygame.image.load('Player4.png'),
+                pygame.image.load('Player5.png'),
+                pygame.image.load('Player6.png'),
+                pygame.image.load('Player7.png')
+              ]
 
+playerLogoIndexes = { UNOCCUPIED: 0 }
 
 #useful game dimensions
 MARGIN = 50
@@ -155,6 +168,16 @@ while True:
             #draw the resource at that position in the tilemap, using the correct colour
             if (map.ll_map[row][column] == WATER):
                DISPLAYSURF.blit(textures[DEEP_WATER], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
+			   
+	    #loop through each row
+    for row in range(map.HEIGHT):
+        #loop through each column in the row
+        for column in range(map.WIDTH):
+            #draw the resource at that position in the tilemap, using the correct colour
+            if (map.ll_map[row][column] != WATER):
+               current_country = map.d_continents[map.ll_map[row][column][0]][map.ll_map[row][column][1]]
+               DISPLAYSURF.blit(playerLogos[playerLogoIndexes[current_country.owner]], (((column) % map.WIDTH) * TILESIZE, ((row) % map.HEIGHT) * TILESIZE))
+               DISPLAYSURF.blit(UNIT_FONT.render(str(current_country.unit_counts.getSummaryCount()), True, (0,0,0)), (((column) % map.WIDTH) * TILESIZE + 40, ((row) % map.HEIGHT) * TILESIZE + 25))
 
     DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
     DISPLAYSURF.blit(source=pygame.image.load("InfoMarque.png"), dest=(map.WIDTH * TILESIZE, 0))

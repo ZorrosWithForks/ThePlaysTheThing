@@ -1,7 +1,16 @@
 #UDP client broadcasts to server(s)
+import tkinter as tk
+import tkinter.scrolledtext as tkst
+import tkinter.messagebox as tkmb
+from tkinter import *
+import socket
+import threading
+from threading import Thread
+import _thread
 import socket
 import pygame
-import Image, ImageTk
+#from tkinter import Image
+#from tkinter import ImageTk
 '''
 address = ('<broadcast>', 54545)
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -16,14 +25,7 @@ while True:
 '''
    
 # client.py 
-import tkinter as tk
-import tkinter.scrolledtext as tkst
-import tkinter.messagebox as tkmb
-from tkinter import *
-import socket
-import threading
-from threading import Thread
-import _thread
+
 
 l_servers = []
 
@@ -82,7 +84,6 @@ class Application(tk.Frame):
             displayServerList(CANVAS, l_servers)
             self.text_box.mark_set(tk.INSERT, '1.0')
             self.text_box.focus()
-            
       finally:
          print("It broke")
 
@@ -108,22 +109,24 @@ CANVAS.pack()
 background = PhotoImage(file="games_background.png")
 background2 = PhotoImage(file="games_background2.png")
 game_banner = PhotoImage(file="game.png")
-image = Image.open(r'\\csmain\Classes\SE_Project\Developement\16-DiningPhilosophers\Caleb\Jake''s folder for messing with network stuff\games_background2.png')
+
+#image = Image.open(r'\\csmain\Classes\SE_Project\Developement\16-DiningPhilosophers\Caleb\Jake''s folder for messing with network stuff\games_background2.png')
 #photo image object
-tkimage = ImageTk.PhotoImage(background2)
+#tkimage = ImageTk.PhotoImage(background2)
+
 players_label = Label(root, text="Players")
 players_label.pack(side=LEFT)
 CANVAS.create_image(0,0, anchor=NW, image=background)
 CANVAS.create_image(0,0, anchor=NW, image=background2)
-Tkinter.Label(root, image=tkimage, text="Players", compound=Tkinter.CENTER).pack()
-
+#Tkinter.Label(root, image=tkimage, text="Players", compound=Tkinter.CENTER).pack()
+'''
 password_label = Label(root, text="Password")
 password_label.pack(side = LEFT)
 password = password_entry = Entry(root)
 password_entry.pack(side = LEFT)
+'''
 app = Application(master=root)
 app.mainloop()
 
 
 #pygame.display.update()
-s.close()
