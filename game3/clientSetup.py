@@ -1,56 +1,91 @@
-import socket
+from tkinter import *
 import tkinter as tk
 import tkinter.scrolledtext as tkst
 import tkinter.messagebox as tkmb
-from tkinter import *
 import socket
 import threading
 from threading import Thread
 import _thread
+import time
+import pickle
 
-l_servers = []
-
-def displayServerList(CANVAS, l_servers):
-   CANVAS.create_image(0,0, anchor=NW, image=background)
-   new_game_pos_y = 50
-   new_game_pos_x = 50
+def refreshFrame(frame, canvas):
+   frame.destroy
+   frame=Frame(canvas)
+   canvas.create_window((0,0),window=frame,anchor='nw')
+   frame.bind("<Configure>",myfunction)
+   return frame
+def display_servers(l_servers, frame, canvas):
+   frame = refreshFrame(frame, canvas)
    for server in l_servers:
-      CANVAS.create_image(new_game_pos_x, new_game_pos_y, anchor=NW, image=game_banner)
-      CANVAS.create_text(new_game_pos_x + 5, new_game_pos_y + 5, anchor=NW, text=str(server[0]))
-      new_game_pos_y += 50
+      print("have a server!!")
+      c = Canvas(frame, width=300, height = 30)
+      c.pack(side="top")
+      lbl_server_name = Label(c,text=server[2])
+      c.create_window (5,5, anchor=NW, window = lbl_server_name)
+      txt_password = Entry(c)
+      c.create_window (100,8, anchor=NW, window = txt_password)
+      bootButton = tk.Button(c, anchor=NW)
+      bootButton["text"] = "Join"
+      c.create_window (250, 5, anchor=NW, window=bootButton)
+      
 
-class Application(tk.Frame):
+def myfunction(event):
+    canvas.configure(scrollregion=canvas.bbox("all"),width=300,height=200)
 
-   def __init__(self, master=None):
-      tk.Frame.__init__(self, master)
-      self.pack()
-      self.createWidgets(l_servers)
-      t = threading.Thread(target=self.listener)
-      t.daemon = True # thread dies when main thread (only non-daemon thread) exits.
-      t.start()
-      password_label = Label(root, text="Password")
-      password_label.pack()
-      password_entry = Entry(root)
-      password_entry.pack()
-
-# create a socket object
+def search(l_servers, frame, canvas):
+   while True:
+      recv_data, addr = client_socket.recvfrom(4096)
+      packet = pickle.loads(recv_data)
+      l_servers.append(packet)
+      print("added a server")
+      display_servers(l_servers, frame, canvas)
+      print("done displaying servers")
+      
+def request(l_servers):
+   while True:
+      print("looping requesting servers")
+      time.sleep(3)
+      del l_servers[:]
+      client_socket.sendto(data.encode('ascii'), address)
+      
+l_servers = []
 address = ('<broadcast>', 54545)
 data = "Request"
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 client_socket.sendto(data.encode('ascii'), address)
 
-# get local machine name
-host = socket.gethostname()
-port = 54545
+root=Tk()
+sizex = 800
+sizey = 600
+posx  = 100
+posy  = 100
+root.wm_geometry("%dx%d+%d+%d" % (sizex, sizey, posx, posy))
 
-# Make the canvas
-root = tk.Tk()
-CANVAS = Canvas(root, width = 640, height = 400)
-CANVAS.pack()
-background = PhotoImage(file="games_background.png")
-background2 = PhotoImage(file="games_background2.png")
-game_banner = PhotoImage(file="game.png")
+myframe=Frame(root,relief=GROOVE,width=300,height=150,bd=1)
+myframe.place(x=10,y=40)
+games_label = Label(root, text="Servers")
+games_label.place(x=10, y=10)
+password_label = Label(root, text="Password:")
+password_label.place(x=100, y=10)
+password_entry = Entry(root)
+password_entry.place(x=70, y=260)
+canvas=Canvas(myframe)
+frame=Frame(canvas)
+myscrollbar=Scrollbar(myframe,orient="vertical",command=canvas.yview)
+canvas.configure(yscrollcommand=myscrollbar.set)
 
-app = Application (master=root)
-app.mainloop()
+myscrollbar.pack(side="right",fill="y")
+canvas.pack(side="left")
+canvas.create_window((0,0),window=frame,anchor='nw')
+frame.bind("<Configure>",myfunction)
+t_request = threading.Thread(target=request, args=(l_servers,))
+t_request.daemon = True
+t_request.start()
+print("Made it")
+t_search = threading.Thread(target=search, args=(l_servers, frame, canvas))
+t_search.daemon = True
+t_search.start()
+print("Am I here?")
+root.mainloop()
