@@ -116,7 +116,7 @@ game_banner = PhotoImage(file="game.png")
 
 players_label = Label(root, text="Players")
 players_label.pack(side=LEFT)
-CANVAS.create_image(0,0, anchor=NW, image=background)
+#CANVAS.create_image(0,0, anchor=NW, image=background)
 CANVAS.create_image(0,0, anchor=NW, image=background2)
 #Tkinter.Label(root, image=tkimage, text="Players", compound=Tkinter.CENTER).pack()
 '''

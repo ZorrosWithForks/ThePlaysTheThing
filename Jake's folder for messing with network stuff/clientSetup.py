@@ -32,6 +32,20 @@ class Application(tk.Frame):
       password_label.pack()
       password_entry = Entry(root)
       password_entry.pack()
+      
+   def createWidgets(self, l_servers):
+   
+      self.text_box = tkst.ScrolledText(self, height = 3, width = 20)
+      self.text_box.pack(side="top")
+
+      self.hi_there = tk.Button(self)
+      self.hi_there["text"] = "Refresh"
+      self.hi_there["command"] = self.find_servers(l_servers)
+      self.hi_there.pack(side="right")
+      
+
+      
+
 
 # create a socket object
 address = ('<broadcast>', 54545)
