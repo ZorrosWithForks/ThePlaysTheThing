@@ -9,6 +9,7 @@ from pygame.locals import *
 from pygame import font
 import pickle
 from Maps import *
+import time
 
 pygame.font.init()
 
@@ -78,6 +79,10 @@ BOTTOM_HALF_START = 15
 #set up the display
 pygame.init()
 DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+
+#initialize the movie
+pygame.mixer.quit()
+movie = pygame.movie.Movie('These Guys XD_mpeg1video.mpg')
 
 #use list comprehension to create our tilemap
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -208,7 +213,35 @@ while True:
                #Change the map render offset
                map_Y_offset = (map_Y_offset + 1) % map.HEIGHT
                moveMap(0, -1)
-
+            if event.key == K_m:
+               #play the movie
+               screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+               info = pygame.display.Info()
+               movie_screen = pygame.Surface((info.current_w, info.current_h))
+               movie_screen.blit(textures[WATER], (200,200))
+               movie.set_display(movie_screen)
+               time_started = time.time()
+               int(time_started)
+               movie.set_volume(.99)
+               movie.play()
+               playing = True
+               while playing:
+                  if event.type == KEYDOWN:
+                      if event.key == K_p:
+                         movie.pause()
+                      if event.key == K_s:
+                         movie.stop()
+                         playing = False
+                  current_time = time.time()
+                  int(current_time)
+                  print("current time is: ", str(current_time))
+                  screen.blit(movie_screen,(0,0))
+                  pygame.display.update()
+                  if current_time - time_started >= int(movie.get_length()):
+                     playing = False
+                     movie.rewind()
+                     print("HERE?")
+               print ("made it here")
     printMap(map)
     
     #update the display
