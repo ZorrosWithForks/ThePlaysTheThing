@@ -7,38 +7,88 @@ import threading
 from threading import Thread
 import _thread
 import pickle
+import time
 
-def data():
+def refresh_frame(frame, canvas):
+   frame.destroy
+   frame=Frame(canvas)
+   canvas.create_window((0,0),window=frame,anchor='nw')
+   frame.bind("<Configure>",myfunction)
+   return frame
 
-    for i in range(42):
-       c = Canvas(frame, width=200, height = 25)
-       c.pack(side="top")
-       l = Label(c,text="Rodrick")
-       c.create_window (0,0, anchor=NW, window = l)
-       bootButton = tk.Button(c, anchor=NW)
-       bootButton["text"] = "Boot"
-       c.create_window (150, 0, anchor=NW, window=bootButton)
+def display_players(frame, canvas, clients):
+   while True:
+      frame = refresh_frame(frame, canvas)
+      print("Number of clients: " + str(len(clients)))
+      for i in clients:
+         c = Canvas(frame, width=300, height = 25)
+         c.pack(side="top")
+         l = Label(c,text=i)
+         c.create_window (0,0, anchor=NW, window = l)
+         bootButton = tk.Button(c, anchor=NW)
+         bootButton["text"] = "Boot"
+         c.create_window (250, 0, anchor=NW, window=bootButton)
+      time.sleep(3)
 
 def myfunction(event):
-    canvas.configure(scrollregion=canvas.bbox("all"),width=200,height=200)
+    canvas.configure(scrollregion=canvas.bbox("all"),width=300,height=200)
     
 def broadcast():
    while True:
       print("Listening")
       recv_data, addr = server_socket.recvfrom(4096)
+      host = socket.gethostname()
       print (recv_data)
-      sendData = (addr[0], addr[1], server_name)
+      sendData = (host, addr[1], server_name)
       packet = pickle.dumps(sendData) 
       server_socket.sendto(packet, addr)
+
+def listener(client, address, clients):
+   print("Accepted connection from: ", address)
+   with clients_lock:
+      clients.add(client)#Array of clients
+      print(str(len(clients)))
+   try:
+      while True:
+         data = client.recv(1024).decode() #block waiting for data from a client
+         if not data:
+            None #Used to be break, now clients don't get removed if they disconnect (bug)
+         else:
+            print(repr(data))
+            
+   finally:
+      with clients_lock:
+         clients.remove(client)
+         client.close()
+      
+def acceptPlayers():
+   serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+   host = socket.gethostname()
+   port = 9999                                           
+   addr = (host, port)
+   serversocket.bind((host, port))
+   serversocket.listen(5)
+   while True:
+      client, address = serversocket.accept()
+      th.append(Thread(target=listener, args = (client,address, clients)).start())
+
+th = []
+clients = set()
+clients_lock = threading.Lock()
 
 address = ('', 54545)
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
 server_socket.bind(address)
 server_name = input("The name of the server is: ")
-t = threading.Thread(target=broadcast)
-t.daemon = True
-t.start()
+
+t_broadcast = threading.Thread(target=broadcast)
+t_broadcast.daemon = True
+t_broadcast.start()
+
+t_accept_players = threading.Thread(target=acceptPlayers)
+t_accept_players.daemon = True
+t_accept_players.start()
 
 root=Tk()
 sizex = 800
@@ -52,9 +102,9 @@ myframe.place(x=10,y=40)
 players_label = Label(root, text="Players")
 players_label.place(x=10, y=10)
 password_label = Label(root, text="Password:")
-password_label.place(x=10, y=260)
+password_label.place(x=10, y=320)
 password_entry = Entry(root)
-password_entry.place(x=70, y=260)
+password_entry.place(x=70, y=320)
 canvas=Canvas(myframe)
 frame=Frame(canvas)
 myscrollbar=Scrollbar(myframe,orient="vertical",command=canvas.yview)
@@ -64,5 +114,8 @@ myscrollbar.pack(side="right",fill="y")
 canvas.pack(side="left")
 canvas.create_window((0,0),window=frame,anchor='nw')
 frame.bind("<Configure>",myfunction)
-data()
+t_display_players = threading.Thread(target=display_players, args=(frame, canvas, clients))
+t_display_players.daemon = True
+t_display_players.start()
+
 root.mainloop()

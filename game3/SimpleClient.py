@@ -107,6 +107,70 @@ def moveMap(x_offset, y_offset):
       for column in range(map.WIDTH):
          ll_temp_map[row][column] = map.ll_map[(row + y_offset) % map.HEIGHT][(column + x_offset) % map.WIDTH]
    map.ll_map = ll_temp_map
+
+def printMap(map):
+    #loop through each row
+    for row in range(map.HEIGHT):
+        #loop through each column in the row
+        for column in range(map.WIDTH):
+            #draw the resource at that position in the tilemap, using the correct colour
+            if (map.ll_map[row][column] != WATER):
+               DISPLAYSURF.blit(textures[d_continent_tiles[map.ll_map[row][column][0]]], (((column) % map.WIDTH) * TILESIZE, ((row) % map.HEIGHT) * TILESIZE))
+  
+    #loop through each row
+    for row in range(map.HEIGHT):
+        #loop through each column in the row
+        for column in range(map.WIDTH):
+            #draw the resource at that position in the tilemap, using the correct colour
+            if (map.ll_map[row][column] == WATER):
+               DISPLAYSURF.blit(textures[WATER], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
+          
+    #loop through each row
+    for row in range(map.HEIGHT):
+        #loop through each column in the row
+        for column in range(map.WIDTH):
+            #draw the resource at that position in the tilemap, using the correct colour
+            if (map.ll_map[row][column] == WATER):
+               DISPLAYSURF.blit(textures[DEEP_WATER], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
+			   
+	 #loop through each row
+    for row in range(map.HEIGHT):
+        #loop through each column in the row
+        for column in range(map.WIDTH):
+            #draw the resource at that position in the tilemap, using the correct colour
+            if (map.ll_map[row][column] != WATER):
+               current_country = map.d_continents[map.ll_map[row][column][0]][map.ll_map[row][column][1]]
+               DISPLAYSURF.blit(playerLogos[playerLogoIndexes[current_country.owner]], (((column) % map.WIDTH) * TILESIZE, ((row) % map.HEIGHT) * TILESIZE))
+               DISPLAYSURF.blit(UNIT_FONT.render(str(current_country.unit_counts.getSummaryCount()), True, (0,0,0)), (((column) % map.WIDTH) * TILESIZE + 40, ((row) % map.HEIGHT) * TILESIZE + 25))
+
+    DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
+    DISPLAYSURF.blit(source=pygame.image.load("InfoMarque.png"), dest=(map.WIDTH * TILESIZE, 0))
+    DISPLAYSURF.blit(source=pygame.image.load("BaseBoard.png"), dest=(0, map.HEIGHT * TILESIZE))
+    
+    #Highlight country mouse is over and display country info
+    curr_x, curr_y = pygame.mouse.get_pos()
+    if (curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE and map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)] != map.WATER):
+      DISPLAYSURF.blit(pygame.image.load('MouseOver.png'), (int(curr_x / TILESIZE) * TILESIZE - MARGIN, int(curr_y / TILESIZE) * TILESIZE - MARGIN), special_flags=BLEND_ADD)
+      current_tile = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)]
+      DISPLAYSURF.blit(CONTINENT_FONT.render("Continent: " + current_tile[0], True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 120))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Country: " + map.d_continents[current_tile[0]][current_tile[1]].name, True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 170))
+      
+      # Unit counts by type
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Infantry: "  + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.infantry), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 225))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Archers: "   + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.archers), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 250))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Cannons: "   + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.cannons), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 275))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Champions: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.champions), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 300))
+      
+      # Country bonuses
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Attack Bonus: " + str(map.d_continents[current_tile[0]][current_tile[1]].attack_bonus), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 350))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Defense Bonus: " + str(map.d_continents[current_tile[0]][current_tile[1]].defense_bonus), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 375))
+      
+      # Owner
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Owner: " + str(map.d_continents[current_tile[0]][current_tile[1]].owner if map.d_continents[current_tile[0]][current_tile[1]].owner != None else "Neutral"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 425))
+      
+      
+    #update the display
+    pygame.display.update()
    
 #main()
 while True:
@@ -145,66 +209,8 @@ while True:
                map_Y_offset = (map_Y_offset + 1) % map.HEIGHT
                moveMap(0, -1)
 
-    #loop through each row
-    for row in range(map.HEIGHT):
-        #loop through each column in the row
-        for column in range(map.WIDTH):
-            #draw the resource at that position in the tilemap, using the correct colour
-            if (map.ll_map[row][column] != WATER):
-               DISPLAYSURF.blit(textures[d_continent_tiles[map.ll_map[row][column][0]]], (((column) % map.WIDTH) * TILESIZE, ((row) % map.HEIGHT) * TILESIZE))
-  
-    #loop through each row
-    for row in range(map.HEIGHT):
-        #loop through each column in the row
-        for column in range(map.WIDTH):
-            #draw the resource at that position in the tilemap, using the correct colour
-            if (map.ll_map[row][column] == WATER):
-               DISPLAYSURF.blit(textures[WATER], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
-          
-    #loop through each row
-    for row in range(map.HEIGHT):
-        #loop through each column in the row
-        for column in range(map.WIDTH):
-            #draw the resource at that position in the tilemap, using the correct colour
-            if (map.ll_map[row][column] == WATER):
-               DISPLAYSURF.blit(textures[DEEP_WATER], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
-			   
-	    #loop through each row
-    for row in range(map.HEIGHT):
-        #loop through each column in the row
-        for column in range(map.WIDTH):
-            #draw the resource at that position in the tilemap, using the correct colour
-            if (map.ll_map[row][column] != WATER):
-               current_country = map.d_continents[map.ll_map[row][column][0]][map.ll_map[row][column][1]]
-               DISPLAYSURF.blit(playerLogos[playerLogoIndexes[current_country.owner]], (((column) % map.WIDTH) * TILESIZE, ((row) % map.HEIGHT) * TILESIZE))
-               DISPLAYSURF.blit(UNIT_FONT.render(str(current_country.unit_counts.getSummaryCount()), True, (0,0,0)), (((column) % map.WIDTH) * TILESIZE + 40, ((row) % map.HEIGHT) * TILESIZE + 25))
-
-    DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
-    DISPLAYSURF.blit(source=pygame.image.load("InfoMarque.png"), dest=(map.WIDTH * TILESIZE, 0))
-    DISPLAYSURF.blit(source=pygame.image.load("BaseBoard.png"), dest=(0, map.HEIGHT * TILESIZE))
+    printMap(map)
     
-    #Highlight country mouse is over and display country info
-    curr_x, curr_y = pygame.mouse.get_pos()
-    if (curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE and map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)] != map.WATER):
-      DISPLAYSURF.blit(pygame.image.load('MouseOver.png'), (int(curr_x / TILESIZE) * TILESIZE - MARGIN, int(curr_y / TILESIZE) * TILESIZE - MARGIN), special_flags=BLEND_ADD)
-      current_tile = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)]
-      DISPLAYSURF.blit(CONTINENT_FONT.render("Continent: " + current_tile[0], True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 120))
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Country: " + map.d_continents[current_tile[0]][current_tile[1]].name, True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 170))
-      
-      # Unit counts by type
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Infantry: "  + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.infantry), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 225))
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Archers: "   + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.archers), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 250))
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Cannons: "   + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.cannons), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 275))
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Champions: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.champions), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 300))
-      
-      # Country bonuses
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Attack Bonus: " + str(map.d_continents[current_tile[0]][current_tile[1]].attack_bonus), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 350))
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Defense Bonus: " + str(map.d_continents[current_tile[0]][current_tile[1]].defense_bonus), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 375))
-      
-      # Owner
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Owner: " + str(map.d_continents[current_tile[0]][current_tile[1]].owner if map.d_continents[current_tile[0]][current_tile[1]].owner != None else "Neutral"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 425))
-      
-      
     #update the display
     pygame.display.update()
     fpsClock.tick(10)
