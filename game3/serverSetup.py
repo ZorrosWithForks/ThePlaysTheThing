@@ -11,7 +11,7 @@ import time
 import select
 
 def refresh_frame(frame, canvas):
-   frame.destroy
+   frame.destroy()
    frame=Frame(canvas)
    canvas.create_window((0,0),window=frame,anchor='nw')
    frame.bind("<Configure>",myfunction)
@@ -24,7 +24,7 @@ def display_players(frame, canvas, clients):
       for i in clients:
          c = Canvas(frame, width=300, height = 25)
          c.pack(side="top")
-         l = Label(c,text=i)
+         l = Label(c,text=i[1])
          c.create_window (0,0, anchor=NW, window = l)
          bootButton = tk.Button(c, anchor=NW)
          bootButton["text"] = "Boot"
@@ -44,10 +44,12 @@ def broadcast():
       packet = pickle.dumps(sendData) 
       server_socket.sendto(packet, addr)
 
-def listener(client, address, clients, serversocket):
+def listener(client, address, clients, serversocket, player_name):
    print("Accepted connection from: ", address)
    with clients_lock:
-      clients.add(client)#Array of clients
+      l_temp = (client, player_name)
+      clients.add(l_temp)#Array of clients
+      
       print(str(len(clients)))
    try:
       while True:
@@ -71,7 +73,8 @@ def acceptPlayers():
    serversocket.listen(5)
    while True:
       client, address = serversocket.accept()
-      th.append(Thread(target=listener, args = (client,address, clients, serversocket)).start())
+      player_name = client.recv(4096).decode()
+      th.append(Thread(target=listener, args = (client,address, clients, serversocket, player_name)).start())
 
 th = []
 clients = set()
