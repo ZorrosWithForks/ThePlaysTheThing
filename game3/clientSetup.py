@@ -35,7 +35,6 @@ def display_servers(l_servers, frame, canvas):
       joinButton = tk.Button(c, anchor=NW, command=lambda server=server: joinGame(server[0])) #Without server=server, each button passes the same argument, the last one in the iteration
       joinButton["text"] = "Join"
       c.create_window (250, 5, anchor=NW, window=joinButton)
-      
 
 def myfunction(event):
     canvas.configure(scrollregion=canvas.bbox("all"),width=300,height=200)

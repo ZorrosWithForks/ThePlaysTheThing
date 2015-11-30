@@ -8,6 +8,7 @@ from threading import Thread
 import _thread
 import pickle
 import time
+import select
 
 def refresh_frame(frame, canvas):
    frame.destroy
@@ -43,18 +44,18 @@ def broadcast():
       packet = pickle.dumps(sendData) 
       server_socket.sendto(packet, addr)
 
-def listener(client, address, clients):
+def listener(client, address, clients, serversocket):
    print("Accepted connection from: ", address)
    with clients_lock:
       clients.add(client)#Array of clients
       print(str(len(clients)))
    try:
       while True:
-         data = client.recv(1024).decode() #block waiting for data from a client
-         if not data:
-            None #Used to be break, now clients don't get removed if they disconnect (bug)
-         else:
-            print(repr(data))
+         ready_to_read, ready_to_write, in_error = \
+            select.select([serversocket,], [serversocket,], [], 5)
+            
+   except select.error:
+      print("connection error")
             
    finally:
       with clients_lock:
@@ -70,7 +71,7 @@ def acceptPlayers():
    serversocket.listen(5)
    while True:
       client, address = serversocket.accept()
-      th.append(Thread(target=listener, args = (client,address, clients)).start())
+      th.append(Thread(target=listener, args = (client,address, clients, serversocket)).start())
 
 th = []
 clients = set()
