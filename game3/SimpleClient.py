@@ -215,7 +215,7 @@ while True:
                moveMap(0, -1)
             if event.key == K_m:
                #play the movie
-               screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+               #screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
                info = pygame.display.Info()
                movie_screen = pygame.Surface((info.current_w, info.current_h))
                movie_screen.blit(textures[WATER], (200,200))
@@ -235,7 +235,7 @@ while True:
                   current_time = time.time()
                   int(current_time)
                   print("current time is: ", str(current_time))
-                  screen.blit(movie_screen,(0,0))
+                  DISPLAYSURF.blit(movie_screen,(0,0))
                   pygame.display.update()
                   if current_time - time_started >= int(movie.get_length()):
                      playing = False
