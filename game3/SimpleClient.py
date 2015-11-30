@@ -9,6 +9,7 @@ from pygame.locals import *
 from pygame import font
 import pickle
 from Maps import *
+import time
 
 pygame.font.init()
 
@@ -22,6 +23,7 @@ BLUE  = (0,   0,   255)
 WHITE = (255, 255, 255)
 
 #constants representing the different resources
+IMAGE_FILE_PATH = "ImageFiles\\"
 CONTINENT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 40)
 COUNTRY_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 25)
 UNIT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 35)
@@ -44,28 +46,28 @@ map_Y_offset = 0
 
 #a dictionary linking resources to textures
 textures =   {
-                WATER  : pygame.image.load('water.png'),
-                DEEP_WATER : pygame.image.load ('deep_water.png'),
-                OVERLAY : pygame.image.load('overlay.png'),
-                CONTINENT_1 : pygame.image.load('continent_1.png'),
-                CONTINENT_2 : pygame.image.load('continent_2.png'),
-                CONTINENT_3 : pygame.image.load('continent_3.png'),
-                CONTINENT_4 : pygame.image.load('continent_4.png'),
-                CONTINENT_5 : pygame.image.load('continent_5.png'),
-                CONTINENT_6 : pygame.image.load('continent_6.png'),
-                CONTINENT_7 : pygame.image.load('continent_7.png'),
-                CONTINENT_8 : pygame.image.load('continent_8.png'),
+                WATER  : pygame.image.load(IMAGE_FILE_PATH + 'water.png'),
+                DEEP_WATER : pygame.image.load(IMAGE_FILE_PATH + 'deep_water.png'),
+                OVERLAY : pygame.image.load(IMAGE_FILE_PATH + 'overlay.png'),
+                CONTINENT_1 : pygame.image.load(IMAGE_FILE_PATH + 'continent_1.png'),
+                CONTINENT_2 : pygame.image.load(IMAGE_FILE_PATH + 'continent_2.png'),
+                CONTINENT_3 : pygame.image.load(IMAGE_FILE_PATH + 'continent_3.png'),
+                CONTINENT_4 : pygame.image.load(IMAGE_FILE_PATH + 'continent_4.png'),
+                CONTINENT_5 : pygame.image.load(IMAGE_FILE_PATH + 'continent_5.png'),
+                CONTINENT_6 : pygame.image.load(IMAGE_FILE_PATH + 'continent_6.png'),
+                CONTINENT_7 : pygame.image.load(IMAGE_FILE_PATH + 'continent_7.png'),
+                CONTINENT_8 : pygame.image.load(IMAGE_FILE_PATH + 'continent_8.png'),
             }
 
 playerLogos = [
-                pygame.image.load('NoPlayer.png'),
-                pygame.image.load('Player1.png'),
-                pygame.image.load('Player2.png'),
-                pygame.image.load('Player3.png'),
-                pygame.image.load('Player4.png'),
-                pygame.image.load('Player5.png'),
-                pygame.image.load('Player6.png'),
-                pygame.image.load('Player7.png')
+                pygame.image.load(IMAGE_FILE_PATH + 'NoPlayer.png'),
+                pygame.image.load(IMAGE_FILE_PATH + 'Player1.png'),
+                pygame.image.load(IMAGE_FILE_PATH + 'Player2.png'),
+                pygame.image.load(IMAGE_FILE_PATH + 'Player3.png'),
+                pygame.image.load(IMAGE_FILE_PATH + 'Player4.png'),
+                pygame.image.load(IMAGE_FILE_PATH + 'Player5.png'),
+                pygame.image.load(IMAGE_FILE_PATH + 'Player6.png'),
+                pygame.image.load(IMAGE_FILE_PATH + 'Player7.png')
               ]
 
 playerLogoIndexes = { UNOCCUPIED: 0 }
@@ -78,6 +80,10 @@ BOTTOM_HALF_START = 15
 #set up the display
 pygame.init()
 DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+
+#initialize the movie
+pygame.mixer.quit()
+movie = pygame.movie.Movie('These Guys XD_mpeg1video.mpg')
 
 #use list comprehension to create our tilemap
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -144,13 +150,13 @@ def printMap(map):
                DISPLAYSURF.blit(UNIT_FONT.render(str(current_country.unit_counts.getSummaryCount()), True, (0,0,0)), (((column) % map.WIDTH) * TILESIZE + 40, ((row) % map.HEIGHT) * TILESIZE + 25))
 
     DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
-    DISPLAYSURF.blit(source=pygame.image.load("InfoMarque.png"), dest=(map.WIDTH * TILESIZE, 0))
-    DISPLAYSURF.blit(source=pygame.image.load("BaseBoard.png"), dest=(0, map.HEIGHT * TILESIZE))
+    DISPLAYSURF.blit(source=pygame.image.load(IMAGE_FILE_PATH + "InfoMarque.png"), dest=(map.WIDTH * TILESIZE, 0))
+    DISPLAYSURF.blit(source=pygame.image.load(IMAGE_FILE_PATH + "BaseBoard.png"), dest=(0, map.HEIGHT * TILESIZE))
     
     #Highlight country mouse is over and display country info
     curr_x, curr_y = pygame.mouse.get_pos()
     if (curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE and map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)] != map.WATER):
-      DISPLAYSURF.blit(pygame.image.load('MouseOver.png'), (int(curr_x / TILESIZE) * TILESIZE - MARGIN, int(curr_y / TILESIZE) * TILESIZE - MARGIN), special_flags=BLEND_ADD)
+      DISPLAYSURF.blit(pygame.image.load(IMAGE_FILE_PATH + 'MouseOver.png'), (int(curr_x / TILESIZE) * TILESIZE - MARGIN, int(curr_y / TILESIZE) * TILESIZE - MARGIN), special_flags=BLEND_ADD)
       current_tile = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)]
       DISPLAYSURF.blit(CONTINENT_FONT.render("Continent: " + current_tile[0], True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 120))
       DISPLAYSURF.blit(COUNTRY_FONT.render("Country: " + map.d_continents[current_tile[0]][current_tile[1]].name, True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 170))
@@ -167,6 +173,8 @@ def printMap(map):
       
       # Owner
       DISPLAYSURF.blit(COUNTRY_FONT.render("Owner: " + str(map.d_continents[current_tile[0]][current_tile[1]].owner if map.d_continents[current_tile[0]][current_tile[1]].owner != None else "Neutral"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 425))
+      
+      DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonus: " + str(map.d_bonuses[current_tile[0]]), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 500))
       
       
     #update the display
@@ -208,7 +216,35 @@ while True:
                #Change the map render offset
                map_Y_offset = (map_Y_offset + 1) % map.HEIGHT
                moveMap(0, -1)
-
+            if event.key == K_m:
+               #play the movie
+               screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+               info = pygame.display.Info()
+               movie_screen = pygame.Surface((info.current_w, info.current_h))
+               movie_screen.blit(textures[WATER], (200,200))
+               movie.set_display(movie_screen)
+               time_started = time.time()
+               int(time_started)
+               movie.set_volume(.99)
+               movie.play()
+               playing = True
+               while playing:
+                  if event.type == KEYDOWN:
+                      if event.key == K_p:
+                         movie.pause()
+                      if event.key == K_s:
+                         movie.stop()
+                         playing = False
+                  current_time = time.time()
+                  int(current_time)
+                  print("current time is: ", str(current_time))
+                  screen.blit(movie_screen,(0,0))
+                  pygame.display.update()
+                  if current_time - time_started >= int(movie.get_length()):
+                     playing = False
+                     movie.rewind()
+                     print("HERE?")
+               print ("made it here")
     printMap(map)
     
     #update the display
