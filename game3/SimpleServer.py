@@ -49,7 +49,7 @@ def serve():
    # get local machine name
    host = socket.gethostname()                           
 
-   port = 9999                                           
+   port = 9998                                          
 
    addr = (host, port)
 

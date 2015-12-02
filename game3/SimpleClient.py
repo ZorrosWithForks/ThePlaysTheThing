@@ -91,7 +91,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # get local machine name
 host = socket.gethostname()                           
 print("test1")
-port = 9999
+port = 9998
 
 # connection to hostname on the port.
 s.connect((host, port))                               

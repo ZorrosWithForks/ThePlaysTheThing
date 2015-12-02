@@ -9,6 +9,8 @@ import _thread
 import pickle
 import time
 import select
+import subprocess
+import sys
 
 def refresh_frame(frame, canvas):
    frame.destroy()
@@ -31,6 +33,12 @@ def display_players(frame, canvas, clients):
          c.create_window (250, 0, anchor=NW, window=bootButton)
       time.sleep(3)
 
+def start_game():
+   cmd = ['SimpleServer.py']
+   root.destroy()
+   process = subprocess.Popen([sys.executable, cmd])
+   process.communicate()
+      
 def myfunction(event):
     canvas.configure(scrollregion=canvas.bbox("all"),width=300,height=200)
     
@@ -109,6 +117,8 @@ password_label = Label(root, text="Password:")
 password_label.place(x=10, y=320)
 password_entry = Entry(root)
 password_entry.place(x=70, y=320)
+play_button = tk.Button(root, text="Play", command = start_game)
+play_button.place(x=360, y=320)
 canvas=Canvas(myframe)
 frame=Frame(canvas)
 myscrollbar=Scrollbar(myframe,orient="vertical",command=canvas.yview)
