@@ -8,22 +8,18 @@ from threading import Thread
 import _thread
 import time
 import pickle
-
-def refreshFrame(frame, canvas):
-   frame.destroy
-   frame=Frame(canvas)
-   canvas.create_window((0,0),window=frame,anchor='nw')
-   frame.bind("<Configure>",myfunction)
-   return frame
    
 def joinGame(ip):
    print("attempting to join " + ip)
    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-   s.connect((ip, 9999))
+   addr = (ip, 9999)
+   s.connect(addr)
+   s.sendto(player_name.encode('ascii'), addr)
    print("joined")
    
 def display_servers(l_servers, frame, canvas):
-   frame = refreshFrame(frame, canvas)
+   for widget in frame.winfo_children():
+      widget.destroy()
    for server in l_servers:
       print("have a server from " + server[0])
       c = Canvas(frame, width=300, height = 30)
@@ -35,7 +31,6 @@ def display_servers(l_servers, frame, canvas):
       joinButton = tk.Button(c, anchor=NW, command=lambda server=server: joinGame(server[0])) #Without server=server, each button passes the same argument, the last one in the iteration
       joinButton["text"] = "Join"
       c.create_window (250, 5, anchor=NW, window=joinButton)
-      
 
 def myfunction(event):
     canvas.configure(scrollregion=canvas.bbox("all"),width=300,height=200)
@@ -49,11 +44,14 @@ def search(l_servers, frame, canvas):
       display_servers(l_servers, frame, canvas)
       print("done displaying servers")
       
-def request(l_servers):
+def request(l_servers, frame, canvas):
    print("looping requesting servers")
    del l_servers[:]
+   display_servers(l_servers, frame, canvas)
    client_socket.sendto(data.encode('ascii'), address)
-      
+
+player_name = input("Enter username: ")
+   
 l_servers = []
 address = ('<broadcast>', 54545)
 data = "Request"
@@ -72,8 +70,6 @@ myframe=Frame(root,relief=GROOVE,width=300,height=150,bd=1)
 myframe.place(x=10,y=40)
 games_label = Label(root, text="Servers")
 games_label.place(x=10, y=10)
-refresh_button = tk.Button(root, text="Refresh", command= lambda: request(l_servers))
-refresh_button.place(x=200, y=260)
 canvas=Canvas(myframe)
 frame=Frame(canvas)
 myscrollbar=Scrollbar(myframe,orient="vertical",command=canvas.yview)
@@ -83,6 +79,8 @@ myscrollbar.pack(side="right",fill="y")
 canvas.pack(side="left")
 canvas.create_window((0,0),window=frame,anchor='nw')
 frame.bind("<Configure>",myfunction)
+refresh_button = tk.Button(root, text="Refresh", command= lambda: request(l_servers, frame, canvas))
+refresh_button.place(x=200, y=260)
 print("Made it")
 t_search = threading.Thread(target=search, args=(l_servers, frame, canvas))
 t_search.daemon = True
