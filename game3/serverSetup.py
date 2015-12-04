@@ -33,10 +33,9 @@ def display_players(frame, canvas, clients):
       time.sleep(3)
 
 def start_game(clients, host):
-   root.destroy()
-   Thread(target=SimpleServer.serve).start()
    for client in clients:
       client[0].sendto(host.encode("ascii"), client[2])
+   SimpleServer.serve(len(clients))
    
       
 def myfunction(event):
