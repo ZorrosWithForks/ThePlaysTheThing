@@ -7,15 +7,21 @@ import threading
 from threading import Thread
 import _thread
 import time
+import SimpleClient
 import pickle
    
 def joinGame(ip):
    print("attempting to join " + ip)
    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
    addr = (ip, 9999)
+   
    s.connect(addr)
    s.sendto(player_name.encode('ascii'), addr)
    print("joined")
+   new_server = s.recv(1024).decode()
+   s.close()
+   root.destroy()
+   SimpleClient.play(new_server)
    
 def display_servers(l_servers, frame, canvas):
    for widget in frame.winfo_children():
@@ -60,13 +66,13 @@ client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 client_socket.sendto(data.encode('ascii'), address)
 
 root=Tk()
-sizex = 800
-sizey = 600
+sizex = 450
+sizey = 350
 posx  = 100
 posy  = 100
 root.wm_geometry("%dx%d+%d+%d" % (sizex, sizey, posx, posy))
 
-myframe=Frame(root,relief=GROOVE,width=300,height=150,bd=1)
+myframe=Frame(root,relief=GROOVE,width=400,height=150,bd=1)
 myframe.place(x=10,y=40)
 games_label = Label(root, text="Servers")
 games_label.place(x=10, y=10)
@@ -86,4 +92,6 @@ t_search = threading.Thread(target=search, args=(l_servers, frame, canvas))
 t_search.daemon = True
 t_search.start()
 print("Am I here?")
+root.wm_title(player_name)
+root.resizable(width=FALSE, height=FALSE)
 root.mainloop()

@@ -8,6 +8,7 @@ import pygame, sys, random
 from pygame.locals import *
 import pickle
 from Maps import *
+import Player
 
 #import time
 

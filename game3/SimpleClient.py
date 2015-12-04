@@ -13,14 +13,9 @@ import time
 
 pygame.font.init()
 
-fpsClock = pygame.time.Clock()
+pygame.init()
 
-#constants representing colours
-BLACK = (0,   0,   0  )
-BROWN = (153, 76,  0  )
-GREEN = (0,   255, 0  )
-BLUE  = (0,   0,   255)
-WHITE = (255, 255, 255)
+fpsClock = pygame.time.Clock()
 
 #constants representing the different resources
 IMAGE_FILE_PATH = "ImageFiles\\"
@@ -76,36 +71,6 @@ playerLogoIndexes = { UNOCCUPIED: 0 }
 MARGIN = 50
 TILESIZE  = 100
 BOTTOM_HALF_START = 15
-
-#set up the display
-pygame.init()
-DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
-
-#initialize the movie
-pygame.mixer.quit()
-movie = pygame.movie.Movie('These Guys XD_mpeg1video.mpg')
-
-#use list comprehension to create our tilemap
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-# get local machine name
-host = socket.gethostname()                           
-print("test1")
-port = 9998
-
-# connection to hostname on the port.
-s.connect((host, port))                               
-print("test2")
-# Receive no more than 1024 bytes
-pickledResponse = s.recv(8192)
-map = pickle.loads(pickledResponse)
-
-# Map continent names to tiles
-d_continent_tiles = {}
-incrementor = 0
-for continent in map.l_continent_names:
-   incrementor += 1
-   d_continent_tiles[continent] = incrementor
 
 def moveMap(x_offset, y_offset):
    ll_temp_map = [[map.WATER for x in range(map.WIDTH)] for y in range(map.HEIGHT)]
@@ -180,76 +145,100 @@ def printMap(map):
     #update the display
     pygame.display.update()
    
-#main()
-while True:
-    #get all the user events
-    for event in pygame.event.get():
-        #if the user wants to quit
-        if event.type == QUIT:
-            #and the game and close the window
-            pygame.quit()
-            sys.exit()
-        pygame.mouse.set_visible(True)
+def play(host_address):
+   #set up the display
+   DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 
-        #if a key is pressed
-        if event.type == KEYDOWN:
-            if event.key == K_i:
-               pygame.display.iconify()
-            if event.key == K_ESCAPE:
+   #initialize the movie
+   pygame.mixer.quit()
+   movie = pygame.movie.Movie('These Guys XD_mpeg1video.mpg')
+
+   #use list comprehension to create our tilemap
+   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+   # connection to hostname on the port.
+   s.connect(host_address)                               
+   print("test2")
+   # Receive no more than 1024 bytes
+   pickledResponse = s.recv(8192)
+   map = pickle.loads(pickledResponse)
+   
+   # Map continent names to tiles
+   d_continent_tiles = {}
+   incrementor = 0
+   for continent in map.l_continent_names:
+      incrementor += 1
+      d_continent_tiles[continent] = incrementor
+   
+   while True:
+       #get all the user events
+       for event in pygame.event.get():
+           #if the user wants to quit
+           if event.type == QUIT:
                #and the game and close the window
                pygame.quit()
                sys.exit()
-            #if the right arrow is pressed
-            if event.key == K_RIGHT:
-               #Change the map render offset
-               map_X_offset = (map_X_offset + 1) % map.WIDTH
-               moveMap(-1, 0)
-            if event.key == K_LEFT:
-               #Change the map render offset
-               map_X_offset = (map_X_offset - 1) % map.WIDTH
-               moveMap(1, 0)
-            if event.key == K_UP:
-               #Change the map render offset
-               map_Y_offset = (map_Y_offset - 1) % map.HEIGHT
-               moveMap(0, 1)
-            if event.key == K_DOWN:
-               #Change the map render offset
-               map_Y_offset = (map_Y_offset + 1) % map.HEIGHT
-               moveMap(0, -1)
-            if event.key == K_m:
-               #play the movie
-               #screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
-               info = pygame.display.Info()
-               movie_screen = pygame.Surface(movie.get_size())
-               #movie_screen.blit(textures[WATER], (200,200))
-               movie.set_display(movie_screen)
-               time_started = time.time()
-               int(time_started)
-               movie.set_volume(.99)
-               movie.play()
-               playing = True
-               while playing:
-                  if event.type == KEYDOWN:
-                      if event.key == K_p:
-                         movie.pause()
-                      if event.key == K_s:
-                         movie.stop()
-                         playing = False
-                  current_time = time.time()
-                  int(current_time)
-                  print("current time is: ", str(current_time))
-                  DISPLAYSURF.blit(movie_screen,(map.WIDTH * TILESIZE + 100, 120))
-                  pygame.display.update()
-                  if current_time - time_started >= int(movie.get_length()):
-                     playing = False
-                     movie.rewind()
-                     pygame.event.clear()
-                     print("HERE?")
-               print ("made it here")
-    printMap(map)
-    
-    #update the display
-    pygame.display.update()
-    fpsClock.tick(10)
+           pygame.mouse.set_visible(True)
 
-s.close()
+           #if a key is pressed
+           if event.type == KEYDOWN:
+               if event.key == K_i:
+                  pygame.display.iconify()
+               if event.key == K_ESCAPE:
+                  #and the game and close the window
+                  pygame.quit()
+                  sys.exit()
+               #if the right arrow is pressed
+               if event.key == K_RIGHT:
+                  #Change the map render offset
+                  map_X_offset = (map_X_offset + 1) % map.WIDTH
+                  moveMap(-1, 0)
+               if event.key == K_LEFT:
+                  #Change the map render offset
+                  map_X_offset = (map_X_offset - 1) % map.WIDTH
+                  moveMap(1, 0)
+               if event.key == K_UP:
+                  #Change the map render offset
+                  map_Y_offset = (map_Y_offset - 1) % map.HEIGHT
+                  moveMap(0, 1)
+               if event.key == K_DOWN:
+                  #Change the map render offset
+                  map_Y_offset = (map_Y_offset + 1) % map.HEIGHT
+                  moveMap(0, -1)
+               if event.key == K_m:
+                  #play the movie
+                  #screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+                  info = pygame.display.Info()
+                  movie_screen = pygame.Surface(movie.get_size())
+                  #movie_screen.blit(textures[WATER], (200,200))
+                  movie.set_display(movie_screen)
+                  time_started = time.time()
+                  int(time_started)
+                  movie.set_volume(.99)
+                  movie.play()
+                  playing = True
+                  while playing:
+                     if event.type == KEYDOWN:
+                         if event.key == K_p:
+                            movie.pause()
+                         if event.key == K_s:
+                            movie.stop()
+                            playing = False
+                     current_time = time.time()
+                     int(current_time)
+                     print("current time is: ", str(current_time))
+                     DISPLAYSURF.blit(movie_screen,(map.WIDTH * TILESIZE + 100, 120))
+                     pygame.display.update()
+                     if current_time - time_started >= int(movie.get_length()):
+                        playing = False
+                        movie.rewind()
+                        pygame.event.clear()
+                        print("HERE?")
+                  print ("made it here")
+       printMap(map)
+       
+       #update the display
+       pygame.display.update()
+       fpsClock.tick(10)
+
+   s.close()
