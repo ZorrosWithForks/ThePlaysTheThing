@@ -11,6 +11,7 @@ import time
 import select
 import subprocess
 import sys
+import SimpleServer
 
 def refresh_frame(frame, canvas):
    frame.destroy()
