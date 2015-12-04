@@ -104,8 +104,8 @@ t_accept_players.daemon = True
 t_accept_players.start()
 
 root=Tk()
-sizex = 800
-sizey = 600
+sizex = 425
+sizey = 350
 posx  = 100
 posy  = 100
 root.wm_geometry("%dx%d+%d+%d" % (sizex, sizey, posx, posy))
@@ -132,5 +132,6 @@ frame.bind("<Configure>",myfunction)
 t_display_players = threading.Thread(target=display_players, args=(frame, canvas, clients))
 t_display_players.daemon = True
 t_display_players.start()
-
+root.wm_title(server_name)
+root.resizable(width=FALSE, height=FALSE)
 root.mainloop()
