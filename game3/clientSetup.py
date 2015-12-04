@@ -7,15 +7,21 @@ import threading
 from threading import Thread
 import _thread
 import time
+import SimpleClient
 import pickle
    
 def joinGame(ip):
    print("attempting to join " + ip)
    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
    addr = (ip, 9999)
+   
    s.connect(addr)
    s.sendto(player_name.encode('ascii'), addr)
    print("joined")
+   new_server = s.recv(1024).decode()
+   s.close()
+   root.destroy()
+   SimpleClient.play(new_server)
    
 def display_servers(l_servers, frame, canvas):
    for widget in frame.winfo_children():
