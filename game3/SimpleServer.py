@@ -33,15 +33,17 @@ def listener(client, address):
          clients.remove(client)
          client.close()
 
-def serve():
-   clients = set()
-   clients_lock = threading.Lock()
-   th = []
+clients = set()
+clients_lock = threading.Lock()
+th = []
 
+def serve(player_count):
+   print("Entering server")
 
    #assemble the map
-   player_count = int(input("Just for sake of argument, enter the number of players: "))
    map = Map(player_count)
+   
+   print("Got the map")
 
    # create a socket object
 

@@ -36,8 +36,6 @@ DEEP_WATER = 10
 OVERLAY = 9
 
 # Map offset variables
-map_X_offset = 0
-map_Y_offset = 0
 
 #a dictionary linking resources to textures
 textures =   {
@@ -72,14 +70,16 @@ MARGIN = 50
 TILESIZE  = 100
 BOTTOM_HALF_START = 15
 
-def moveMap(x_offset, y_offset):
+d_continent_tiles = {}
+
+def moveMap(x_offset, y_offset, map):
    ll_temp_map = [[map.WATER for x in range(map.WIDTH)] for y in range(map.HEIGHT)]
    for row in range(map.HEIGHT):
       for column in range(map.WIDTH):
          ll_temp_map[row][column] = map.ll_map[(row + y_offset) % map.HEIGHT][(column + x_offset) % map.WIDTH]
    map.ll_map = ll_temp_map
 
-def printMap(map):
+def printMap(map, DISPLAYSURF):
     #loop through each row
     for row in range(map.HEIGHT):
         #loop through each column in the row
@@ -144,9 +144,12 @@ def printMap(map):
       
     #update the display
     pygame.display.update()
-   
+
 def play(host_address):
+   map_X_offset = 0
+   map_Y_offset = 0
    #set up the display
+   print("Enter play")
    DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 
    #initialize the movie
@@ -155,16 +158,15 @@ def play(host_address):
 
    #use list comprehension to create our tilemap
    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+   print("About to connect to host")
    # connection to hostname on the port.
    s.connect(host_address)                               
-   print("test2")
+   print("Connected to host")
    # Receive no more than 1024 bytes
    pickledResponse = s.recv(8192)
    map = pickle.loads(pickledResponse)
-   
+   print("Got the map")
    # Map continent names to tiles
-   d_continent_tiles = {}
    incrementor = 0
    for continent in map.l_continent_names:
       incrementor += 1
@@ -192,19 +194,19 @@ def play(host_address):
                if event.key == K_RIGHT:
                   #Change the map render offset
                   map_X_offset = (map_X_offset + 1) % map.WIDTH
-                  moveMap(-1, 0)
+                  moveMap(-1, 0, map)
                if event.key == K_LEFT:
                   #Change the map render offset
                   map_X_offset = (map_X_offset - 1) % map.WIDTH
-                  moveMap(1, 0)
+                  moveMap(1, 0, map)
                if event.key == K_UP:
                   #Change the map render offset
                   map_Y_offset = (map_Y_offset - 1) % map.HEIGHT
-                  moveMap(0, 1)
+                  moveMap(0, 1, map)
                if event.key == K_DOWN:
                   #Change the map render offset
                   map_Y_offset = (map_Y_offset + 1) % map.HEIGHT
-                  moveMap(0, -1)
+                  moveMap(0, -1, map)
                if event.key == K_m:
                   #play the movie
                   #screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
@@ -235,7 +237,7 @@ def play(host_address):
                         pygame.event.clear()
                         print("HERE?")
                   print ("made it here")
-       printMap(map)
+       printMap(map, DISPLAYSURF)
        
        #update the display
        pygame.display.update()
