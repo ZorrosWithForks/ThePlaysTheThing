@@ -18,7 +18,7 @@ def joinGame(ip):
    s.connect(addr)
    s.sendto(player_name.encode('ascii'), addr)
    print("joined")
-   new_server = s.recv(1024).decode()
+   new_server = (s.recv(1024).decode(), 9998)
    s.close()
    root.destroy()
    SimpleClient.play(new_server)
