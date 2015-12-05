@@ -10,6 +10,7 @@ from pygame import font
 import pickle
 from Maps import *
 import time
+import Player
 
 pygame.font.init()
 
@@ -111,8 +112,9 @@ def printMap(map, DISPLAYSURF):
             #draw the resource at that position in the tilemap, using the correct colour
             if (map.ll_map[row][column] != WATER):
                current_country = map.d_continents[map.ll_map[row][column][0]][map.ll_map[row][column][1]]
-               DISPLAYSURF.blit(playerLogos[playerLogoIndexes[current_country.owner]], (((column) % map.WIDTH) * TILESIZE, ((row) % map.HEIGHT) * TILESIZE))
+               DISPLAYSURF.blit(playerLogos[playerLogoIndexes["Unoccupied"]], (((column) % map.WIDTH) * TILESIZE, ((row) % map.HEIGHT) * TILESIZE))
                DISPLAYSURF.blit(UNIT_FONT.render(str(current_country.unit_counts.getSummaryCount()), True, (0,0,0)), (((column) % map.WIDTH) * TILESIZE + 40, ((row) % map.HEIGHT) * TILESIZE + 25))
+               
 
     DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
     DISPLAYSURF.blit(source=pygame.image.load(IMAGE_FILE_PATH + "InfoMarque.png"), dest=(map.WIDTH * TILESIZE, 0))
@@ -145,7 +147,7 @@ def printMap(map, DISPLAYSURF):
     #update the display
     pygame.display.update()
 
-def play(host_address):
+def play(host_address, player_name):
    map_X_offset = 0
    map_Y_offset = 0
    #set up the display
@@ -162,10 +164,12 @@ def play(host_address):
    # connection to hostname on the port.
    s.connect(host_address)                               
    print("Connected to host")
+   s.sendto(player_name.encode("ascii"), host_address)
    # Receive no more than 1024 bytes
    pickledResponse = s.recv(8192)
    map = pickle.loads(pickledResponse)
    print("Got the map")
+   
    # Map continent names to tiles
    incrementor = 0
    for continent in map.l_continent_names:

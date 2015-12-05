@@ -10,13 +10,14 @@ import pickle
 from Maps import *
 import Player
 
-#import time
+clients_lock = threading.Lock()
+th = []
 
-def listener(client, address):
+def listener(client, address, l_players):
    print("Accepted connection from: ", address)
    with clients_lock:
-      clients.add(client)#Array of clients
-   
+      
+      print("Added player")
    try:
       while True:
          data = client.recv(1024).decode() #block waiting for data from a client
@@ -30,20 +31,13 @@ def listener(client, address):
                       #c.sendall(data.encode('ascii'))
    finally:
       with clients_lock:
-         clients.remove(client)
+         #l_players.remove(client)
          client.close()
 
-clients = set()
-clients_lock = threading.Lock()
-th = []
-
-def serve(player_count):
-   print("Entering server")
-
-   #assemble the map
-   map = Map(player_count)
+def serve(player_count):   
+   l_players = []
    
-   print("Got the map")
+   print("Entering server")
 
    # create a socket object
 
@@ -61,12 +55,21 @@ def serve(player_count):
 
    # queue up to 5 requests
    serversocket.listen(5)
-
-   while True:
+   i = 0
+   while i < player_count:
       print("Server is listening for connections...")
       client, address = serversocket.accept()
-      packet = pickle.dumps(map)
-      client.sendto(packet, addr)
-      th.append(Thread(target=listener, args = (client,address)).start()) #spin another thread for the new client
+      th.append(Thread(target=listener, args = (client, address, l_players)).start()) #spin another thread for the new client
+      l_players.append(Player.Player(user_name=client.recv(1024).decode(), connection_object=client))#Array of clients
+      i += 1
       
+   #assemble the map
+   print("got map")
+   print("# of players: " + str(len(l_players)))
+   map = Map(l_players)
+   for player in l_players:
+      packet = pickle.dumps(map)
+      player.connection_object.sendto(packet, addr)
+      print("Sent to: " + player.user_name)
+   
    serversocket.close()
