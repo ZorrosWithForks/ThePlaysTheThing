@@ -1,8 +1,9 @@
 import random
 
 class Map:
-   def __init__(self, player_count):
-      self.COUNTRY_COUNT = player_count * 6 + 5
+   def __init__(self, l_players):
+      self.PLAYER_COUNT = len(l_players)
+      self.COUNTRY_COUNT = self.PLAYER_COUNT * 6 + 5
       self.WIDTH = 10
       self.HEIGHT = 7
       self.WATER = (0, 0) #Constant representing water in map, If a particular tile is not water, it's a country
@@ -17,12 +18,16 @@ class Map:
       # Generate the name for, and put the minimum 3 countries in, each continent
       self.d_continents = {}
       self.l_continent_names = []
-      for continent in range(0, player_count + 1):
+      for continent in range(0, self.PLAYER_COUNT + 1):
          continent_name = random.choice("AEIOU")
          continent_name += random.choice("pbwtcmnds")
          continent_name += random.choice("aeiou")
          continent_name += random.choice(["sia", "rica", "rope", "tica", "lia"])
          self.l_continent_names.append(continent_name)
+         
+         if continent < self.PLAYER_COUNT:
+            l_countries[continent * 3:continent * 3 + 3].owner = l_players[continent].name
+         
          self.d_continents[continent_name] = l_countries[continent * 3:continent * 3 + 3]
       else:
          l_countries = l_countries[continent * 3 + 3:]

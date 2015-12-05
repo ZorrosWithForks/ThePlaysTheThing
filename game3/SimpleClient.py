@@ -145,7 +145,7 @@ def printMap(map, DISPLAYSURF):
     #update the display
     pygame.display.update()
 
-def play(host_address):
+def play(host_address, player_name):
    map_X_offset = 0
    map_Y_offset = 0
    #set up the display
@@ -166,6 +166,8 @@ def play(host_address):
    pickledResponse = s.recv(8192)
    map = pickle.loads(pickledResponse)
    print("Got the map")
+   
+   s.sendto(player_name.encode("ascii"), host_address)
    # Map continent names to tiles
    incrementor = 0
    for continent in map.l_continent_names:

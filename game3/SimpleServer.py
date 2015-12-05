@@ -12,10 +12,10 @@ import Player
 
 #import time
 
-def listener(client, address):
+def listener(client, address, l_players):
    print("Accepted connection from: ", address)
    with clients_lock:
-      clients.add(client)#Array of clients
+      l_players.append(Player.Player(user_name=client.recv(1024).decode(), connection_object=client)#Array of clients
    
    try:
       while True:
@@ -33,11 +33,11 @@ def listener(client, address):
          clients.remove(client)
          client.close()
 
-clients = set()
-clients_lock = threading.Lock()
-th = []
-
-def serve(player_count):
+def serve(player_count):   
+   l_players = []
+   clients_lock = threading.Lock()
+   th = []
+   
    print("Entering server")
 
    #assemble the map
@@ -62,11 +62,11 @@ def serve(player_count):
    # queue up to 5 requests
    serversocket.listen(5)
 
-   while True:
+   while len(l_players) < player_count:
       print("Server is listening for connections...")
       client, address = serversocket.accept()
       packet = pickle.dumps(map)
       client.sendto(packet, addr)
-      th.append(Thread(target=listener, args = (client,address)).start()) #spin another thread for the new client
+      th.append(Thread(target=listener, args = (client, address, l_players)).start()) #spin another thread for the new client
       
    serversocket.close()

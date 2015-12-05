@@ -21,7 +21,7 @@ def joinGame(ip):
    new_server = (s.recv(1024).decode(), 9998)
    s.close()
    root.destroy()
-   SimpleClient.play(new_server)
+   SimpleClient.play(new_server, player_name)
    
 def display_servers(l_servers, frame, canvas):
    for widget in frame.winfo_children():
