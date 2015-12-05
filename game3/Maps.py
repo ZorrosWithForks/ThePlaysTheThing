@@ -9,7 +9,7 @@ class Map:
       self.WATER = (0, 0) #Constant representing water in map, If a particular tile is not water, it's a country
       
       self.ll_map = [[self.WATER for x in range(self.WIDTH)] for y in range(self.HEIGHT)]
-      
+      print("In map: # of players: " + str(self.PLAYER_COUNT))
       # Generate list of countries
       l_countries = []
       for country in range(0, self.COUNTRY_COUNT):
@@ -26,7 +26,7 @@ class Map:
          self.l_continent_names.append(continent_name)
          
          if continent < self.PLAYER_COUNT:
-            l_countries[continent * 3:continent * 3 + 3].owner = l_players[continent].name
+            l_countries[continent].owner = l_players[continent].user_name
          
          self.d_continents[continent_name] = l_countries[continent * 3:continent * 3 + 3]
       else:
