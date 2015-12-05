@@ -2,6 +2,10 @@ import random
 
 class Map:
    def __init__(self, l_players):
+      self.l_player_names = []
+      for player in l_players:
+         self.l_player_names.append(player.user_name)
+      
       self.PLAYER_COUNT = len(l_players)
       self.COUNTRY_COUNT = self.PLAYER_COUNT * 6 + 5
       self.WIDTH = 10
@@ -25,9 +29,6 @@ class Map:
          continent_name += random.choice(["sia", "rica", "rope", "tica", "lia"])
          self.l_continent_names.append(continent_name)
          
-         if continent < self.PLAYER_COUNT:
-            l_countries[continent].owner = l_players[continent].user_name
-         
          self.d_continents[continent_name] = l_countries[continent * 3:continent * 3 + 3]
       else:
          l_countries = l_countries[continent * 3 + 3:]
@@ -40,7 +41,10 @@ class Map:
       self.d_bonuses = {}
       for continent in self.l_continent_names:
          self.d_bonuses[continent] = len(self.d_continents[continent]) + random.randint(0, 2)
-         
+      
+      for player_index in range(0, len(self.l_player_names)):
+         self.d_continents[self.l_continent_names[player_index]][0].owner = self.l_player_names[player_index]
+   
       start = True
       temp_valid_tiles = []
       # Populate the map next

@@ -34,6 +34,10 @@ def listener(client, address, l_players):
          #l_players.remove(client)
          client.close()
 
+#This will eventually send a limited copy of the map to a player
+def sendMapToPlayer(player, map):
+   None
+         
 def serve(player_count):   
    l_players = []
    

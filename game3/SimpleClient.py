@@ -53,7 +53,7 @@ textures =   {
                 CONTINENT_8 : pygame.image.load(IMAGE_FILE_PATH + 'continent_8.png'),
             }
 
-playerLogos = [
+l_playerLogos = [
                 pygame.image.load(IMAGE_FILE_PATH + 'NoPlayer.png'),
                 pygame.image.load(IMAGE_FILE_PATH + 'Player1.png'),
                 pygame.image.load(IMAGE_FILE_PATH + 'Player2.png'),
@@ -64,7 +64,7 @@ playerLogos = [
                 pygame.image.load(IMAGE_FILE_PATH + 'Player7.png')
               ]
 
-playerLogoIndexes = { UNOCCUPIED: 0 }
+d_playerLogoIndexes = { UNOCCUPIED: 0 }
 
 #useful game dimensions
 MARGIN = 50
@@ -79,7 +79,7 @@ def moveMap(x_offset, y_offset, map):
       for column in range(map.WIDTH):
          ll_temp_map[row][column] = map.ll_map[(row + y_offset) % map.HEIGHT][(column + x_offset) % map.WIDTH]
    map.ll_map = ll_temp_map
-
+   
 def printMap(map, DISPLAYSURF):
     #loop through each row
     for row in range(map.HEIGHT):
@@ -112,7 +112,7 @@ def printMap(map, DISPLAYSURF):
             #draw the resource at that position in the tilemap, using the correct colour
             if (map.ll_map[row][column] != WATER):
                current_country = map.d_continents[map.ll_map[row][column][0]][map.ll_map[row][column][1]]
-               DISPLAYSURF.blit(playerLogos[playerLogoIndexes["Unoccupied"]], (((column) % map.WIDTH) * TILESIZE, ((row) % map.HEIGHT) * TILESIZE))
+               DISPLAYSURF.blit(l_playerLogos[d_playerLogoIndexes[current_country.owner]], (((column) % map.WIDTH) * TILESIZE, ((row) % map.HEIGHT) * TILESIZE))
                DISPLAYSURF.blit(UNIT_FONT.render(str(current_country.unit_counts.getSummaryCount()), True, (0,0,0)), (((column) % map.WIDTH) * TILESIZE + 40, ((row) % map.HEIGHT) * TILESIZE + 25))
                
 
@@ -155,8 +155,8 @@ def play(host_address, player_name):
    DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 
    #initialize the movie
-   pygame.mixer.quit()
-   movie = pygame.movie.Movie('These Guys XD_mpeg1video.mpg')
+   #pygame.mixer.quit()
+   #movie = pygame.movie.Movie('These Guys XD_mpeg1video.mpg')
 
    #use list comprehension to create our tilemap
    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -177,6 +177,12 @@ def play(host_address, player_name):
    for continent in map.l_continent_names:
       incrementor += 1
       d_continent_tiles[continent] = incrementor
+   
+   # Populate texture map index dictionary based on player names
+   temp_index = 0
+   for player_name in map.l_player_names:
+      temp_index += 1
+      d_playerLogoIndexes[player_name] = temp_index
    
    while True:
        #get all the user events
@@ -213,12 +219,13 @@ def play(host_address, player_name):
                   #Change the map render offset
                   map_Y_offset = (map_Y_offset + 1) % map.HEIGHT
                   moveMap(0, -1, map)
+               """
                if event.key == K_m:
                   #play the movie
                   #screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
                   info = pygame.display.Info()
                   movie_screen = pygame.Surface(movie.get_size())
-                  #movie_screen.blit(textures[WATER], (200,200))
+                  movie_screen.blit(textures[WATER], (200,200))
                   movie.set_display(movie_screen)
                   time_started = time.time()
                   int(time_started)
@@ -242,7 +249,7 @@ def play(host_address, player_name):
                         movie.rewind()
                         pygame.event.clear()
                         print("HERE?")
-                  print ("made it here")
+                  print ("made it here")"""
        printMap(map, DISPLAYSURF)
        
        #update the display
