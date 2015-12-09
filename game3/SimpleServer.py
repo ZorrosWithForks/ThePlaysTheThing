@@ -72,7 +72,7 @@ def serve(player_count):
    print("# of players: " + str(len(l_players)))
    map = Map(l_players)
    for player in l_players:
-      packet = pickle.dumps(map)
+      packet = pickle.dumps(Map(map_to_copy=map, copy_player_name=player.user_name))
       player.connection_object.sendto(packet, addr)
       print("Sent to: " + player.user_name)
    
