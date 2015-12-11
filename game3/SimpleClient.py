@@ -155,8 +155,8 @@ def play(host_address, player_name):
    DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 
    #initialize the movie
-   #pygame.mixer.quit()
-   #movie = pygame.movie.Movie('These Guys XD_mpeg1video.mpg')
+   pygame.mixer.quit()
+   movie = pygame.movie.Movie('These Guys XD_mpeg1video.mpg')
 
    #use list comprehension to create our tilemap
    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -219,7 +219,7 @@ def play(host_address, player_name):
                   #Change the map render offset
                   map_Y_offset = (map_Y_offset + 1) % map.HEIGHT
                   moveMap(0, -1, map)
-               """
+               
                if event.key == K_m:
                   #play the movie
                   #screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
@@ -249,7 +249,7 @@ def play(host_address, player_name):
                         movie.rewind()
                         pygame.event.clear()
                         print("HERE?")
-                  print ("made it here")"""
+                  print ("made it here")
        printMap(map, DISPLAYSURF)
        
        #update the display
