@@ -36,7 +36,11 @@ WATER = (0,0)
 DEEP_WATER = 10
 OVERLAY = 9
 
-# Map offset variables
+# Graphics Constants
+INFO_MARQUEE = pygame.image.load(IMAGE_FILE_PATH + "InfoMarque.png")
+INFO_OVERLAY = pygame.image.load(IMAGE_FILE_PATH + "InfoMarqueOverlay.png")
+MAP_FRAME = pygame.image.load(IMAGE_FILE_PATH + "MapFrame.png")
+MAP_LIGHT = pygame.image.load(IMAGE_FILE_PATH + "MapLighting.png")
 
 #a dictionary linking resources to textures
 textures =   {
@@ -104,6 +108,10 @@ def printMap(map, DISPLAYSURF):
             #draw the resource at that position in the tilemap, using the correct colour
             if (map.ll_map[row][column] == WATER):
                DISPLAYSURF.blit(textures[DEEP_WATER], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
+
+    DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
+    DISPLAYSURF.blit(MAP_FRAME, dest=(0,0))
+    DISPLAYSURF.blit(MAP_LIGHT, dest=(0,0), special_flags=BLEND_ADD)
 			   
 	 #loop through each row
     for row in range(map.HEIGHT):
@@ -115,10 +123,8 @@ def printMap(map, DISPLAYSURF):
                if current_country.owner != None:
                   DISPLAYSURF.blit(l_playerLogos[d_playerLogoIndexes[current_country.owner]], (((column) % map.WIDTH) * TILESIZE, ((row) % map.HEIGHT) * TILESIZE))
                   DISPLAYSURF.blit(UNIT_FONT.render(str(current_country.unit_counts.getSummaryCount()), True, (0,0,0)), (((column) % map.WIDTH) * TILESIZE + 40, ((row) % map.HEIGHT) * TILESIZE + 25))
-               
 
-    DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
-    DISPLAYSURF.blit(source=pygame.image.load(IMAGE_FILE_PATH + "InfoMarque.png"), dest=(map.WIDTH * TILESIZE, 0))
+    DISPLAYSURF.blit(source=INFO_MARQUEE, dest=(map.WIDTH * TILESIZE, 0))
     DISPLAYSURF.blit(source=pygame.image.load(IMAGE_FILE_PATH + "BaseBoard.png"), dest=(0, map.HEIGHT * TILESIZE))
     
     #Highlight country mouse is over and display country info
@@ -145,7 +151,8 @@ def printMap(map, DISPLAYSURF):
          
          DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonus: " + str(map.d_bonuses[current_tile[0]]), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 500))
          
-      
+    DISPLAYSURF.blit(source=INFO_OVERLAY, dest=(map.WIDTH * TILESIZE, 0), special_flags=BLEND_RGBA_ADD)
+	
     #update the display
     pygame.display.update()
 
