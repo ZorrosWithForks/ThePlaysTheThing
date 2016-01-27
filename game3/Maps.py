@@ -61,7 +61,6 @@ class Map:
          # Populate the map next
          for continent in self.l_continent_names:
             for country in range(len(self.d_continents[continent])):
-               valid_tiles_c3 = []
                valid_tiles_c2 = []
                valid_tiles_c1 = []
                valid_tiles_c0 = []
@@ -78,19 +77,14 @@ class Map:
                      neighbor_count += 1 if str(self.ll_map[(y) % self.HEIGHT][(x + 1) % self.WIDTH][0]) == continent else 0
                      neighbor_count += 1 if str(self.ll_map[(y) % self.HEIGHT][(x - 1) % self.WIDTH][0]) == continent else 0
                      
-                     if self.ll_map[y][x] == self.WATER and neighbor_count >= 3:
-                        valid_tiles_c3.append((y, x))
-                     elif self.ll_map[y][x] == self.WATER and neighbor_count == 2:
+                     if self.ll_map[y][x] == self.WATER and neighbor_count >= 2:
                         valid_tiles_c2.append((y, x))
                      elif self.ll_map[y][x] == self.WATER and neighbor_count == 1:
                         valid_tiles_c1.append((y, x))
                      elif self.ll_map[y][x] == self.WATER and neighbor_count == 0:
                         valid_tiles_c0.append((y, x))
                
-               if len(valid_tiles_c3) > 0:
-                  temp_tile = random.choice(valid_tiles_c3)
-                  self.ll_map[temp_tile[0]][temp_tile[1]] = (continent, country)
-               elif len(valid_tiles_c2) > 0:
+               if len(valid_tiles_c2) > 0:
                   temp_tile = random.choice(valid_tiles_c2)
                   self.ll_map[temp_tile[0]][temp_tile[1]] = (continent, country)
                elif len(valid_tiles_c1) > 0:

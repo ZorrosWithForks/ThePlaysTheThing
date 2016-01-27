@@ -21,6 +21,7 @@ def joinGame(ip):
    new_server = (s.recv(1024).decode(), 9998)
    s.close()
    root.destroy()
+   print ("root destroyed")
    SimpleClient.play(new_server, player_name)
    
 def display_servers(l_servers, frame, canvas):
@@ -28,18 +29,18 @@ def display_servers(l_servers, frame, canvas):
       widget.destroy()
    for server in l_servers:
       print("have a server from " + server[0])
-      c = Canvas(frame, width=300, height = 30)
+      c = Canvas(frame, width=400, height = 30)
       c.pack(side="top")
       lbl_server_name = Label(c,text=server[2])
       c.create_window (5,5, anchor=NW, window = lbl_server_name)
       txt_password = Entry(c)
-      c.create_window (100,8, anchor=NW, window = txt_password)
+      c.create_window (200,8, anchor=NW, window = txt_password)
       joinButton = tk.Button(c, anchor=NW, command=lambda server=server: joinGame(server[0])) #Without server=server, each button passes the same argument, the last one in the iteration
       joinButton["text"] = "Join"
-      c.create_window (250, 5, anchor=NW, window=joinButton)
+      c.create_window (350, 5, anchor=NW, window=joinButton)
 
 def myfunction(event):
-    canvas.configure(scrollregion=canvas.bbox("all"),width=300,height=200)
+    canvas.configure(scrollregion=canvas.bbox("all"),width=400,height=200)
 
 def search(l_servers, frame, canvas):
    while True:
@@ -66,13 +67,13 @@ client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 client_socket.sendto(data.encode('ascii'), address)
 
 root=Tk()
-sizex = 450
-sizey = 350
+sizex = 500
+sizey = 300
 posx  = 100
 posy  = 100
 root.wm_geometry("%dx%d+%d+%d" % (sizex, sizey, posx, posy))
 
-myframe=Frame(root,relief=GROOVE,width=400,height=150,bd=1)
+myframe=Frame(root,relief=GROOVE,width=500,height=150,bd=1)
 myframe.place(x=10,y=40)
 games_label = Label(root, text="Servers")
 games_label.place(x=10, y=10)

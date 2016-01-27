@@ -150,9 +150,22 @@ def printMap(map, DISPLAYSURF):
          DISPLAYSURF.blit(COUNTRY_FONT.render("Owner: " + str(map.d_continents[current_tile[0]][current_tile[1]].owner if map.d_continents[current_tile[0]][current_tile[1]].owner != None else "Neutral"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 425))
          
          DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonus: " + str(map.d_bonuses[current_tile[0]]), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 500))
-         
+    else:
+      x_offset = 120
+      y_offset = 180
+      DISPLAYSURF.blit(CONTINENT_FONT.render("Players:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 130))
+      for name in map.l_player_names:
+         DISPLAYSURF.blit(COUNTRY_FONT.render(name, True, (0,0,0)), (map.WIDTH * TILESIZE + x_offset, y_offset))
+         y_offset += 25
+      y_offset += 25
+      DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Strengths:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, y_offset))
+      y_offset += 20
+      for continent_name in map.l_continent_names:
+         y_offset += 25
+         DISPLAYSURF.blit(COUNTRY_FONT.render(continent_name + ": " + str(map.d_bonuses[continent_name]), True, (0,0,0)), (map.WIDTH * TILESIZE + x_offset, y_offset))
+
     DISPLAYSURF.blit(source=INFO_OVERLAY, dest=(map.WIDTH * TILESIZE, 0), special_flags=BLEND_RGBA_ADD)
-	
+
     #update the display
     pygame.display.update()
 
@@ -164,8 +177,8 @@ def play(host_address, player_name):
    DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 
    #initialize the movie
-   #pygame.mixer.quit()
-   #movie = pygame.movie.Movie('These Guys XD_mpeg1video.mpg')
+   pygame.mixer.quit()
+   movie = pygame.movie.Movie('These Guys XD_mpeg1video.mpg')
 
    #use list comprehension to create our tilemap
    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -228,7 +241,7 @@ def play(host_address, player_name):
                   #Change the map render offset
                   map_Y_offset = (map_Y_offset + 1) % map.HEIGHT
                   moveMap(0, -1, map)
-               """
+               
                if event.key == K_m:
                   #play the movie
                   #screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
@@ -258,7 +271,7 @@ def play(host_address, player_name):
                         movie.rewind()
                         pygame.event.clear()
                         print("HERE?")
-                  print ("made it here")"""
+                  print ("made it here")
        printMap(map, DISPLAYSURF)
        
        #update the display
