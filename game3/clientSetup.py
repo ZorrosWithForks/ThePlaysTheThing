@@ -60,7 +60,7 @@ def request(l_servers, frame, canvas):
 player_name = input("Enter username: ")
    
 l_servers = []
-address = ('<broadcast>', 54545)
+address = ('<broadcast>', 8080)
 data = "Request"
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)

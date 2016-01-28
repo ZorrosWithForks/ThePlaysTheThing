@@ -45,8 +45,10 @@ def broadcast():
    while True:
       print("Listening")
       recv_data, addr = server_socket.recvfrom(4096)
-      host = socket.gethostname()
-      print (recv_data)
+      host = socket.gethostbyname(socket.gethostname())
+      print(host)
+      print(socket.gethostname())
+      print(recv_data)
       sendData = (host, addr[1], server_name)
       packet = pickle.dumps(sendData) 
       server_socket.sendto(packet, addr)
@@ -73,7 +75,9 @@ def listener(client, client_address, clients, serversocket, player_name):
       
 def acceptPlayers():
    serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-   host = socket.gethostname()
+   host = socket.gethostbyname(socket.gethostname())
+   print(host)
+   print(socket.gethostname())
    port = 9999                                           
    addr = (host, port)
    serversocket.bind((host, port))
@@ -87,8 +91,8 @@ th = []
 clients = set()
 clients_lock = threading.Lock()
 
-host = socket.gethostname()
-broadcast_address = ('', 54545)
+host = socket.gethostbyname(socket.gethostname())
+broadcast_address = ('', 8080)
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
 server_socket.bind(broadcast_address)
