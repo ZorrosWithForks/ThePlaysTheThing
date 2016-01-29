@@ -137,10 +137,10 @@ def printMap(map, DISPLAYSURF):
       
       if map.d_continents[current_tile[0]][current_tile[1]].owner != None: 
          # Unit counts by type
-         DISPLAYSURF.blit(COUNTRY_FONT.render("Infantry: "  + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.infantry), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 225))
-         DISPLAYSURF.blit(COUNTRY_FONT.render("Archers: "   + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.archers), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 250))
-         DISPLAYSURF.blit(COUNTRY_FONT.render("Cannons: "   + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.cannons), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 275))
-         DISPLAYSURF.blit(COUNTRY_FONT.render("Champions: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.champions), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 300))
+         DISPLAYSURF.blit(COUNTRY_FONT.render("Pistoleers: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.infantry), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 225))
+         DISPLAYSURF.blit(COUNTRY_FONT.render("Musketeers: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.archers), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 250))
+         DISPLAYSURF.blit(COUNTRY_FONT.render("Cannons: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.cannons), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 275))
+         DISPLAYSURF.blit(COUNTRY_FONT.render("Airships: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.champions), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 300))
          
          # Country bonuses
          DISPLAYSURF.blit(COUNTRY_FONT.render("Attack Bonus: " + str(map.d_continents[current_tile[0]][current_tile[1]].attack_bonus), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 350))
@@ -189,7 +189,7 @@ def play(host_address, player_name):
    s.sendto(player_name.encode("ascii"), host_address)
    # Receive no more than 1024 bytes
    pickledResponse = s.recv(8192)
-   map = pickle.loads(pickledResponse)
+   map, player = pickle.loads(pickledResponse)
    print("Got the map")
    
    s.sendto(player_name.encode("ascii"), host_address)

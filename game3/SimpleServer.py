@@ -33,10 +33,6 @@ def listener(client, address, l_players):
       with clients_lock:
          #l_players.remove(client)
          client.close()
-
-#This will eventually send a limited copy of the map to a player
-def sendMapToPlayer(player, map):
-   None
          
 def serve(player_count):   
    l_players = []
@@ -64,7 +60,8 @@ def serve(player_count):
       print("Server is listening for connections...")
       client, address = serversocket.accept()
       th.append(Thread(target=listener, args = (client, address, l_players)).start()) #spin another thread for the new client
-      l_players.append(Player.Player(user_name=client.recv(1024).decode(), connection_object=client))#Array of clients
+      l_players.append(Player.Player(user_name=client.recv(1024).decode()))#Array of clients
+      l_players[i].connection = client
       i += 1
       
    #assemble the map
@@ -72,8 +69,10 @@ def serve(player_count):
    print("# of players: " + str(len(l_players)))
    map = Map(l_players)
    for player in l_players:
-      packet = pickle.dumps(Map(map_to_copy=map, copy_player_name=player.user_name))
-      player.connection_object.sendto(packet, addr)
+      curr_connection = player.connection
+      player.connection = None
+      packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=player.user_name), player))
+      curr_connection.sendto(packet, addr)
       print("Sent to: " + player.user_name)
    
    serversocket.close()

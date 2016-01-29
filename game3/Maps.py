@@ -55,6 +55,7 @@ class Map:
          
          for player_index in range(0, len(self.l_player_names)):
             self.d_continents[self.l_continent_names[player_index]][0].owner = self.l_player_names[player_index]
+            self.d_continents[self.l_continent_names[player_index]][0].unit_counts = UnitCounts(0, 0, 0, 0)
       
          start = True
          temp_valid_tiles = []
@@ -153,14 +154,15 @@ class Map:
                   neighbor_is_player += 1 if self.d_continents[self.ll_map[(y) % self.HEIGHT][(x - 1) % self.WIDTH][0]][self.ll_map[(y) % self.HEIGHT][(x - 1) % self.WIDTH][1]].owner == copy_player_name else 0
                if self.ll_map[(y) % self.HEIGHT][(x) % self.WIDTH] != self.WATER:
                   neighbor_is_player += 1 if self.d_continents[self.ll_map[(y) % self.HEIGHT][(x) % self.WIDTH][0]][self.ll_map[(y) % self.HEIGHT][(x) % self.WIDTH][1]].owner == copy_player_name else 0
-            
+               
                if neighbor_is_player == 0 and self.ll_map[y][x] != self.WATER:
+                  #Player and unit information is hidden from the player on tiles not directly adjacent to a tile the player owns 
                   self.d_continents[self.ll_map[y][x][0]][self.ll_map[y][x][1]].owner = None
                   self.d_continents[self.ll_map[y][x][0]][self.ll_map[y][x][1]].attack_bonus = None
                   self.d_continents[self.ll_map[y][x][0]][self.ll_map[y][x][1]].defense_bonus = None
                   self.d_continents[self.ll_map[y][x][0]][self.ll_map[y][x][1]].unit_production = None
                   self.d_continents[self.ll_map[y][x][0]][self.ll_map[y][x][1]].unit_counts = None
-
+                  
 class UnitCounts:
    def __init__(self, infantry, archers, cannons, champions):
       self.infantry  = infantry
