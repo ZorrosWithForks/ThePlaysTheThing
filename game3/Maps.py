@@ -198,7 +198,8 @@ class Country:
          self.attack_bonus = country_to_copy.attack_bonus
          self.defense_bonus = country_to_copy.defense_bonus
          self.unit_production = country_to_copy.unit_production
-         self.unit_counts = UnitCounts(country_to_copy.unit_counts.infantry, country_to_copy.unit_counts.archers, country_to_copy.unit_counts.cannons, country_to_copy.unit_counts.champions)
+         if country_to_copy.unit_counts != None:
+            self.unit_counts = UnitCounts(country_to_copy.unit_counts.infantry, country_to_copy.unit_counts.archers, country_to_copy.unit_counts.cannons, country_to_copy.unit_counts.champions)
 
    def __repr__(self):
       return "{name:" + self.name + ",\n owner:" + str(self.owner) + ",\n attack_bonus:" + str(self.attack_bonus) + ",\n defense_bonus:" + str(self.defense_bonus) + ",\n unit_counts:" + str(self.unit_counts) + ",\n unit_production" + str(self.unit_production) + "}"

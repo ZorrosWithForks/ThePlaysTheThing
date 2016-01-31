@@ -23,6 +23,7 @@ IMAGE_FILE_PATH = "ImageFiles\\"
 CONTINENT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 40)
 COUNTRY_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 25)
 UNIT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 35)
+MONEY_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 22)
 CONTINENT_1 = 1
 CONTINENT_2 = 2
 CONTINENT_3 = 3
@@ -182,7 +183,8 @@ def printMap(map, DISPLAYSURF, infoDisplay, params=None):
                current_country = map.d_continents[map.ll_map[row][column][0]][map.ll_map[row][column][1]]
                if current_country.owner != None:
                   DISPLAYSURF.blit(l_playerLogos[d_playerLogoIndexes[current_country.owner]], (((column) % map.WIDTH) * TILESIZE, ((row) % map.HEIGHT) * TILESIZE))
-                  DISPLAYSURF.blit(UNIT_FONT.render(str(current_country.unit_counts.getSummaryCount()), True, (0,0,0)), (((column) % map.WIDTH) * TILESIZE + 40, ((row) % map.HEIGHT) * TILESIZE + 25))
+                  count = str(current_country.unit_counts.getSummaryCount())
+                  DISPLAYSURF.blit(UNIT_FONT.render(count, True, (0,0,0)), (((column) % map.WIDTH) * TILESIZE + 45 - len(count) * 7, ((row) % map.HEIGHT) * TILESIZE + 25))
 
     DISPLAYSURF.blit(source=INFO_MARQUEE, dest=(map.WIDTH * TILESIZE, 0))
     DISPLAYSURF.blit(source=pygame.image.load(IMAGE_FILE_PATH + "BaseBoard.png"), dest=(0, map.HEIGHT * TILESIZE))
@@ -191,7 +193,7 @@ def printMap(map, DISPLAYSURF, infoDisplay, params=None):
 
     DISPLAYSURF.blit(source=INFO_OVERLAY, dest=(map.WIDTH * TILESIZE, 0), special_flags=BLEND_RGBA_ADD)
 
-def handleGeneral(event, map, map_X_offset, map_Y_offset):
+def handleGeneral(event, map, map_X_offset, map_Y_offset, temp_map=None):
   if event.type == QUIT:
       #and the game and close the window
       pygame.quit()
@@ -209,45 +211,102 @@ def handleGeneral(event, map, map_X_offset, map_Y_offset):
       #if the right arrow is pressed
       if event.key == K_RIGHT:
          #Change the map render offset
-         map_X_offset = (map_X_offset + 1) % map.WIDTH
-         moveMap(-1, 0, map)
-      if event.key == K_LEFT:
-         #Change the map render offset
          map_X_offset = (map_X_offset - 1) % map.WIDTH
          moveMap(1, 0, map)
-      if event.key == K_UP:
+         if temp_map != None: moveMap(1, 0, temp_map)
+      if event.key == K_LEFT:
          #Change the map render offset
-         map_Y_offset = (map_Y_offset - 1) % map.HEIGHT
-         moveMap(0, 1, map)
-      if event.key == K_DOWN:
+         map_X_offset = (map_X_offset + 1) % map.WIDTH
+         moveMap(-1, 0, map)
+         if temp_map != None: moveMap(-1, 0, temp_map)
+      if event.key == K_UP:
          #Change the map render offset
          map_Y_offset = (map_Y_offset + 1) % map.HEIGHT
          moveMap(0, -1, map)
+         if temp_map != None: moveMap(0, -1, temp_map)
+      if event.key == K_DOWN:
+         #Change the map render offset
+         map_Y_offset = (map_Y_offset - 1) % map.HEIGHT
+         moveMap(0, 1, map)
+         if temp_map != None: moveMap(0, 1, temp_map)
 
-def placeUnits(DISPLAYSURF, map, map_X_offset, map_Y_offset):
+def placeUnits(DISPLAYSURF, map, map_X_offset, map_Y_offset, player):
    BUY_PISTOLEERS = pygame.image.load(IMAGE_FILE_PATH + "PistoleersBuy.png")
    BUY_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "MusketeersBuy.png")
    BUY_CANNONS = pygame.image.load(IMAGE_FILE_PATH + "CannonBuy.png")
    BUY_AIRSHIPS = pygame.image.load(IMAGE_FILE_PATH + "AirshipBuy.png")
+   MONEY_SCREEN = pygame.image.load(IMAGE_FILE_PATH + "MoneyScreen.png")
    placing = True
    selectedCountry = None
+   temp_map = Map(map_to_copy=map, copy_player_name=player.user_name)
    
    while placing:          
        #get all the user events
        for event in pygame.event.get():
            #if the user wants to quit
            if selectedCountry == None:
-              handleGeneral(event, map, map_X_offset, map_Y_offset)
+              handleGeneral(event, map, map_X_offset, map_Y_offset, temp_map)
            
            if event.type == MOUSEBUTTONDOWN:
              curr_x, curr_y = pygame.mouse.get_pos()
-             curr_country = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)] if curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE else map.WATER
-             if (curr_country != map.WATER and map.d_continents[curr_country[0]][curr_country[1]].owner == map.current_player):
-               if selectedCountry == None or selectedCountry != (int(curr_x / TILESIZE), int(curr_y / TILESIZE)):
-                  selectedCountry = (int(curr_x / TILESIZE), int(curr_y / TILESIZE))
-               else:
-                  selectedCountry = None
-                  
+             if curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE:
+                curr_country = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)]
+                if (curr_country != map.WATER and map.d_continents[curr_country[0]][curr_country[1]].owner == map.current_player):
+                  if selectedCountry == None or selectedCountry != (int(curr_x / TILESIZE), int(curr_y / TILESIZE)):
+                     selectedCountry = (int(curr_x / TILESIZE), int(curr_y / TILESIZE))
+                  else:
+                     selectedCountry = None
+             elif selectedCountry != None:
+                curr_country = map.ll_map[selectedCountry[1]][selectedCountry[0]]
+                
+                #Pistoleers
+                if 175 + 250 <= curr_x <= 175 + 300 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Pistoleers
+                  map.d_continents[curr_country[0]][curr_country[1]].unit_counts.infantry += player.unit_counts
+                  player.unit_counts = 0
+                elif 175 + 300 <= curr_x <= 175 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and player.unit_counts > 0: # "+" for Pistoleers
+                  map.d_continents[curr_country[0]][curr_country[1]].unit_counts.infantry += 1
+                  player.unit_counts -= 1
+                elif 175 + 350 <= curr_x <= 175 + 400 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Pistoleers
+                  if map.d_continents[curr_country[0]][curr_country[1]].unit_counts.infantry > temp_map.d_continents[curr_country[0]][curr_country[1]].unit_counts.infantry:
+                     map.d_continents[curr_country[0]][curr_country[1]].unit_counts.infantry -= 1
+                     player.unit_counts += 1
+                
+                #Musketeers
+                if 580 + 250 <= curr_x <= 580 + 300 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Musketeers
+                  map.d_continents[curr_country[0]][curr_country[1]].unit_counts.archers += int(player.unit_counts / 2)
+                  player.unit_counts = player.unit_counts % 2
+                elif 580 + 300 <= curr_x <= 580 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and player.unit_counts > 1: # "+" for Musketeers
+                  map.d_continents[curr_country[0]][curr_country[1]].unit_counts.archers += 1
+                  player.unit_counts -= 2
+                elif 580 + 350 <= curr_x <= 580 + 400 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Musketeers
+                  if map.d_continents[curr_country[0]][curr_country[1]].unit_counts.archers > temp_map.d_continents[curr_country[0]][curr_country[1]].unit_counts.archers:
+                     map.d_continents[curr_country[0]][curr_country[1]].unit_counts.archers -= 1
+                     player.unit_counts += 2
+                     
+                #Cannons
+                if 175 + 250 <= curr_x <= 175 + 300 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Cannons
+                  map.d_continents[curr_country[0]][curr_country[1]].unit_counts.cannons += int(player.unit_counts / 2)
+                  player.unit_counts = player.unit_counts % 2
+                elif 175 + 300 <= curr_x <= 175 + 350 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and player.unit_counts > 1: # "+" for Cannons
+                  map.d_continents[curr_country[0]][curr_country[1]].unit_counts.cannons += 1
+                  player.unit_counts -= 2
+                elif 175 + 350 <= curr_x <= 175 + 400 and map.HEIGHT * TILESIZE + 125 < curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Cannons
+                  if map.d_continents[curr_country[0]][curr_country[1]].unit_counts.cannons > temp_map.d_continents[curr_country[0]][curr_country[1]].unit_counts.cannons:
+                     map.d_continents[curr_country[0]][curr_country[1]].unit_counts.cannons -= 1
+                     player.unit_counts += 2
+                     
+                #Airships
+                if 580 + 250 <= curr_x <= 580 + 300 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Airships
+                  map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions += int(player.unit_counts / 5)
+                  player.unit_counts = player.unit_counts % 5
+                elif 580 + 300 <= curr_x <= 580 + 350 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and player.unit_counts > 4: # "+" for Airships
+                  map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions += 1
+                  player.unit_counts -= 5
+                elif 580 + 350 <= curr_x <= 580 + 400 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Airships
+                  if map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions > temp_map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions:
+                     map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions -= 1
+                     player.unit_counts += 5
+                
        if selectedCountry != None:
           selectedCountry = (selectedCountry[0] + map_X_offset, selectedCountry[1] + map_Y_offset)
        
@@ -259,10 +318,12 @@ def placeUnits(DISPLAYSURF, map, map_X_offset, map_Y_offset):
        if selectedCountry != None:
          DISPLAYSURF.blit(SELECTED_TILE, (selectedCountry[0] * TILESIZE, selectedCountry[1] * TILESIZE), special_flags=BLEND_ADD)
        
-       DISPLAYSURF.blit(BUY_PISTOLEERS, (60, map.HEIGHT * TILESIZE + 60))
-       DISPLAYSURF.blit(BUY_MUSKETEERS, (465, map.HEIGHT * TILESIZE + 60))
-       DISPLAYSURF.blit(BUY_CANNONS, (60, map.HEIGHT * TILESIZE + 115))
-       DISPLAYSURF.blit(BUY_AIRSHIPS, (465, map.HEIGHT * TILESIZE + 115))
+       DISPLAYSURF.blit(MONEY_SCREEN, (70, map.HEIGHT * TILESIZE + 70))
+       DISPLAYSURF.blit(MONEY_FONT.render(str(player.unit_counts), True, (255, 0, 0)), (95, map.HEIGHT * TILESIZE + 103))
+       DISPLAYSURF.blit(BUY_PISTOLEERS, (170, map.HEIGHT * TILESIZE + 70))
+       DISPLAYSURF.blit(BUY_MUSKETEERS, (575, map.HEIGHT * TILESIZE + 70))
+       DISPLAYSURF.blit(BUY_CANNONS, (170, map.HEIGHT * TILESIZE + 125))
+       DISPLAYSURF.blit(BUY_AIRSHIPS, (575, map.HEIGHT * TILESIZE + 125))
        
        #update the display
        pygame.display.update()
@@ -355,6 +416,6 @@ def play(host_address, player_name):
    print(player_name)
    
    while True:
-      placeUnits(DISPLAYSURF, map, map_X_offset, map_Y_offset)
+      placeUnits(DISPLAYSURF, map, map_X_offset, map_Y_offset, player)
 
    s.close()
