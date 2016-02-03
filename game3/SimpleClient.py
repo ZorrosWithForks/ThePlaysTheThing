@@ -17,7 +17,7 @@ pygame.font.init()
 pygame.init()
 
 fpsClock = pygame.time.Clock()
-
+   
 #constants representing the different resources
 IMAGE_FILE_PATH = "ImageFiles\\"
 CONTINENT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 40)
@@ -36,6 +36,17 @@ UNOCCUPIED = "Unoccupied"
 WATER = (0,0)
 DEEP_WATER = 10
 OVERLAY = 9
+
+class CursorGraphic:
+   def __init__(self):
+      self.CursorOver = False
+      self.OFF = pygame.image.load(IMAGE_FILE_PATH + 'Cursor.png')
+      self.ON = pygame.image.load(IMAGE_FILE_PATH + 'CursorOn.png')
+      
+   def updateCursor(self, DISPLAYSURF):
+      DISPLAYSURF.blit(self.ON if self.CursorOver else self.OFF, pygame.mouse.get_pos())
+
+playCursor = CursorGraphic()
 
 # Graphics Constants
 MOUSE_OVER = pygame.image.load(IMAGE_FILE_PATH + 'MouseOver.png')
@@ -198,7 +209,7 @@ def handleGeneral(event, map, map_X_offset, map_Y_offset, temp_map=None):
       #and the game and close the window
       pygame.quit()
       sys.exit()
-  pygame.mouse.set_visible(True)
+  pygame.mouse.set_visible(False)
 
   #if a key is pressed
   if event.type == KEYDOWN:
@@ -242,13 +253,13 @@ def placeUnits(DISPLAYSURF, map, map_X_offset, map_Y_offset, player):
    
    while placing:          
        #get all the user events
+       curr_x, curr_y = pygame.mouse.get_pos()
        for event in pygame.event.get():
            #if the user wants to quit
            if selectedCountry == None:
               handleGeneral(event, map, map_X_offset, map_Y_offset, temp_map)
            
            if event.type == MOUSEBUTTONDOWN:
-             curr_x, curr_y = pygame.mouse.get_pos()
              if curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE:
                 curr_country = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)]
                 if (curr_country != map.WATER and map.d_continents[curr_country[0]][curr_country[1]].owner == map.current_player):
@@ -325,9 +336,12 @@ def placeUnits(DISPLAYSURF, map, map_X_offset, map_Y_offset, player):
        DISPLAYSURF.blit(BUY_CANNONS, (170, map.HEIGHT * TILESIZE + 125))
        DISPLAYSURF.blit(BUY_AIRSHIPS, (575, map.HEIGHT * TILESIZE + 125))
        
+       playCursor.CursorOver = (175 + 250 <= curr_x <= 175 + 400 or 580 + 250 <= curr_x <= 580 + 400)
+       playCursor.CursorOver = playCursor.CursorOver and (map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 or map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175)
+       playCursor.updateCursor(DISPLAYSURF)
        #update the display
        pygame.display.update()
-       fpsClock.tick(10)
+       #fpsClock.tick(50)
        
 def declareAttacks(DISPLAYSURF, map, map_X_offset, map_Y_offset):
    declaring = True
@@ -342,7 +356,7 @@ def declareAttacks(DISPLAYSURF, map, map_X_offset, map_Y_offset):
        
        #update the display
        pygame.display.update()
-       fpsClock.tick(10)
+       #fpsClock.tick(50)
        
 def resolveBattles(DISPLAYSURF, map, map_X_offset, map_Y_offset):
    resolving = True
@@ -357,7 +371,7 @@ def resolveBattles(DISPLAYSURF, map, map_X_offset, map_Y_offset):
        
        #update the display
        pygame.display.update()
-       fpsClock.tick(10)
+       #fpsClock.tick(50)
        
 def moveTroops(DISPLAYSURF, map, map_X_offset, map_Y_offset):
    moving = True
@@ -372,7 +386,7 @@ def moveTroops(DISPLAYSURF, map, map_X_offset, map_Y_offset):
        
        #update the display
        pygame.display.update()
-       fpsClock.tick(10)
+       #fpsClock.tick(50)
        
          
 def play(host_address, player_name):
