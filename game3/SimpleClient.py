@@ -40,11 +40,12 @@ OVERLAY = 9
 class CursorGraphic:
    def __init__(self):
       self.CursorOver = False
-      self.OFF = pygame.image.load(IMAGE_FILE_PATH + 'Cursor.png')
       self.ON = pygame.image.load(IMAGE_FILE_PATH + 'CursorOn.png')
       
    def updateCursor(self, DISPLAYSURF):
-      DISPLAYSURF.blit(self.ON if self.CursorOver else self.OFF, pygame.mouse.get_pos())
+      x, y = pygame.mouse.get_pos()
+      if self.CursorOver:
+         DISPLAYSURF.blit(self.ON, (x - 50, y - 50))
 
 playCursor = CursorGraphic()
 
@@ -209,7 +210,7 @@ def handleGeneral(event, map, map_X_offset, map_Y_offset, temp_map=None):
       #and the game and close the window
       pygame.quit()
       sys.exit()
-  pygame.mouse.set_visible(False)
+  pygame.mouse.set_visible(True)
 
   #if a key is pressed
   if event.type == KEYDOWN:
@@ -247,6 +248,7 @@ def placeUnits(DISPLAYSURF, map, map_X_offset, map_Y_offset, player):
    BUY_CANNONS = pygame.image.load(IMAGE_FILE_PATH + "CannonBuy.png")
    BUY_AIRSHIPS = pygame.image.load(IMAGE_FILE_PATH + "AirshipBuy.png")
    MONEY_SCREEN = pygame.image.load(IMAGE_FILE_PATH + "MoneyScreen.png")
+   DONE_BUTTON = pygame.image.load(IMAGE_FILE_PATH + "DoneButton.png")
    placing = True
    selectedCountry = None
    temp_map = Map(map_to_copy=map, copy_player_name=player.user_name)
@@ -335,9 +337,11 @@ def placeUnits(DISPLAYSURF, map, map_X_offset, map_Y_offset, player):
        DISPLAYSURF.blit(BUY_MUSKETEERS, (575, map.HEIGHT * TILESIZE + 70))
        DISPLAYSURF.blit(BUY_CANNONS, (170, map.HEIGHT * TILESIZE + 125))
        DISPLAYSURF.blit(BUY_AIRSHIPS, (575, map.HEIGHT * TILESIZE + 125))
+       DISPLAYSURF.blit(DONE_BUTTON, (980, map.HEIGHT * TILESIZE + 70))
        
        playCursor.CursorOver = (175 + 250 <= curr_x <= 175 + 400 or 580 + 250 <= curr_x <= 580 + 400)
        playCursor.CursorOver = playCursor.CursorOver and (map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 or map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175)
+       playCursor.CursorOver = playCursor.CursorOver or (980 <= curr_x <= 1080 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 175)
        playCursor.updateCursor(DISPLAYSURF)
        #update the display
        pygame.display.update()

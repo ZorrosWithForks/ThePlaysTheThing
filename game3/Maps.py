@@ -56,6 +56,8 @@ class Map:
          for player_index in range(0, len(self.l_player_names)):
             self.d_continents[self.l_continent_names[player_index]][0].owner = self.l_player_names[player_index]
             self.d_continents[self.l_continent_names[player_index]][0].unit_counts = UnitCounts(0, 0, 0, 0)
+            self.d_continents[self.l_continent_names[player_index]][0].defense_bonus = 10
+            self.d_continents[self.l_continent_names[player_index]][0].attack_bonus = 10
       
          start = True
          temp_valid_tiles = []
