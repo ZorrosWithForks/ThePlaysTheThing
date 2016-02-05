@@ -249,6 +249,7 @@ def placeUnits(DISPLAYSURF, map, map_X_offset, map_Y_offset, player):
    BUY_AIRSHIPS = pygame.image.load(IMAGE_FILE_PATH + "AirshipBuy.png")
    MONEY_SCREEN = pygame.image.load(IMAGE_FILE_PATH + "MoneyScreen.png")
    DONE_BUTTON = pygame.image.load(IMAGE_FILE_PATH + "DoneButton.png")
+   DONE_BUTTON_ACTIVE = pygame.image.load(IMAGE_FILE_PATH + "DoneButtonActive.png")
    placing = True
    selectedCountry = None
    temp_map = Map(map_to_copy=map, copy_player_name=player.user_name)
@@ -337,7 +338,7 @@ def placeUnits(DISPLAYSURF, map, map_X_offset, map_Y_offset, player):
        DISPLAYSURF.blit(BUY_MUSKETEERS, (575, map.HEIGHT * TILESIZE + 70))
        DISPLAYSURF.blit(BUY_CANNONS, (170, map.HEIGHT * TILESIZE + 125))
        DISPLAYSURF.blit(BUY_AIRSHIPS, (575, map.HEIGHT * TILESIZE + 125))
-       DISPLAYSURF.blit(DONE_BUTTON, (980, map.HEIGHT * TILESIZE + 70))
+       DISPLAYSURF.blit(DONE_BUTTON if player.unit_counts > 0 else DONE_BUTTON_ACTIVE, (980, map.HEIGHT * TILESIZE + 70))
        
        playCursor.CursorOver = (175 + 250 <= curr_x <= 175 + 400 or 580 + 250 <= curr_x <= 580 + 400)
        playCursor.CursorOver = playCursor.CursorOver and (map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 or map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175)

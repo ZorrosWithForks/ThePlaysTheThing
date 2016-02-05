@@ -34,6 +34,42 @@ def listener(client, address, l_players):
          #l_players.remove(client)
          client.close()
          
+def receivePlacements(l_players, serversocket, map):
+   l_placements = []
+   
+   d_players = {}
+   for player in l_players:
+      d_players[player.user_name] = player
+   
+   grand_total = 0
+   
+   for player in l_players:
+      response = player.connection.recv(8192)
+      l_placements.append(pickle.loads(response))
+   
+   for placement in l_placements:
+      for continent in map.l_continent_names:
+         for country_i in range(len(map.d_continents[continent])):
+            if placement[0].d_continents[continent][country_i].unit_counts != None and placement[0].d_continents[continent][country_i].owner == placement[1].user_name:
+               grand_total += (placement[0].d_continents[continent][country_i].unit_counts.infantry - map.d_continents[continent][country_i].unit_counts.infantry)
+               grand_total += (placement[0].d_continents[continent][country_i].unit_counts.archers - map.d_continents[continent][country_i].unit_counts.archers) * 2
+               grand_total += (placement[0].d_continents[continent][country_i].unit_counts.cannons - map.d_continents[continent][country_i].unit_counts.cannons) * 2
+               grand_total += (placement[0].d_continents[continent][country_i].unit_counts.champions - map.d_continents[continent][country_i].unit_counts.champions) * 5
+               
+      if grand_total <= d_players[placement[1].user_name].unit_counts:
+         for continent in map.l_continent_names:
+            for country_i in range(len(map.d_continents[continent])):
+               if placement[0].d_continents[continent][country_i].unit_counts != None and placement[0].d_continents[continent][country_i].owner == placement[1].user_name:
+                  map.d_continents[continent][country_i].unit_counts = placement[0].d_continents[continent][country_i].unit_counts
+
+   for player in l_players:
+      curr_connection = player.connection
+      player.connection = None
+      packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=player.user_name), player))
+      curr_connection.sendto(packet, addr)
+      player.connection = curr_connection
+      print("Sent to: " + player.user_name)
+               
 def serve(player_count):   
    l_players = []
    
@@ -73,6 +109,10 @@ def serve(player_count):
       player.connection = None
       packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=player.user_name), player))
       curr_connection.sendto(packet, addr)
+      player.connection = curr_connection
       print("Sent to: " + player.user_name)
+   
+   while True:
+      receivePlacements(l_players, serversocket, map)
    
    serversocket.close()
