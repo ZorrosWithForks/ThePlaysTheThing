@@ -80,7 +80,8 @@ def serve(player_count):
    serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 
    # get local machine name
-   host = socket.gethostname()                           
+   temp = socket.gethostbyname_ex(socket.gethostname())[-1]
+   host = temp[-1]                           
 
    port = 9998                                          
 

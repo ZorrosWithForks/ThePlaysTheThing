@@ -44,11 +44,18 @@ def myfunction(event):
 def broadcast():
    while True:
       print("Listening")
-      recv_data, addr = server_socket.recvfrom(4096)
-      
+      recv_data, addr = server_socket.recvfrom(8192)
+      #host = socket.gethostbyname(socket.gethostname() + ".studentnet.int")
+      print(host)
+      print(socket.gethostname())
+      print(addr)
       print(recv_data)
-      packet = pickle.dumps((host, server_name)) 
+      print(server_name)
+      #packet = pickle.dumps((host, addr[1], server_name))
+      packet = pickle.dumps((host, server_name))
       server_socket.sendto(packet, addr)
+      #server_socket.sendto(server_name.encode(), addr)
+      print("Sent")
 
 def listener(client, client_address, clients, serversocket, player_name):
    print("Accepted connection from: ", client_address)
@@ -72,6 +79,9 @@ def listener(client, client_address, clients, serversocket, player_name):
       
 def acceptPlayers():
    serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+   #host = socket.gethostbyname(socket.gethostname()  + ".studentnet.int")
+   #print(host)
+   #print(socket.gethostname())
    port = 9999                                           
    addr = (host, port)
    serversocket.bind((host, port))
@@ -86,10 +96,12 @@ clients = set()
 clients_lock = threading.Lock()
 
 temp = socket.gethostbyname_ex(socket.gethostname())[-1]
-host = temp[-1]
+host = temp[1]
+#host = socket.getfqdn(socket.gethostname() + ".studentnet.int")
 broadcast_address = ('', 8080)
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
+server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 server_socket.bind(broadcast_address)
 server_name = input("The name of the server is: ")
 

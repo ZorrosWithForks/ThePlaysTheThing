@@ -44,7 +44,15 @@ def myfunction(event):
 
 def search(l_servers, frame, canvas):
    while True:
+      #host, addr = client_socket.recvfrom(8192)
+      #host = host.decode()
+      #print(host)
+      #server_name, addr = client_socket.recvfrom(8192)
+      #server_name = server_name.decode()
+      #print(server_name)
+      packet = []
       packet, addr = client_socket.recvfrom(4096)
+      #thing = packet.decode()
       if packet != None:
          try:
             server_info = pickle.loads(packet)
@@ -68,8 +76,12 @@ player_name = input("Enter username: ")
 l_servers = []
 address = ('255.255.255.255', 8080)
 data = "Request"
+temp = []
 temp = socket.gethostbyname_ex(socket.gethostname())[-1]
-host = temp[-1]
+if len(temp) > 1:
+   host = str(temp[1])
+else:
+   host = str(temp[0])
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 client_socket.bind((host, 8080))
