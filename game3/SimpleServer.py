@@ -20,11 +20,12 @@ def listener(client, address, l_players):
     
    try:
       while True:
-         data = client.recv(1024).decode() #block waiting for data from a client
-         if not data:
-            break
-         else:
-            print(repr(data))
+         None
+         #data = client.recv(1024).decode() #block waiting for data from a client
+         #if not data:
+            #break
+         #else:
+            #print(repr(data))
             #with clients_lock:
                #for c in clients:
 						#do something for every client
@@ -34,20 +35,22 @@ def listener(client, address, l_players):
          #l_players.remove(client)
          client.close()
          
-def receivePlacements(l_players, serversocket, map):
+def receivePlacements(l_players, serversocket, map, address):
    l_placements = []
    
    d_players = {}
    for player in l_players:
       d_players[player.user_name] = player
    
-   grand_total = 0
-   
    for player in l_players:
       response = player.connection.recv(8192)
-      l_placements.append(pickle.loads(response))
+      placement = pickle.loads(response)
+      l_placements.append(placement)
+   
+   print("I got it! Yay!")
    
    for placement in l_placements:
+      grand_total = 0
       for continent in map.l_continent_names:
          for country_i in range(len(map.d_continents[continent])):
             if placement[0].d_continents[continent][country_i].unit_counts != None and placement[0].d_continents[continent][country_i].owner == placement[1].user_name:
@@ -61,12 +64,13 @@ def receivePlacements(l_players, serversocket, map):
             for country_i in range(len(map.d_continents[continent])):
                if placement[0].d_continents[continent][country_i].unit_counts != None and placement[0].d_continents[continent][country_i].owner == placement[1].user_name:
                   map.d_continents[continent][country_i].unit_counts = placement[0].d_continents[continent][country_i].unit_counts
+      else: print("Cheaters never prosper!")
 
    for player in l_players:
       curr_connection = player.connection
       player.connection = None
-      packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=player.user_name), player))
-      curr_connection.sendto(packet, addr)
+      packet = pickle.dumps(Map(map_to_copy=map, copy_player_name=player.user_name))
+      curr_connection.sendto(packet, address)
       player.connection = curr_connection
       print("Sent to: " + player.user_name)
                
@@ -96,7 +100,7 @@ def serve(player_count):
    while i < player_count:
       print("Server is listening for connections...")
       client, address = serversocket.accept()
-      th.append(Thread(target=listener, args = (client, address, l_players)).start()) #spin another thread for the new client
+      #th.append(Thread(target=listener, args = (client, address, l_players)).start()) #spin another thread for the new client
       l_players.append(Player.Player(user_name=client.recv(1024).decode()))#Array of clients
       l_players[i].connection = client
       i += 1
@@ -114,6 +118,6 @@ def serve(player_count):
       print("Sent to: " + player.user_name)
    
    while True:
-      receivePlacements(l_players, serversocket, map)
+      receivePlacements(l_players, serversocket, map, addr)
    
    serversocket.close()

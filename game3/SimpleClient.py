@@ -91,6 +91,9 @@ MARGIN = 50
 TILESIZE  = 100
 BOTTOM_HALF_START = 15
 
+map_X_offset = 0
+map_Y_offset = 0
+
 d_continent_tiles = {}
 
 def moveMap(x_offset, y_offset, map):
@@ -205,13 +208,14 @@ def printMap(map, DISPLAYSURF, infoDisplay, params=None):
 
     DISPLAYSURF.blit(source=INFO_OVERLAY, dest=(map.WIDTH * TILESIZE, 0), special_flags=BLEND_RGBA_ADD)
 
-def handleGeneral(event, map, map_X_offset, map_Y_offset, temp_map=None):
+def handleGeneral(event, map, temp_map=None, selectedCountry=None):
+  global map_X_offset
+  global map_Y_offset
   if event.type == QUIT:
       #and the game and close the window
       pygame.quit()
       sys.exit()
   pygame.mouse.set_visible(True)
-
   #if a key is pressed
   if event.type == KEYDOWN:
       if event.key == K_i:
@@ -223,26 +227,31 @@ def handleGeneral(event, map, map_X_offset, map_Y_offset, temp_map=None):
       #if the right arrow is pressed
       if event.key == K_RIGHT:
          #Change the map render offset
-         map_X_offset = (map_X_offset - 1) % map.WIDTH
+         map_X_offset -= 1
          moveMap(1, 0, map)
+         if selectedCountry != None: selectedCountry[0] = (selectedCountry[0] - 1) % map.WIDTH
          if temp_map != None: moveMap(1, 0, temp_map)
       if event.key == K_LEFT:
          #Change the map render offset
-         map_X_offset = (map_X_offset + 1) % map.WIDTH
+         map_X_offset += 1
          moveMap(-1, 0, map)
+         if selectedCountry != None: selectedCountry[0] = (selectedCountry[0] + 1) % map.WIDTH
          if temp_map != None: moveMap(-1, 0, temp_map)
       if event.key == K_UP:
          #Change the map render offset
-         map_Y_offset = (map_Y_offset + 1) % map.HEIGHT
+         map_Y_offset += 1
          moveMap(0, -1, map)
+         if selectedCountry != None: selectedCountry[1] = (selectedCountry[1] + 1) % map.HEIGHT
          if temp_map != None: moveMap(0, -1, temp_map)
       if event.key == K_DOWN:
          #Change the map render offset
-         map_Y_offset = (map_Y_offset - 1) % map.HEIGHT
+         map_Y_offset -= 1
          moveMap(0, 1, map)
+         if selectedCountry != None: selectedCountry[1] = (selectedCountry[1] - 1) % map.HEIGHT
          if temp_map != None: moveMap(0, 1, temp_map)
+         
 
-def placeUnits(DISPLAYSURF, map, map_X_offset, map_Y_offset, player):
+def placeUnits(DISPLAYSURF, map, player, socket, host_address):
    BUY_PISTOLEERS = pygame.image.load(IMAGE_FILE_PATH + "PistoleersBuy.png")
    BUY_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "MusketeersBuy.png")
    BUY_CANNONS = pygame.image.load(IMAGE_FILE_PATH + "CannonBuy.png")
@@ -259,15 +268,17 @@ def placeUnits(DISPLAYSURF, map, map_X_offset, map_Y_offset, player):
        curr_x, curr_y = pygame.mouse.get_pos()
        for event in pygame.event.get():
            #if the user wants to quit
-           if selectedCountry == None:
-              handleGeneral(event, map, map_X_offset, map_Y_offset, temp_map)
+           #if selectedCountry == None:
+           print("Before: (" + str(map_X_offset) + ", " + str(map_Y_offset) + ")")
+           handleGeneral(event, map, temp_map, selectedCountry)
+           print("After: (" + str(map_X_offset) + ", " + str(map_Y_offset) + ")")
            
            if event.type == MOUSEBUTTONDOWN:
              if curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE:
                 curr_country = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)]
                 if (curr_country != map.WATER and map.d_continents[curr_country[0]][curr_country[1]].owner == map.current_player):
-                  if selectedCountry == None or selectedCountry != (int(curr_x / TILESIZE), int(curr_y / TILESIZE)):
-                     selectedCountry = (int(curr_x / TILESIZE), int(curr_y / TILESIZE))
+                  if selectedCountry == None or selectedCountry != [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]:
+                     selectedCountry = [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]
                   else:
                      selectedCountry = None
              elif selectedCountry != None:
@@ -320,9 +331,12 @@ def placeUnits(DISPLAYSURF, map, map_X_offset, map_Y_offset, player):
                   if map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions > temp_map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions:
                      map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions -= 1
                      player.unit_counts += 5
-                
-       if selectedCountry != None:
-          selectedCountry = (selectedCountry[0] + map_X_offset, selectedCountry[1] + map_Y_offset)
+                     
+                #Done
+             if 980 <= curr_x <= 1080 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 175 and player.unit_counts == 0:
+               update_map = pickle.dumps((map, player))
+               socket.sendto(update_map, host_address)
+               placing = False
        
        if selectedCountry == None:
          printMap(map, DISPLAYSURF, standardInfo)
@@ -344,33 +358,39 @@ def placeUnits(DISPLAYSURF, map, map_X_offset, map_Y_offset, player):
        playCursor.CursorOver = playCursor.CursorOver and (map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 or map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175)
        playCursor.CursorOver = playCursor.CursorOver or (980 <= curr_x <= 1080 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 175)
        playCursor.updateCursor(DISPLAYSURF)
+       
        #update the display
        pygame.display.update()
-       #fpsClock.tick(50)
        
-def declareAttacks(DISPLAYSURF, map, map_X_offset, map_Y_offset):
+def declareAttacks(DISPLAYSURF, player, socket, host_address):
    declaring = True
 
+   response = socket.recv(8192)
+   map = pickle.loads(response)
+   print("(" + str(map_X_offset) + ", " + str(map_Y_offset) + ")")
+   
+   moveMap(-map_X_offset, -map_Y_offset, map)
+   print("I have the map!")
+   
    while declaring:
        #get all the user events
        for event in pygame.event.get():
            #if the user wants to quit
-           handleGeneral(event, map, map_X_offset, map_Y_offset)
+           handleGeneral(event, map)
                   
-       printMap(map, DISPLAYSURF)
+       printMap(map, DISPLAYSURF, standardInfo)
        
        #update the display
        pygame.display.update()
-       #fpsClock.tick(50)
        
-def resolveBattles(DISPLAYSURF, map, map_X_offset, map_Y_offset):
+def resolveBattles(DISPLAYSURF, map):
    resolving = True
 
    while resolving:
        #get all the user events
        for event in pygame.event.get():
            #if the user wants to quit
-           handleGeneral(event, map, map_X_offset, map_Y_offset)
+           handleGeneral(event, map)
                   
        printMap(map, DISPLAYSURF)
        
@@ -378,14 +398,14 @@ def resolveBattles(DISPLAYSURF, map, map_X_offset, map_Y_offset):
        pygame.display.update()
        #fpsClock.tick(50)
        
-def moveTroops(DISPLAYSURF, map, map_X_offset, map_Y_offset):
+def moveTroops(DISPLAYSURF, map):
    moving = True
 
    while moving:
        #get all the user events
        for event in pygame.event.get():
            #if the user wants to quit
-           handleGeneral(event, map, map_X_offset, map_Y_offset)
+           handleGeneral(event, map)
                   
        printMap(map, DISPLAYSURF)
        
@@ -395,8 +415,6 @@ def moveTroops(DISPLAYSURF, map, map_X_offset, map_Y_offset):
        
          
 def play(host_address, player_name):
-   map_X_offset = 0
-   map_Y_offset = 0
    #set up the display
    print("Enter play")
    DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
@@ -417,7 +435,7 @@ def play(host_address, player_name):
    map, player = pickle.loads(pickledResponse)
    print("Got the map")
    
-   s.sendto(player_name.encode("ascii"), host_address)
+   #s.sendto(player_name.encode("ascii"), host_address)
 
    # Map continent names to tiles
    incrementor = 0
@@ -435,6 +453,10 @@ def play(host_address, player_name):
    print(player_name)
    
    while True:
-      placeUnits(DISPLAYSURF, map, map_X_offset, map_Y_offset, player)
+      placeUnits(DISPLAYSURF, map, player, s, host_address)
+      declareAttacks(DISPLAYSURF, player, s, host_address)
+      print("Exited properly")
+      #pygame.quit()
+      #sys.exit()
 
    s.close()
