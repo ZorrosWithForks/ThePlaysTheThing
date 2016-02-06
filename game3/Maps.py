@@ -181,9 +181,10 @@ class UnitCounts:
 class Country:
    def __init__(self, country_to_copy=None):
       if country_to_copy == None:
-         self.name =  random.choice("PKBWLTCMNDL")
+         self.name = "" if random.randint(1, 10) != 1 else random.choice(["Great", "Greater", "Lesser", "North", "South", "East", "West", "New", "Republic of", "Kingdom of"]) + " " 
+         self.name += random.choice("PKBWLTCMNDL")
          self.name += random.choice("aeiou")
-         self.name += random.choice("pblmnd")
+         self.name += random.choice("pblwnd")
          self.name += random.choice("pbwtcmnd")
          self.name += random.choice("aeiou")
          self.name += random.choice("pbwltcmndts")

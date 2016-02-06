@@ -21,7 +21,6 @@ def refresh_frame(frame, canvas):
 def display_players(frame, canvas, clients):
    while True:
       frame = refresh_frame(frame, canvas)
-      print("Number of clients: " + str(len(clients)))
       for i in clients:
          c = Canvas(frame, width=300, height = 25)
          c.pack(side="top")
