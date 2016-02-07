@@ -269,9 +269,7 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address):
        for event in pygame.event.get():
            #if the user wants to quit
            #if selectedCountry == None:
-           print("Before: (" + str(map_X_offset) + ", " + str(map_Y_offset) + ")")
            handleGeneral(event, map, temp_map, selectedCountry)
-           print("After: (" + str(map_X_offset) + ", " + str(map_Y_offset) + ")")
            
            if event.type == MOUSEBUTTONDOWN:
              if curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE:
@@ -361,12 +359,34 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address):
        
        #update the display
        pygame.display.update()
-       
-def declareAttacks(DISPLAYSURF, player, socket, host_address):
+refreshing = True
+oldMap = None
+def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
+   global refreshing
+   def refresh():
+      global refreshing
+      global oldMap
+      response = socket.recv(8192)
+      oldMap = pickle.loads(response)
+      refreshing = False
+      print("set refreshing to false")
+      
+   t_updateScreen = threading.Thread(target=refresh)
+   t_updateScreen.start()
+   
+   while refreshing:
+      for event in pygame.event.get():
+         #if the user wants to quit
+         handleGeneral(event, map)
+              
+      printMap(map, DISPLAYSURF, standardInfo)
+      #update the display
+      pygame.display.update()
+   print("Exited refreshing")
+   map = oldMap
    declaring = True
-
-   response = socket.recv(8192)
-   map = pickle.loads(response)
+   t_updateScreen._stop()
+   refreshing = False
    print("(" + str(map_X_offset) + ", " + str(map_Y_offset) + ")")
    
    moveMap(-map_X_offset, -map_Y_offset, map)
@@ -454,7 +474,7 @@ def play(host_address, player_name):
    
    while True:
       placeUnits(DISPLAYSURF, map, player, s, host_address)
-      declareAttacks(DISPLAYSURF, player, s, host_address)
+      declareAttacks(DISPLAYSURF, map, player, s, host_address)
       print("Exited properly")
       #pygame.quit()
       #sys.exit()
