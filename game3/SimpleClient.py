@@ -57,6 +57,9 @@ INFO_OVERLAY = pygame.image.load(IMAGE_FILE_PATH + "InfoMarqueOverlay.png")
 MAP_FRAME = pygame.image.load(IMAGE_FILE_PATH + "MapFrame.png")
 MAP_LIGHT = pygame.image.load(IMAGE_FILE_PATH + "MapLighting.png")
 SELECTED_TILE = pygame.image.load(IMAGE_FILE_PATH + "Selected.png")
+ATTACK_OPTION = pygame.image.load(IMAGE_FILE_PATH + "AttackOption.png")
+ATTACKER = pygame.image.load(IMAGE_FILE_PATH + "Attacker.png")
+DEFENDER = pygame.image.load(IMAGE_FILE_PATH + "Defender.png")
 
 #a dictionary linking resources to textures
 textures =   {
@@ -144,6 +147,9 @@ def standardInfo(map, DISPLAYSURF, params):
 
 def selectedInfo(map, DISPLAYSURF, params):
     current_tile = map.ll_map[params[1]][params[0]]
+    
+    DISPLAYSURF.blit(CONTINENT_FONT.render("Continent: " + current_tile[0], True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 120))
+    DISPLAYSURF.blit(COUNTRY_FONT.render("Country: " + map.d_continents[current_tile[0]][current_tile[1]].name, True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 170))
 
     # Unit counts by type
     DISPLAYSURF.blit(COUNTRY_FONT.render("Pistoleers: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.infantry), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 225))
@@ -216,39 +222,39 @@ def handleGeneral(event, map, temp_map=None, selectedCountry=None):
       pygame.quit()
       sys.exit()
   pygame.mouse.set_visible(True)
-  #if a key is pressed
+  # if a key is pressed
   if event.type == KEYDOWN:
-      if event.key == K_i:
-         pygame.display.iconify()
+      # if event.key == K_i:
+         # pygame.display.iconify()
       if event.key == K_ESCAPE:
-         #and the game and close the window
+         # and the game and close the window
          pygame.quit()
          sys.exit()
-      #if the right arrow is pressed
-      if event.key == K_RIGHT:
-         #Change the map render offset
-         map_X_offset -= 1
-         moveMap(1, 0, map)
-         if selectedCountry != None: selectedCountry[0] = (selectedCountry[0] - 1) % map.WIDTH
-         if temp_map != None: moveMap(1, 0, temp_map)
-      if event.key == K_LEFT:
-         #Change the map render offset
-         map_X_offset += 1
-         moveMap(-1, 0, map)
-         if selectedCountry != None: selectedCountry[0] = (selectedCountry[0] + 1) % map.WIDTH
-         if temp_map != None: moveMap(-1, 0, temp_map)
-      if event.key == K_UP:
-         #Change the map render offset
-         map_Y_offset += 1
-         moveMap(0, -1, map)
-         if selectedCountry != None: selectedCountry[1] = (selectedCountry[1] + 1) % map.HEIGHT
-         if temp_map != None: moveMap(0, -1, temp_map)
-      if event.key == K_DOWN:
-         #Change the map render offset
-         map_Y_offset -= 1
-         moveMap(0, 1, map)
-         if selectedCountry != None: selectedCountry[1] = (selectedCountry[1] - 1) % map.HEIGHT
-         if temp_map != None: moveMap(0, 1, temp_map)
+      # #if the right arrow is pressed
+      # if event.key == K_RIGHT:
+         # #Change the map render offset
+         # map_X_offset -= 1
+         # moveMap(1, 0, map)
+         # if selectedCountry != None: selectedCountry[0] = (selectedCountry[0] - 1) % map.WIDTH
+         # if temp_map != None: moveMap(1, 0, temp_map)
+      # if event.key == K_LEFT:
+         # #Change the map render offset
+         # map_X_offset += 1
+         # moveMap(-1, 0, map)
+         # if selectedCountry != None: selectedCountry[0] = (selectedCountry[0] + 1) % map.WIDTH
+         # if temp_map != None: moveMap(-1, 0, temp_map)
+      # if event.key == K_UP:
+         # #Change the map render offset
+         # map_Y_offset += 1
+         # moveMap(0, -1, map)
+         # if selectedCountry != None: selectedCountry[1] = (selectedCountry[1] + 1) % map.HEIGHT
+         # if temp_map != None: moveMap(0, -1, temp_map)
+      # if event.key == K_DOWN:
+         # #Change the map render offset
+         # map_Y_offset -= 1
+         # moveMap(0, 1, map)
+         # if selectedCountry != None: selectedCountry[1] = (selectedCountry[1] - 1) % map.HEIGHT
+         # if temp_map != None: moveMap(0, 1, temp_map)
          
 
 def placeUnits(DISPLAYSURF, map, player, socket, host_address):
@@ -263,7 +269,7 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address):
    selectedCountry = None
    temp_map = Map(map_to_copy=map, copy_player_name=player.user_name)
    
-   while placing:          
+   while placing:
        #get all the user events
        curr_x, curr_y = pygame.mouse.get_pos()
        for event in pygame.event.get():
@@ -275,7 +281,7 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address):
              if curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE:
                 curr_country = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)]
                 if (curr_country != map.WATER and map.d_continents[curr_country[0]][curr_country[1]].owner == map.current_player):
-                  if selectedCountry == None or selectedCountry != [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]:
+                  if map.d_continents[curr_country[0]][curr_country[1]].owner == player.user_name and selectedCountry != [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]:
                      selectedCountry = [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]
                   else:
                      selectedCountry = None
@@ -361,6 +367,7 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address):
        pygame.display.update()
 refreshing = True
 oldMap = None
+
 def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
    global refreshing
    def refresh():
@@ -387,18 +394,93 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
    declaring = True
    t_updateScreen._stop()
    refreshing = False
-   print("(" + str(map_X_offset) + ", " + str(map_Y_offset) + ")")
+   #print("(" + str(map_X_offset) + ", " + str(map_Y_offset) + ")")
    
-   moveMap(-map_X_offset, -map_Y_offset, map)
+   #moveMap(-map_X_offset, -map_Y_offset, map)
    print("I have the map!")
+   
+   selectedCountry = None
+   l_neighbors = []
+   d_attacks = {}
+   l_attackers = []
+   l_defenders = []
    
    while declaring:
        #get all the user events
+       curr_x, curr_y = pygame.mouse.get_pos()
        for event in pygame.event.get():
            #if the user wants to quit
-           handleGeneral(event, map)
-                  
-       printMap(map, DISPLAYSURF, standardInfo)
+           handleGeneral(event, map, selectedCountry=selectedCountry)
+           
+           if event.type == MOUSEBUTTONDOWN:
+             if curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE:
+                curr_country = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)]
+                if (curr_country != map.WATER and map.d_continents[curr_country[0]][curr_country[1]].owner == player.user_name):
+                  if map.d_continents[curr_country[0]][curr_country[1]].owner == player.user_name and selectedCountry != [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]:
+                     l_neighbors = []
+                     selectedCountry = [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]
+                  elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_neighbors:
+                     l_attackers.append([selectedCountry[0], selectedCountry[1]])
+                     l_defenders.append([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
+                     d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0)] #[attacker, defender, l_defend_coords attack force]
+                  else:
+                     selectedCountry = None
+             elif selectedCountry != None:
+                curr_country = map.ll_map[selectedCountry[1]][selectedCountry[0]]
+       
+       if selectedCountry == None:
+         printMap(map, DISPLAYSURF, standardInfo)
+       else:
+         printMap(map, DISPLAYSURF, selectedInfo, selectedCountry)
+       
+       if selectedCountry != None and not (selectedCountry in l_attackers):
+         DISPLAYSURF.blit(SELECTED_TILE, (selectedCountry[0] * TILESIZE, selectedCountry[1] * TILESIZE), special_flags=BLEND_ADD)
+         
+         current_tile = map.ll_map[selectedCountry[1] + 1][selectedCountry[0] + 1]
+         if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
+            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0] + 1) * TILESIZE, (selectedCountry[1] + 1) * TILESIZE), special_flags=BLEND_ADD)
+            l_neighbors.append([(selectedCountry[0] + 1), (selectedCountry[1] + 1)])
+            
+         current_tile = map.ll_map[selectedCountry[1] - 1][selectedCountry[0] + 1]
+         if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
+            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0] + 1) * TILESIZE, (selectedCountry[1] - 1) * TILESIZE), special_flags=BLEND_ADD)
+            l_neighbors.append([(selectedCountry[0] + 1), (selectedCountry[1] - 1)])
+            
+         current_tile = map.ll_map[selectedCountry[1]][selectedCountry[0] + 1]
+         if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
+            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0] + 1) * TILESIZE, (selectedCountry[1]) * TILESIZE), special_flags=BLEND_ADD)
+            l_neighbors.append([(selectedCountry[0] + 1), (selectedCountry[1])])
+            
+         current_tile = map.ll_map[selectedCountry[1] + 1][selectedCountry[0] - 1]
+         if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
+            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0] - 1) * TILESIZE, (selectedCountry[1] + 1) * TILESIZE), special_flags=BLEND_ADD)
+            l_neighbors.append([((selectedCountry[0] - 1)), ((selectedCountry[1] + 1))])
+            
+         current_tile = map.ll_map[selectedCountry[1] - 1][selectedCountry[0] - 1]
+         if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
+            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0] - 1) * TILESIZE, (selectedCountry[1] - 1) * TILESIZE), special_flags=BLEND_ADD)
+            l_neighbors.append([(selectedCountry[0] - 1), (selectedCountry[1] - 1)])
+            
+         current_tile = map.ll_map[selectedCountry[1]][selectedCountry[0] - 1]
+         if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
+            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0] - 1) * TILESIZE, (selectedCountry[1]) * TILESIZE), special_flags=BLEND_ADD)
+            l_neighbors.append([(selectedCountry[0] - 1), (selectedCountry[1])])
+            
+         current_tile = map.ll_map[selectedCountry[1] + 1][selectedCountry[0]]
+         if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
+            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0]) * TILESIZE, (selectedCountry[1] + 1) * TILESIZE), special_flags=BLEND_ADD)
+            l_neighbors.append([(selectedCountry[0]), (selectedCountry[1] + 1)])
+            
+         current_tile = map.ll_map[selectedCountry[1] - 1][selectedCountry[0]]
+         if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
+            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0]) * TILESIZE, (selectedCountry[1] - 1) * TILESIZE), special_flags=BLEND_ADD)
+            l_neighbors.append([(selectedCountry[0]), (selectedCountry[1] - 1)])
+       
+       for attacker in l_attackers:
+         DISPLAYSURF.blit(ATTACKER, (attacker[0] * TILESIZE, attacker[1] * TILESIZE), special_flags=BLEND_ADD)
+       
+       for defender in l_defenders:
+         DISPLAYSURF.blit(DEFENDER, (defender[0] * TILESIZE, defender[1] * TILESIZE), special_flags=BLEND_ADD)
        
        #update the display
        pygame.display.update()
