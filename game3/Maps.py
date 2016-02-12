@@ -94,8 +94,7 @@ class Map:
                   temp_tile = random.choice(valid_tiles_c1)
                   self.ll_map[temp_tile[0]][temp_tile[1]] = (continent, country)
                elif start:
-                  temp_tile = random.choice(valid_tiles_c0)
-                  self.ll_map[temp_tile[0]][temp_tile[1]] = (continent, country)
+                  self.ll_map[int(self.HEIGHT / 2)][int(self.WIDTH / 2)] = (continent, country)
                   start = False
                else:
                   temp_tile = random.choice(temp_valid_tiles)
