@@ -94,8 +94,7 @@ class Map:
                   temp_tile = random.choice(valid_tiles_c1)
                   self.ll_map[temp_tile[0]][temp_tile[1]] = (continent, country)
                elif start:
-                  temp_tile = random.choice(valid_tiles_c0)
-                  self.ll_map[temp_tile[0]][temp_tile[1]] = (continent, country)
+                  self.ll_map[int(self.HEIGHT / 2)][int(self.WIDTH / 2)] = (continent, country)
                   start = False
                else:
                   temp_tile = random.choice(temp_valid_tiles)
@@ -181,9 +180,10 @@ class UnitCounts:
 class Country:
    def __init__(self, country_to_copy=None):
       if country_to_copy == None:
-         self.name =  random.choice("PKBWLTCMNDL")
+         self.name = "" if random.randint(1, 10) != 1 else random.choice(["Great", "Greater", "Lesser", "North", "South", "East", "West", "New", "Republic of", "Kingdom of"]) + " " 
+         self.name += random.choice("PKBWLTCMNDL")
          self.name += random.choice("aeiou")
-         self.name += random.choice("pblmnd")
+         self.name += random.choice("pblwnd")
          self.name += random.choice("pbwtcmnd")
          self.name += random.choice("aeiou")
          self.name += random.choice("pbwltcmndts")
