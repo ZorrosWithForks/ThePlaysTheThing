@@ -48,6 +48,7 @@ def receivePlacements(l_players, serversocket, map, address):
       l_placements.append(placement)
    
    #print("I got it! Yay!")
+
    
    for placement in l_placements:
       grand_total = 0
