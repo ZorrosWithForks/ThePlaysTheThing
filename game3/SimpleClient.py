@@ -99,13 +99,6 @@ map_Y_offset = 0
 
 d_continent_tiles = {}
 
-def moveMap(x_offset, y_offset, map):
-   ll_temp_map = [[map.WATER for x in range(map.WIDTH)] for y in range(map.HEIGHT)]
-   for row in range(map.HEIGHT):
-      for column in range(map.WIDTH):
-         ll_temp_map[row][column] = map.ll_map[(row + y_offset) % map.HEIGHT][(column + x_offset) % map.WIDTH]
-   map.ll_map = ll_temp_map
-
 def standardInfo(map, DISPLAYSURF, params):
     #Highlight country mouse is over and display country info
     curr_x, curr_y = pygame.mouse.get_pos()
@@ -224,37 +217,10 @@ def handleGeneral(event, map, temp_map=None, selectedCountry=None):
   pygame.mouse.set_visible(True)
   # if a key is pressed
   if event.type == KEYDOWN:
-      # if event.key == K_i:
-         # pygame.display.iconify()
       if event.key == K_ESCAPE:
          # and the game and close the window
          pygame.quit()
          sys.exit()
-      # #if the right arrow is pressed
-      # if event.key == K_RIGHT:
-         # #Change the map render offset
-         # map_X_offset -= 1
-         # moveMap(1, 0, map)
-         # if selectedCountry != None: selectedCountry[0] = (selectedCountry[0] - 1) % map.WIDTH
-         # if temp_map != None: moveMap(1, 0, temp_map)
-      # if event.key == K_LEFT:
-         # #Change the map render offset
-         # map_X_offset += 1
-         # moveMap(-1, 0, map)
-         # if selectedCountry != None: selectedCountry[0] = (selectedCountry[0] + 1) % map.WIDTH
-         # if temp_map != None: moveMap(-1, 0, temp_map)
-      # if event.key == K_UP:
-         # #Change the map render offset
-         # map_Y_offset += 1
-         # moveMap(0, -1, map)
-         # if selectedCountry != None: selectedCountry[1] = (selectedCountry[1] + 1) % map.HEIGHT
-         # if temp_map != None: moveMap(0, -1, temp_map)
-      # if event.key == K_DOWN:
-         # #Change the map render offset
-         # map_Y_offset -= 1
-         # moveMap(0, 1, map)
-         # if selectedCountry != None: selectedCountry[1] = (selectedCountry[1] - 1) % map.HEIGHT
-         # if temp_map != None: moveMap(0, 1, temp_map)
          
 
 def placeUnits(DISPLAYSURF, map, player, socket, host_address):
@@ -394,9 +360,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
    declaring = True
    t_updateScreen._stop()
    refreshing = False
-   #print("(" + str(map_X_offset) + ", " + str(map_Y_offset) + ")")
    
-   #moveMap(-map_X_offset, -map_Y_offset, map)
    print("I have the map!")
    
    selectedCountry = None
@@ -415,15 +379,18 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
            if event.type == MOUSEBUTTONDOWN:
              if curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE:
                 curr_country = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)]
-                if (curr_country != map.WATER and map.d_continents[curr_country[0]][curr_country[1]].owner == player.user_name):
+                if (curr_country != map.WATER):
                   if map.d_continents[curr_country[0]][curr_country[1]].owner == player.user_name and selectedCountry != [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]:
+                     print("first thing")
                      l_neighbors = []
                      selectedCountry = [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]
                   elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_neighbors:
+                     print("tried to create an attack")
                      l_attackers.append([selectedCountry[0], selectedCountry[1]])
                      l_defenders.append([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
-                     d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0)] #[attacker, defender, l_defend_coords attack force]
+                     d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0)] #[defender, l_defend_coords attack force]
                   else:
+                     print("Else")
                      selectedCountry = None
              elif selectedCountry != None:
                 curr_country = map.ll_map[selectedCountry[1]][selectedCountry[0]]
@@ -433,9 +400,10 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
        else:
          printMap(map, DISPLAYSURF, selectedInfo, selectedCountry)
        
-       if selectedCountry != None and not (selectedCountry in l_attackers):
+       if selectedCountry != None:
          DISPLAYSURF.blit(SELECTED_TILE, (selectedCountry[0] * TILESIZE, selectedCountry[1] * TILESIZE), special_flags=BLEND_ADD)
-         
+       
+       if selectedCountry != None and not (selectedCountry in l_attackers):
          current_tile = map.ll_map[selectedCountry[1] + 1][selectedCountry[0] + 1]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
             DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0] + 1) * TILESIZE, (selectedCountry[1] + 1) * TILESIZE), special_flags=BLEND_ADD)
