@@ -60,6 +60,7 @@ SELECTED_TILE = pygame.image.load(IMAGE_FILE_PATH + "Selected.png")
 ATTACK_OPTION = pygame.image.load(IMAGE_FILE_PATH + "AttackOption.png")
 ATTACKER = pygame.image.load(IMAGE_FILE_PATH + "Attacker.png")
 DEFENDER = pygame.image.load(IMAGE_FILE_PATH + "Defender.png")
+WAITING = pygame.image.load(IMAGE_FILE_PATH + "Waiting.png")
 
 #a dictionary linking resources to textures
 textures =   {
@@ -351,8 +352,9 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
       for event in pygame.event.get():
          #if the user wants to quit
          handleGeneral(event, map)
-              
+      
       printMap(map, DISPLAYSURF, standardInfo)
+      DISPLAYSURF.blit(WAITING, (70, map.HEIGHT * TILESIZE + 70))
       #update the display
       pygame.display.update()
    print("Exited refreshing")
