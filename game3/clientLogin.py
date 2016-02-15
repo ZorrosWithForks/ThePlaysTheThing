@@ -32,7 +32,7 @@ def joinGame(ip):
    s.close()
    SimpleClient.play(new_server, username)
    
-def display_servers(l_servers, x_panel_position, y_panel_position, y_offset):
+def display_servers(x_panel_position, y_panel_position, y_offset):
    for server in l_servers:
       print (str(y_panel_position))
       #print("server name is: ", + server[2])
@@ -47,7 +47,7 @@ def display_servers(l_servers, x_panel_position, y_panel_position, y_offset):
       l_join_spots.append((x_panel_position + 1100, y_panel_position + 25, server[0]))
       y_panel_position += 100
       #pygame.display.update()
-def search(l_servers, x_panel_position, y_panel_position, y_offset):
+def search(x_panel_position, y_panel_position, y_offset):
    while True:
       packet, addr = client_socket.recvfrom(4096)
       if packet != None:
@@ -55,7 +55,8 @@ def search(l_servers, x_panel_position, y_panel_position, y_offset):
             server_info = pickle.loads(packet)
             l_servers.append(server_info)
             print("added a server: " + server_info[0])
-            display_servers(l_servers, x_panel_position, y_panel_position, y_offset)
+            print("server length is: " + str(l_servers))
+            display_servers(x_panel_position, y_panel_position, y_offset)
          except:
             #This is happening. why?
             print("Client tried connecting to itself")
@@ -63,10 +64,11 @@ def search(l_servers, x_panel_position, y_panel_position, y_offset):
          print("No recv_data")
       print("done displaying servers")
       
-def request(l_servers, x_panel_position, y_panel_position, y_offset):
+def request(x_panel_position, y_panel_position, y_offset):
    print("looping requesting servers")
    del l_servers[:]
-   display_servers(l_servers, x_panel_position, y_panel_position, y_offset)
+   y_offset = 0
+   print("servers after deleeting: ", str(l_servers))
    client_socket.sendto(data.encode('ascii'), address)
 
 #def Loginclient():
@@ -143,7 +145,7 @@ client_socket.bind((host, 8080))
 client_socket.sendto(data.encode('ascii'), address)
 
 print("Made it")
-t_search = threading.Thread(target=search, args=(l_servers, x_panel_position, y_panel_position, y_offset))
+t_search = threading.Thread(target=search, args=(x_panel_position, y_panel_position, y_offset))
 t_search.daemon = True
 t_search.start()
 print("Am I here?")
@@ -176,7 +178,7 @@ while True:
             #if (len(l_servers) > 5):
             LOGIN_TOP_SURFACE.blit(BLACK_BACKGROUND, (100, 100))
             y_offset -= 100
-            display_servers(l_servers, x_panel_position, y_panel_position, y_offset)
+            display_servers(x_panel_position, y_panel_position, y_offset)
          if event.key == K_DOWN:
             SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
             if (SERVERS_AREA.x <= 100 and SERVERS_AREA.y <= 100):#put in server checking too need to find out how to get the position of a surface.
@@ -184,7 +186,7 @@ while True:
                print("Servers area y is: " + str(SERVERS_AREA.y))
                LOGIN_TOP_SURFACE.blit(BLACK_BACKGROUND, (100, 100))
                y_offset += 100
-               display_servers(l_servers, x_panel_position, y_panel_position, y_offset)
+               display_servers(x_panel_position, y_panel_position, y_offset)
          if event.key == K_BACKSPACE:
             username = username[:-1]
          elif event.key == K_LSHIFT or event.key == K_RSHIFT:
@@ -301,6 +303,7 @@ while True:
    LOGIN_TOP_SURFACE.blit(DOWN_ARROW, (arrow_x_pos, down_arrow_y_pos))
    LOGIN_TOP_SURFACE.blit(UP_ARROW, (arrow_x_pos, up_arrow_y_pos))
    LOGIN_TOP_SURFACE.blit(REFRESH_BUTTON, (1300, 700))
+   waiting_on_players = SERVER_FONT.render("Waiting on players:", 1, (0,255,255))
    
    if username == "" and just_accessed != True:
       LOGIN_TOP_SURFACE.blit(no_username_message, (200, 800))
@@ -313,7 +316,7 @@ while True:
          #click refresh
          if refresh_x_pos <= x_mouse_position_main <= refresh_x_pos + 200 and refresh_y_pos <= y_mouse_position_main <= refresh_y_pos + 100:
             print("clicked refresh")
-            request(l_servers, x_panel_position, y_panel_position, y_offset)
+            request(x_panel_position, y_panel_position, y_offset)
          
          #click a join
          for button in l_join_spots:
