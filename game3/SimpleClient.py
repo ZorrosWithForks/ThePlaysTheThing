@@ -380,22 +380,23 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
            handleGeneral(event, map, selectedCountry=selectedCountry)
            
            if event.type == MOUSEBUTTONDOWN:
-             if curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE:
+             if curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE: # if the user clicked on the map
                 curr_country = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)]
 
-                if (curr_country != map.WATER):
-                  if map.d_continents[curr_country[0]][curr_country[1]].owner == player.user_name and selectedCountry != [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]:
-                     print("first thing")
+                if (curr_country != map.WATER): # if the user did not click water
+                  if map.d_continents[curr_country[0]][curr_country[1]].owner == player.user_name and selectedCountry != [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]: # if the user clicked his own country and not a selected country
                      l_neighbors = []
                      selectedCountry = [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]
-                  elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_neighbors:
-                     print("tried to create an attack")
-                     l_attackers.append([selectedCountry[0], selectedCountry[1]])
-                     l_defenders.append([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
-                     d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0)] #[defender, l_defend_coords attack force]
+                  elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] != selectedCountry and selectedCountry != None: # if not clicking your selected country and there is a selected country
+                     if not ([selectedCountry[0], selectedCountry[1]] in l_attackers) and [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_neighbors: # if selected country is not attacking and clicking neighboring country
+                        l_attackers.append([selectedCountry[0], selectedCountry[1]])
+                        l_defenders.append([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
+                        d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0)] #[defender, l_defend_coords attack force]
+                     elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_defenders: # if clicking the country your selected country is attacking
+                        l_defenders.remove([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
+                        l_attackers.remove([selectedCountry[0], selectedCountry[1]])
+                        d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = None
                   else:
-                     print("Else")
-
                      selectedCountry = None
              elif selectedCountry != None:
                 curr_country = map.ll_map[selectedCountry[1]][selectedCountry[0]]
@@ -410,52 +411,51 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
        
        if selectedCountry != None and not (selectedCountry in l_attackers):
 
-         current_tile = map.ll_map[selectedCountry[1] + 1][selectedCountry[0] + 1]
+         current_tile = map.ll_map[(selectedCountry[1] + 1) % map.HEIGHT][(selectedCountry[0] + 1) % map.WIDTH]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
-            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0] + 1) * TILESIZE, (selectedCountry[1] + 1) * TILESIZE), special_flags=BLEND_ADD)
-            l_neighbors.append([(selectedCountry[0] + 1), (selectedCountry[1] + 1)])
+            DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] + 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1] + 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
+            l_neighbors.append([(selectedCountry[0] + 1) % map.WIDTH, (selectedCountry[1] + 1) % map.HEIGHT])
             
-         current_tile = map.ll_map[selectedCountry[1] - 1][selectedCountry[0] + 1]
+         current_tile = map.ll_map[(selectedCountry[1] - 1) % map.HEIGHT][(selectedCountry[0] + 1) % map.WIDTH]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
-            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0] + 1) * TILESIZE, (selectedCountry[1] - 1) * TILESIZE), special_flags=BLEND_ADD)
-            l_neighbors.append([(selectedCountry[0] + 1), (selectedCountry[1] - 1)])
+            DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] + 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1] - 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
+            l_neighbors.append([(selectedCountry[0] + 1) % map.WIDTH, (selectedCountry[1] - 1) % map.HEIGHT])
             
-         current_tile = map.ll_map[selectedCountry[1]][selectedCountry[0] + 1]
+         current_tile = map.ll_map[(selectedCountry[1]) % map.HEIGHT][(selectedCountry[0] + 1) % map.WIDTH]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
-            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0] + 1) * TILESIZE, (selectedCountry[1]) * TILESIZE), special_flags=BLEND_ADD)
-            l_neighbors.append([(selectedCountry[0] + 1), (selectedCountry[1])])
+            DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] + 1) % map.WIDTH) * TILESIZE, (selectedCountry[1]) * TILESIZE), special_flags=BLEND_ADD)
+            l_neighbors.append([(selectedCountry[0] + 1) % map.WIDTH, (selectedCountry[1])])
             
-         current_tile = map.ll_map[selectedCountry[1] + 1][selectedCountry[0] - 1]
+         current_tile = map.ll_map[(selectedCountry[1] + 1) % map.HEIGHT][(selectedCountry[0] - 1) % map.WIDTH]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
-            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0] - 1) * TILESIZE, (selectedCountry[1] + 1) * TILESIZE), special_flags=BLEND_ADD)
-            l_neighbors.append([((selectedCountry[0] - 1)), ((selectedCountry[1] + 1))])
+            DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] - 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1] + 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
+            l_neighbors.append([(selectedCountry[0] - 1) % map.WIDTH, (selectedCountry[1] + 1) % map.HEIGHT])
             
-         current_tile = map.ll_map[selectedCountry[1] - 1][selectedCountry[0] - 1]
+         current_tile = map.ll_map[(selectedCountry[1] - 1) % map.HEIGHT][(selectedCountry[0] - 1) % map.WIDTH]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
-            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0] - 1) * TILESIZE, (selectedCountry[1] - 1) * TILESIZE), special_flags=BLEND_ADD)
-            l_neighbors.append([(selectedCountry[0] - 1), (selectedCountry[1] - 1)])
+            DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] - 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1] - 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
+            l_neighbors.append([(selectedCountry[0] - 1) % map.WIDTH, (selectedCountry[1] - 1) % map.HEIGHT])
             
-         current_tile = map.ll_map[selectedCountry[1]][selectedCountry[0] - 1]
+         current_tile = map.ll_map[selectedCountry[1]][(selectedCountry[0] - 1) % map.WIDTH]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
-            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0] - 1) * TILESIZE, (selectedCountry[1]) * TILESIZE), special_flags=BLEND_ADD)
-            l_neighbors.append([(selectedCountry[0] - 1), (selectedCountry[1])])
+            DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] - 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1]) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
+            l_neighbors.append([(selectedCountry[0] - 1) % map.WIDTH, (selectedCountry[1]) % map.HEIGHT])
             
-         current_tile = map.ll_map[selectedCountry[1] + 1][selectedCountry[0]]
+         current_tile = map.ll_map[(selectedCountry[1] + 1) % map.HEIGHT][selectedCountry[0]]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
-            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0]) * TILESIZE, (selectedCountry[1] + 1) * TILESIZE), special_flags=BLEND_ADD)
-            l_neighbors.append([(selectedCountry[0]), (selectedCountry[1] + 1)])
+            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0]) * TILESIZE, ((selectedCountry[1] + 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
+            l_neighbors.append([(selectedCountry[0]), (selectedCountry[1] + 1) % map.HEIGHT])
             
-         current_tile = map.ll_map[selectedCountry[1] - 1][selectedCountry[0]]
+         current_tile = map.ll_map[(selectedCountry[1] - 1) % map.HEIGHT][selectedCountry[0]]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
-            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0]) * TILESIZE, (selectedCountry[1] - 1) * TILESIZE), special_flags=BLEND_ADD)
-            l_neighbors.append([(selectedCountry[0]), (selectedCountry[1] - 1)])
+            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0]) * TILESIZE, ((selectedCountry[1] - 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
+            l_neighbors.append([(selectedCountry[0]), (selectedCountry[1] - 1) % map.HEIGHT])
        
-       for attacker in l_attackers:
-         DISPLAYSURF.blit(ATTACKER, (attacker[0] * TILESIZE, attacker[1] * TILESIZE), special_flags=BLEND_ADD)
-       
-       for defender in l_defenders:
-         DISPLAYSURF.blit(DEFENDER, (defender[0] * TILESIZE, defender[1] * TILESIZE), special_flags=BLEND_ADD)
-       
+       for battle in range(len(l_attackers)):
+         pygame.draw.aaline(DISPLAYSURF, (0,0,0), (l_attackers[battle][0] * TILESIZE + 50, l_attackers[battle][1] * TILESIZE + 50), (l_defenders[battle][0] * TILESIZE + 50, l_defenders[battle][1] * TILESIZE + 50), 1)
+         DISPLAYSURF.blit(ATTACKER, (l_attackers[battle][0] * TILESIZE, l_attackers[battle][1] * TILESIZE), special_flags=BLEND_ADD)
+         DISPLAYSURF.blit(DEFENDER, (l_defenders[battle][0] * TILESIZE, l_defenders[battle][1] * TILESIZE), special_flags=BLEND_ADD)
+         
        #update the display
        pygame.display.update()
        
