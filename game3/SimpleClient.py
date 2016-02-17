@@ -52,6 +52,10 @@ class CursorGraphic:
 playCursor = CursorGraphic()
 
 # Graphics Constants
+ATK_LEFT_RIGHT = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_L_R.png')
+ATK_TOP_BOTTOM = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_T_B.png')
+ATK_UPLEFT_DOWNRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_UL_BR.png')
+ATK_DOWNLEFT_UPRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_UR_BL.png')
 MOUSE_OVER = pygame.image.load(IMAGE_FILE_PATH + 'MouseOver.png')
 MOUSE_OVER_UNKNOWN = pygame.image.load(IMAGE_FILE_PATH + 'MouseOverUnknown.png')
 INFO_MARQUEE = pygame.image.load(IMAGE_FILE_PATH + "InfoMarque.png")
@@ -63,6 +67,18 @@ ATTACK_OPTION = pygame.image.load(IMAGE_FILE_PATH + "AttackOption.png")
 ATTACKER = pygame.image.load(IMAGE_FILE_PATH + "Attacker.png")
 DEFENDER = pygame.image.load(IMAGE_FILE_PATH + "Defender.png")
 WAITING = pygame.image.load(IMAGE_FILE_PATH + "Waiting.png")
+
+def blitBattle(map, DISPLAYSURF, attack_coords, defend_coords):
+   if attack_coords[0] == defend_coords[0]:
+      DISPLAYSURF.blit(ATK_TOP_BOTTOM, (attack_coords[0] * TILESIZE, min(attack_coords[1], defend_coords[1]) * TILESIZE))
+   elif attack_coords[1] == defend_coords[1]:
+      DISPLAYSURF.blit(ATK_LEFT_RIGHT, (min(attack_coords[0], defend_coords[0]) * TILESIZE, attack_coords[1] * TILESIZE))
+   elif attack_coords[0] < defend_coords[0] and attack_coords[1] < defend_coords[1]:
+      DISPLAYSURF.blit(ATK_UPLEFT_DOWNRIGHT, (attack_coords[0] * TILESIZE, attack_coords[1] * TILESIZE))
+   elif attack_coords[0] > defend_coords[0] and attack_coords[1] > defend_coords[1]:
+      DISPLAYSURF.blit(ATK_UPLEFT_DOWNRIGHT, (defend_coords[0] * TILESIZE, defend_coords[1] * TILESIZE))
+   else:
+      DISPLAYSURF.blit(ATK_DOWNLEFT_UPRIGHT, (min(attack_coords[0], defend_coords[0]) * TILESIZE, min(attack_coords[1], defend_coords[1]) * TILESIZE))
 
 #a dictionary linking resources to textures
 textures =   {
@@ -534,9 +550,9 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
             l_neighbors.append([(selectedCountry[0]), (selectedCountry[1] - 1) % map.HEIGHT])
        
        for battle in range(len(l_attackers)):
-         pygame.draw.aaline(DISPLAYSURF, (0,0,0), (l_attackers[battle][0] * TILESIZE + 50, l_attackers[battle][1] * TILESIZE + 50), (l_defenders[battle][0] * TILESIZE + 50, l_defenders[battle][1] * TILESIZE + 50), 1)
-         DISPLAYSURF.blit(ATTACKER, (l_attackers[battle][0] * TILESIZE, l_attackers[battle][1] * TILESIZE), special_flags=BLEND_ADD)
          DISPLAYSURF.blit(DEFENDER, (l_defenders[battle][0] * TILESIZE, l_defenders[battle][1] * TILESIZE), special_flags=BLEND_ADD)
+         blitBattle(map, DISPLAYSURF, l_attackers[battle], l_defenders[battle])
+         DISPLAYSURF.blit(ATTACKER, (l_attackers[battle][0] * TILESIZE, l_attackers[battle][1] * TILESIZE), special_flags=BLEND_ADD)
       
        DISPLAYSURF.blit(SEND_PISTOLEERS, (170, map.HEIGHT * TILESIZE + 70))
        DISPLAYSURF.blit(SEND_MUSKETEERS, (575, map.HEIGHT * TILESIZE + 70))
