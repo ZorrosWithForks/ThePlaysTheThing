@@ -364,10 +364,12 @@ refreshing = True
 oldMap = None
 
 def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
-   BUY_PISTOLEERS = pygame.image.load(IMAGE_FILE_PATH + "PistoleersBuy.png")
-   BUY_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "MusketeersBuy.png")
-   BUY_CANNONS = pygame.image.load(IMAGE_FILE_PATH + "CannonBuy.png")
-   BUY_AIRSHIPS = pygame.image.load(IMAGE_FILE_PATH + "AirshipBuy.png")
+   SEND_PISTOLEERS = pygame.image.load(IMAGE_FILE_PATH + "SendPistoleers.png")
+   SEND_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "SendMusketeers.png")
+   SEND_CANNONS = pygame.image.load(IMAGE_FILE_PATH + "SendCannons.png")
+   SEND_AIRSHIPS = pygame.image.load(IMAGE_FILE_PATH + "SendAirships.png")
+   DONE_BUTTON = pygame.image.load(IMAGE_FILE_PATH + "DoneButton.png")
+   DONE_BUTTON_ACTIVE = pygame.image.load(IMAGE_FILE_PATH + "DoneButtonActive.png")
    global refreshing
    def refresh():
       global refreshing
@@ -431,6 +433,50 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
                      selectedCountry = None
              elif selectedCountry != None:
                 curr_country = map.ll_map[selectedCountry[1]][selectedCountry[0]]
+                attacker = d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]]
+                if selectedCountry in l_attackers:
+                  #Pistoleers
+                  if 175 + 250 <= curr_x <= 175 + 300 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Pistoleers
+                     attacker[1].infantry = map.d_continents[curr_country[0]][curr_country[1]].unit_counts.infantry
+                  elif 175 + 300 <= curr_x <= 175 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and \
+                        attacker[1].infantry < map.d_continents[curr_country[0]][curr_country[1]].unit_counts.infantry: # "+" for Pistoleers
+                     attacker[1].infantry += 1
+                  elif 175 + 350 <= curr_x <= 175 + 400 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Pistoleers
+                     if attacker[1].infantry > 0:
+                        attacker[1].infantry -= 1
+                        
+                  #Musketeers
+                  if 580 + 250 <= curr_x <= 580 + 300 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Musketeers
+                     attacker[1].archers = map.d_continents[curr_country[0]][curr_country[1]].unit_counts.archers
+                  elif 580 + 300 <= curr_x <= 580 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and \
+                        attacker[1].archers < map.d_continents[curr_country[0]][curr_country[1]].unit_counts.archers:# "+" for Musketeers
+                     attacker[1].archers += 1
+                  elif 580 + 350 <= curr_x <= 580 + 400 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Musketeers
+                     if attacker[1].archers > 0:
+                        attacker[1].archers -= 1
+                        
+                   #Cannons
+                  if 175 + 250 <= curr_x <= 175 + 300 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Cannons
+                     attacker[1].cannons = map.d_continents[curr_country[0]][curr_country[1]].unit_counts.cannons
+                  elif 175 + 300 <= curr_x <= 175 + 350 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and \
+                        attacker[1].cannons < map.d_continents[curr_country[0]][curr_country[1]].unit_counts.cannons: # "+" for Cannons
+                     attacker[1].cannons += 1
+                  elif 175 + 350 <= curr_x <= 175 + 400 and map.HEIGHT * TILESIZE + 125 < curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Cannons
+                     if attacker[1].cannons > 0:
+                        attacker[1].cannons -= 1
+                        
+                  #Airships
+                  if 580 + 250 <= curr_x <= 580 + 300 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Airships
+                     attacker[1].champions = map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions
+                  elif 580 + 300 <= curr_x <= 580 + 350 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and \
+                        attacker[1].champions < map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions: # "+" for Airships
+                     attacker[1].champions += 1
+                  elif 580 + 350 <= curr_x <= 580 + 400 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Airships
+                     if attacker[1].champions > 0:
+                        attacker[1].champions -= 1
+       
+       
+       
        
        if selectedCountry == None:
          printMap(map, DISPLAYSURF, standardInfo)
@@ -490,11 +536,11 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
          DISPLAYSURF.blit(ATTACKER, (l_attackers[battle][0] * TILESIZE, l_attackers[battle][1] * TILESIZE), special_flags=BLEND_ADD)
          DISPLAYSURF.blit(DEFENDER, (l_defenders[battle][0] * TILESIZE, l_defenders[battle][1] * TILESIZE), special_flags=BLEND_ADD)
       
-       if selectedCountry in l_attackers:
-         DISPLAYSURF.blit(BUY_PISTOLEERS, (170, map.HEIGHT * TILESIZE + 70))
-         DISPLAYSURF.blit(BUY_MUSKETEERS, (575, map.HEIGHT * TILESIZE + 70))
-         DISPLAYSURF.blit(BUY_CANNONS, (170, map.HEIGHT * TILESIZE + 125))
-         DISPLAYSURF.blit(BUY_AIRSHIPS, (575, map.HEIGHT * TILESIZE + 125))
+       DISPLAYSURF.blit(SEND_PISTOLEERS, (170, map.HEIGHT * TILESIZE + 70))
+       DISPLAYSURF.blit(SEND_MUSKETEERS, (575, map.HEIGHT * TILESIZE + 70))
+       DISPLAYSURF.blit(SEND_CANNONS, (170, map.HEIGHT * TILESIZE + 125))
+       DISPLAYSURF.blit(SEND_AIRSHIPS, (575, map.HEIGHT * TILESIZE + 125))
+       DISPLAYSURF.blit(DONE_BUTTON if player.unit_counts > 0 else DONE_BUTTON_ACTIVE, (980, map.HEIGHT * TILESIZE + 70))
          
        #update the display
        pygame.display.update()
