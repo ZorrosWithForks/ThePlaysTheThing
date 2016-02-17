@@ -11,6 +11,41 @@ from pygame.locals import *
 import random
 #import main_menu
 
+
+def button(msg,x,y,w,h,button_pressed,button_unpressed):
+   ''' x: The x location of the top left coordinate of the button box.
+
+       y: The y location of the top left coordinate of the button box.
+
+       w: Button width.
+
+       h: Button height.
+
+       ic: Inactive color (when a mouse is not hovering).
+
+       ac: Active color (when a mouse is hovering).
+   '''
+   mouse = pygame.mouse.get_pos()
+   click = pygame.mouse.get_pressed()
+   
+   if x+w > mouse[0] > x and y+h > mouse[1] > y:
+      # pygame.draw.rect(LOGIN_TOP_SURFACE, ac,(x,y,w,h))
+      LOGIN_TOP_SURFACE.blit(button_pressed, (x, y))
+      if click[0] == 1 and msg == "Refresh":
+         #LOGIN_TOP_SURFACE.blit(REFRESH_BUTTON_PRESSED, (1300, 700))
+         print("THIS PRINTS IN THE BUTTON")
+         request(x_panel_position, y_panel_position, y_offset)
+   else:
+      # pygame.draw.rect(LOGIN_TOP_SURFACE, ic,(x,y,w,h))
+      LOGIN_TOP_SURFACE.blit(button_unpressed, (x, y))
+      
+   smallText = pygame.font.Font("freesansbold.ttf",20)
+   textSurf, textRect = text_objects(msg, smallText, l_colors[WHITE])
+   textRect.center = ( (x+(w/2)), (y+(h/2)) )
+   #LOGIN_TOP_SURFACE.blit(textSurf, textRect)
+
+
+
 def text_objects(text, font, color):
     textSurface = font.render(text, True, color)
     return textSurface, textSurface.get_rect()
@@ -34,7 +69,7 @@ def joinGame(ip):
    
 def display_servers(x_panel_position, y_panel_position, y_offset):
    for server in l_servers:
-      print (str(y_panel_position))
+      print ("displaying servers")
       #print("server name is: ", + server[2])
       print("have a server from " + server[0])
       LOGIN_TOP_SURFACE.blit(SERVER_BAR, (x_panel_position, y_panel_position + y_offset))
@@ -81,7 +116,8 @@ LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background.
 BLACK_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background2.png")
 SERVER_BAR = pygame.image.load(IMAGE_FILE_PATH + "Server.png")
 JOIN_BUTTON = pygame.image.load(IMAGE_FILE_PATH + "JoinButton.png")
-REFRESH_BUTTON = pygame.image.load(IMAGE_FILE_PATH + "RefreshButton2.png")
+REFRESH_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "RefreshButton_unpressed.png")
+REFRESH_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "RefreshButton_pressed.png")
 UP_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "upArrow.png")
 DOWN_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "downArrow.png")
 USERNAME_BOX =  pygame.image.load(IMAGE_FILE_PATH + "username_box.png")
@@ -100,6 +136,14 @@ width, height = SERVER_FONT.size("Username:")
 print("width of A is: " + str(width))
 print("height of A is: " + str(height))
 
+BLACK = 1
+WHITE = 2
+RED = 3
+GREEN = 4
+BLUE = 5
+BABY_BLUE = 6
+BRIGHT_RED = 7
+BRIGHT_GREEN = 8
 
 # Declare the username
 username = ""
@@ -110,14 +154,30 @@ just_accessed = True
 x_pos = 100
 y_pos = 725
 
+# Colors for buttons
+l_colors = {
+            BLACK :(0,0,0),
+            WHITE :(255,255,255),
+            RED :(200,0,0),
+            GREEN :(0,200,0),
+            BLUE :(0,66,255),
+            BABY_BLUE :(0,223,255),
+            BRIGHT_RED :(255,0,0),
+            BRIGHT_GREEN :(0,255,0),
+            }
+
+GRAY = (55,55,55)
+ 
+BLOCK_COLOR = (53,115,255)
+
 # Position of back button
 x_back_button = 5
 y_back_button = 5
 
 # Position of the arrows
 arrow_x_pos = 1500
-up_arrow_y_pos = 500
-down_arrow_y_pos = 100
+up_arrow_y_pos = 550
+down_arrow_y_pos = 50
 
 # Position of refresh button
 refresh_x_pos = 1300
@@ -139,6 +199,7 @@ address = ('255.255.255.255', 8080)
 data = "Request"
 temp = socket.gethostbyname_ex(socket.gethostname())[-1]
 host = temp[-1]
+# Main starts here
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 client_socket.bind((host, 8080))
@@ -302,8 +363,10 @@ while True:
    LOGIN_TOP_SURFACE.blit(BACK_BUTTON, (x_back_button, y_back_button))
    LOGIN_TOP_SURFACE.blit(DOWN_ARROW, (arrow_x_pos, down_arrow_y_pos))
    LOGIN_TOP_SURFACE.blit(UP_ARROW, (arrow_x_pos, up_arrow_y_pos))
-   LOGIN_TOP_SURFACE.blit(REFRESH_BUTTON, (1300, 700))
+   # may be able to use buttons
+   # LOGIN_TOP_SURFACE.blit(REFRESH_BUTTON, (1300, 700))
    waiting_on_players = SERVER_FONT.render("Waiting on players:", 1, (0,255,255))
+   button("Refresh",refresh_x_pos,refresh_y_pos,200,100,REFRESH_BUTTON_PRESSED,REFRESH_BUTTON_UNPRESSED) # TUPLE OBJECT NOT COLLABLE
    
    if username == "" and just_accessed != True:
       LOGIN_TOP_SURFACE.blit(no_username_message, (200, 800))
@@ -314,30 +377,30 @@ while True:
          print("clicked mounce here")
          
          #click refresh
-         if refresh_x_pos <= x_mouse_position_main <= refresh_x_pos + 200 and refresh_y_pos <= y_mouse_position_main <= refresh_y_pos + 100:
-            print("clicked refresh")
-            request(x_panel_position, y_panel_position, y_offset)
+         # if refresh_x_pos <= x_mouse_position_main <= refresh_x_pos + 200 and refresh_y_pos <= y_mouse_position_main <= refresh_y_pos + 100:
+            # print("clicked refresh")
+            # request(x_panel_position, y_panel_position, y_offset)
          
          #click a join
-         for button in l_join_spots:
-            if button[0] <= x_mouse_position_main <= button[0] + 200 and button[1] <= y_mouse_position_main <= button[1] + 100:
+         for join_button in l_join_spots:
+            if join_button[0] <= x_mouse_position_main <= join_button[0] + 200 and join_button[1] <= y_mouse_position_main <= join_button[1] + 100:
                if username == "":
                   just_accessed = False
                   LOGIN_TOP_SURFACE.blit(no_username_message, (200, 800))
                else:
                   pygame.display.iconify()
-                  joinGame(button[2])
+                  joinGame(join_button[2])
                   
          #click back button
          # if x_back_button <= x_mouse_position_main <= x_back_button + 75 and y_back_button <= y_mouse_position_main <= y_back_button + 50:
-            #call main menu
+            #return
                   
-         #click up arrow
-         if arrow_x_pos <= x_mouse_position_main <= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 50:
-            SERVERS_SURFACE.scroll(0, -100)
-         #click down arrow
-         if arrow_x_pos <= x_mouse_position_main <= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 50:
-            SERVERS_SURFACE.scroll(0, 100)
+         # #click up arrow
+         # if arrow_x_pos <= x_mouse_position_main <= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 50:
+            # SERVERS_SURFACE.scroll(0, -100)
+         # #click down arrow
+         # if arrow_x_pos <= x_mouse_position_main <= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 50:
+            # SERVERS_SURFACE.scroll(0, 100)
             
    pygame.display.update()
 # if __name__ == '__main__':

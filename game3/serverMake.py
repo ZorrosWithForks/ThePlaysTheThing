@@ -66,6 +66,7 @@ def display_players(x_panel_position, y_panel_position):
 def start_game():
    for client in clients:
       client[0].sendto(host.encode("ascii"), client[2])
+   pygame.display.iconify()
    SimpleServer.serve(len(clients))
 
 def begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients):
@@ -274,6 +275,7 @@ while True:
 
       # clicked start
       if x_start_server_button <= x_mouse_position_main <= x_mouse_position_main + 150 and y_start_server_button <= y_mouse_position_main <= y_start_server_button + 75:
+         pygame.display.iconify()
          begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients)
 
    display_players(x_panel_position, y_panel_position)

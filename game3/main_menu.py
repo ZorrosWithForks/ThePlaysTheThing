@@ -1,8 +1,7 @@
 import pygame
 import time
 import random
-import clientSetup
-import serverSetup
+import os
  
 pygame.init()
  
@@ -20,6 +19,14 @@ bright_green = (0,255,0)
 grey = (55,55,55)
  
 block_color = (53,115,255)
+
+MENU = 1
+
+HOST = 2
+
+JOIN = 3
+
+QUIT = 0
  
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 pygame.display.set_caption('Staged Conflict')
@@ -42,7 +49,7 @@ def message_display(text):
  
     game_loop()
     
-def button(msg,x,y,w,h,ic,ac,action=None):
+def button(msg,x,y,w,h,ic,ac,action):
    ''' x: The x location of the top left coordinate of the button box.
 
        y: The y location of the top left coordinate of the button box.
@@ -62,12 +69,12 @@ def button(msg,x,y,w,h,ic,ac,action=None):
       pygame.draw.rect(gameDisplay, ac,(x,y,w,h), 5)
       if click[0] == 1 and action != None:
          pygame.display.iconify()
-         action()
+         os.system(action)
    else:
       pygame.draw.rect(gameDisplay, ic,(x,y,w,h))
 
    smallText = pygame.font.Font("freesansbold.ttf",20)
-   textSurf, textRect = text_objects(msg, smallText, white)
+   textSurf, textRect = text_objects(msg, smallText, ac)
    textRect.center = ( (x+(w/2)), (y+(h/2)) )
    gameDisplay.blit(textSurf, textRect)
     
@@ -93,8 +100,8 @@ def game_intro():
         
         mouse = pygame.mouse.get_pos()
         
-        button("Host Game",250,300,300,50,green,bright_green, serverSetup.setupServer)
-        button("Join Game",250,375,300,50,red,bright_red, clientSetup.setupClient)
+        button("Host Game",250,300,300,50,green,bright_green,"serverMake.py")
+        button("Join Game",250,375,300,50,red,bright_red,"clientLogin.py")
         button("Quit",250,450,300,50,black,grey,quitgame)
 
         pygame.display.update()
@@ -107,3 +114,21 @@ in_game = False
 game_intro()
 pygame.quit()
 quit()
+
+'''
+game_state = MENU
+
+while game_state != QUIT
+   if game_state == MENU
+      game_state = game_intro()
+   elif game_state == HOST
+      serverSetup.setupServer()
+      game_state = MENU
+   elif game_state == JOIN
+      clientSetup.setupClient()
+      game_state = MENU
+
+pygame.quit()
+quit()
+
+'''
