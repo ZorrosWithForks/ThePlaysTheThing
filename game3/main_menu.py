@@ -1,12 +1,17 @@
 import pygame
 import time
 import random
-import os
- 
+#import clientSetup
+import serverMake
+import clientLogin
+
+#^Imported libraries MUST have the function/if_MAIN thing at the end or else they will be run
+# immediately upon import
+
 pygame.init()
  
-display_width = 800
-display_height = 600
+#display_width = 800
+#display_height = 600
  
 black = (0,0,0)
 white = (255,255,255)
@@ -28,28 +33,33 @@ JOIN = 3
 
 QUIT = 0
  
-gameDisplay = pygame.display.set_mode((display_width,display_height))
+#gameDisplay = pygame.display.set_mode((display_width,display_height))
+gameDisplay = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+display_width = gameDisplay.get_width()
+display_height = gameDisplay.get_height()
+
+
 pygame.display.set_caption('Staged Conflict')
 clock = pygame.time.Clock()
  
  
 def text_objects(text, font, color):
-    textSurface = font.render(text, True, color)
-    return textSurface, textSurface.get_rect()
+   textSurface = font.render(text, True, color)
+   return textSurface, textSurface.get_rect()
  
 def message_display(text):
-    largeText = pygame.font.Font('freesansbold.ttf',115)
-    TextSurf, TextRect = text_objects(text, largeText, black)
-    TextRect.center = ((display_width/2),(display_height/2))
-    gameDisplay.blit(TextSurf, TextRect)
+   largeText = pygame.font.Font('freesansbold.ttf',115)
+   TextSurf, TextRect = text_objects(text, largeText, black)
+   TextRect.center = ((display_width/2),(display_height/2))
+   gameDisplay.blit(TextSurf, TextRect)
  
-    pygame.display.update()
+   pygame.display.update()
  
-    time.sleep(2)
+   time.sleep(2)
  
-    game_loop()
+   game_loop()
     
-def button(msg,x,y,w,h,ic,ac,action):
+def button(msg,x,y,w,h,ic,ac,action=None):
    ''' x: The x location of the top left coordinate of the button box.
 
        y: The y location of the top left coordinate of the button box.
@@ -68,8 +78,8 @@ def button(msg,x,y,w,h,ic,ac,action):
    if x+w > mouse[0] > x and y+h > mouse[1] > y:
       pygame.draw.rect(gameDisplay, ac,(x,y,w,h), 5)
       if click[0] == 1 and action != None:
-         pygame.display.iconify()
-         os.system(action)
+         #pygame.display.iconify()
+         action()
    else:
       pygame.draw.rect(gameDisplay, ic,(x,y,w,h))
 
@@ -83,29 +93,29 @@ def quitgame():
 
 def game_intro():
 
-    intro = True
+   intro = True
 
-    while intro:
-        for event in pygame.event.get():
-            #print(event)
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+   while intro:
+      for event in pygame.event.get():
+         #print(event)
+         if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
                 
-        gameDisplay.fill(white)
-        largeText = pygame.font.Font('freesansbold.ttf',95)
-        TextSurf, TextRect = text_objects("Staged Conflict", largeText, black)
-        TextRect.center = ((display_width/2),(display_height/2) - 150)
-        gameDisplay.blit(TextSurf, TextRect)
+      gameDisplay.fill(white)
+      largeText = pygame.font.Font('freesansbold.ttf',190)
+      TextSurf, TextRect = text_objects("Staged Conflict", largeText, black)
+      TextRect.center = ((display_width/2),(display_height/2) - 150)
+      gameDisplay.blit(TextSurf, TextRect)
         
-        mouse = pygame.mouse.get_pos()
+      mouse = pygame.mouse.get_pos()
         
-        button("Host Game",250,300,300,50,green,bright_green,"serverMake.py")
-        button("Join Game",250,375,300,50,red,bright_red,"clientLogin.py")
-        button("Quit",250,450,300,50,black,grey,quitgame)
+      button("Host Game",450,450,700,100,green,bright_green, serverMake.MakeServer)
+      button("Join Game",450,600,700,100,red,bright_red, clientLogin.LoginClient)
+      button("Quit",450,750,700,100,black,grey,quitgame)
 
-        pygame.display.update()
-        clock.tick(15)
+      pygame.display.update()
+      clock.tick(15)
     
 in_menu = True
 in_game = False
