@@ -52,6 +52,10 @@ class CursorGraphic:
 playCursor = CursorGraphic()
 
 # Graphics Constants
+ATK_LEFT_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Left.png')
+ATK_RIGHT_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Right.png')
+ATK_TOP_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Top.png')
+ATK_BOTTOM_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Bottom.png')
 ATK_LEFT_RIGHT = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_L_R.png')
 ATK_TOP_BOTTOM = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_T_B.png')
 ATK_UPLEFT_DOWNRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_UL_BR.png')
@@ -69,7 +73,13 @@ DEFENDER = pygame.image.load(IMAGE_FILE_PATH + "Defender.png")
 WAITING = pygame.image.load(IMAGE_FILE_PATH + "Waiting.png")
 
 def blitBattle(map, DISPLAYSURF, attack_coords, defend_coords):
-   if attack_coords[0] == defend_coords[0]:
+   if min(attack_coords[0], defend_coords[0]) == 0 and max(attack_coords[0], defend_coords[0]) == map.WIDTH - 1:
+      DISPLAYSURF.blit(ATK_LEFT_EDGE, (0, (attack_coords[1] if attack_coords[0] == 0 else defend_coords[1]) * TILESIZE))
+      DISPLAYSURF.blit(ATK_RIGHT_EDGE, ((map.WIDTH - 1) * TILESIZE, (attack_coords[1] if defend_coords[0] == 0 else defend_coords[1]) * TILESIZE))
+   elif min(attack_coords[1], defend_coords[1]) == 0 and max(attack_coords[1], defend_coords[1]) == map.HEIGHT - 1:
+      DISPLAYSURF.blit(ATK_TOP_EDGE, ((attack_coords[0] if attack_coords[1] == 0 else defend_coords[0]) * TILESIZE, 0))
+      DISPLAYSURF.blit(ATK_BOTTOM_EDGE, ((attack_coords[0] if defend_coords[1] == 0 else defend_coords[0]) * TILESIZE, (map.HEIGHT - 1) * TILESIZE))
+   elif attack_coords[0] == defend_coords[0]:
       DISPLAYSURF.blit(ATK_TOP_BOTTOM, (attack_coords[0] * TILESIZE, min(attack_coords[1], defend_coords[1]) * TILESIZE))
    elif attack_coords[1] == defend_coords[1]:
       DISPLAYSURF.blit(ATK_LEFT_RIGHT, (min(attack_coords[0], defend_coords[0]) * TILESIZE, attack_coords[1] * TILESIZE))
