@@ -52,10 +52,24 @@ class CursorGraphic:
 playCursor = CursorGraphic()
 
 # Graphics Constants
+INFO_BUY_UNITS = pygame.image.load(IMAGE_FILE_PATH + "InfoBuyUnits.png")
+INFO_ATTACK = pygame.image.load(IMAGE_FILE_PATH + "InfoAttack.png")
+INFO_PISTOLEERS = pygame.image.load(IMAGE_FILE_PATH + "InfoPistoleers.png")
+INFO_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "InfoMusketeers.png")
+INFO_CANNONS = pygame.image.load(IMAGE_FILE_PATH + "InfoCannons.png")
+INFO_AIRSHIPS = pygame.image.load(IMAGE_FILE_PATH + "InfoAirships.png")
+INFO_BUTTON_OFF = pygame.image.load(IMAGE_FILE_PATH + "HelpButton.png")
+INFO_BUTTON_ON = pygame.image.load(IMAGE_FILE_PATH + "HelpButtonActive.png")
+
+ATK_LEFT_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Left.png')
+ATK_RIGHT_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Right.png')
+ATK_TOP_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Top.png')
+ATK_BOTTOM_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Bottom.png')
 ATK_LEFT_RIGHT = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_L_R.png')
 ATK_TOP_BOTTOM = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_T_B.png')
 ATK_UPLEFT_DOWNRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_UL_BR.png')
 ATK_DOWNLEFT_UPRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_UR_BL.png')
+
 MOUSE_OVER = pygame.image.load(IMAGE_FILE_PATH + 'MouseOver.png')
 MOUSE_OVER_UNKNOWN = pygame.image.load(IMAGE_FILE_PATH + 'MouseOverUnknown.png')
 INFO_MARQUEE = pygame.image.load(IMAGE_FILE_PATH + "InfoMarque.png")
@@ -68,8 +82,32 @@ ATTACKER = pygame.image.load(IMAGE_FILE_PATH + "Attacker.png")
 DEFENDER = pygame.image.load(IMAGE_FILE_PATH + "Defender.png")
 WAITING = pygame.image.load(IMAGE_FILE_PATH + "Waiting.png")
 
+def blitInfo(DISPLAYSURF, map, phase_info):
+   curr_x, curr_y = pygame.mouse.get_pos()
+   
+   if 170 <= curr_x <= 70 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120:
+      DISPLAYSURF.blit(INFO_PISTOLEERS, (0, 0))
+   elif 575 <= curr_x <= 575 + 250 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120:
+      DISPLAYSURF.blit(INFO_MUSKETEERS, (0, 0))
+   elif 170 <= curr_x <= 70 + 350 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175:
+      DISPLAYSURF.blit(INFO_CANNONS, (0, 0))
+   elif 575 <= curr_x <= 575 + 250 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175:
+      DISPLAYSURF.blit(INFO_AIRSHIPS, (0, 0))
+   
+   if 1085 <= curr_x <= 1185 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 175:
+      DISPLAYSURF.blit(phase_info, (0, 0))
+      DISPLAYSURF.blit(INFO_BUTTON_ON, (1085, map.HEIGHT * TILESIZE + 70))
+   else:
+      DISPLAYSURF.blit(INFO_BUTTON_OFF, (1085, map.HEIGHT * TILESIZE + 70))
+
 def blitBattle(map, DISPLAYSURF, attack_coords, defend_coords):
-   if attack_coords[0] == defend_coords[0]:
+   if min(attack_coords[0], defend_coords[0]) == 0 and max(attack_coords[0], defend_coords[0]) == map.WIDTH - 1:
+      DISPLAYSURF.blit(ATK_LEFT_EDGE, (0, (attack_coords[1] if attack_coords[0] == 0 else defend_coords[1]) * TILESIZE))
+      DISPLAYSURF.blit(ATK_RIGHT_EDGE, ((map.WIDTH - 1) * TILESIZE, (attack_coords[1] if defend_coords[0] == 0 else defend_coords[1]) * TILESIZE))
+   elif min(attack_coords[1], defend_coords[1]) == 0 and max(attack_coords[1], defend_coords[1]) == map.HEIGHT - 1:
+      DISPLAYSURF.blit(ATK_TOP_EDGE, ((attack_coords[0] if attack_coords[1] == 0 else defend_coords[0]) * TILESIZE, 0))
+      DISPLAYSURF.blit(ATK_BOTTOM_EDGE, ((attack_coords[0] if defend_coords[1] == 0 else defend_coords[0]) * TILESIZE, (map.HEIGHT - 1) * TILESIZE))
+   elif attack_coords[0] == defend_coords[0]:
       DISPLAYSURF.blit(ATK_TOP_BOTTOM, (attack_coords[0] * TILESIZE, min(attack_coords[1], defend_coords[1]) * TILESIZE))
    elif attack_coords[1] == defend_coords[1]:
       DISPLAYSURF.blit(ATK_LEFT_RIGHT, (min(attack_coords[0], defend_coords[0]) * TILESIZE, attack_coords[1] * TILESIZE))
@@ -292,10 +330,10 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address):
            
            if event.type == MOUSEBUTTONDOWN:
              if curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE:
-                curr_country = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)]
+                curr_country = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)] #Continent name and country index
                 if (curr_country != map.WATER and map.d_continents[curr_country[0]][curr_country[1]].owner == map.current_player):
                   if map.d_continents[curr_country[0]][curr_country[1]].owner == player.user_name and selectedCountry != [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]:
-                     selectedCountry = [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]
+                     selectedCountry = [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] #Coordinates of the current selected country
                   else:
                      selectedCountry = None
              elif selectedCountry != None:
@@ -349,7 +387,7 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address):
                      map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions -= 1
                      player.unit_counts += 5
                      
-                #Done
+             #Done
              if 980 <= curr_x <= 1080 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 175 and player.unit_counts == 0:
                update_map = pickle.dumps((map, player))
                socket.sendto(update_map, host_address)
@@ -371,10 +409,7 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address):
        DISPLAYSURF.blit(BUY_AIRSHIPS, (575, map.HEIGHT * TILESIZE + 125))
        DISPLAYSURF.blit(DONE_BUTTON if player.unit_counts > 0 else DONE_BUTTON_ACTIVE, (980, map.HEIGHT * TILESIZE + 70))
        
-       playCursor.CursorOver = (175 + 250 <= curr_x <= 175 + 400 or 580 + 250 <= curr_x <= 580 + 400)
-       playCursor.CursorOver = playCursor.CursorOver and (map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 or map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175)
-       playCursor.CursorOver = playCursor.CursorOver or (980 <= curr_x <= 1080 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 175)
-       playCursor.updateCursor(DISPLAYSURF)
+       blitInfo(DISPLAYSURF, map, INFO_BUY_UNITS)
        
        #update the display
        pygame.display.update()
@@ -560,6 +595,8 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
        DISPLAYSURF.blit(SEND_CANNONS, (170, map.HEIGHT * TILESIZE + 125))
        DISPLAYSURF.blit(SEND_AIRSHIPS, (575, map.HEIGHT * TILESIZE + 125))
        DISPLAYSURF.blit(DONE_BUTTON if player.unit_counts > 0 else DONE_BUTTON_ACTIVE, (980, map.HEIGHT * TILESIZE + 70))
+       
+       blitInfo(DISPLAYSURF, map, INFO_ATTACK)
          
        #update the display
        pygame.display.update()
