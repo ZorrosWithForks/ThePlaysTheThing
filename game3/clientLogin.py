@@ -10,86 +10,10 @@ import pygame, sys
 from pygame.locals import *
 import random
 import re
+from bad_stuff import *
 #import main_menu
 
 def LoginClient():
-
-   """
-   Module that provides a class that filters profanities
-
-   """
-
-   __author__ = "leoluk"
-   __version__ = '0.0.1'
-
-   class ProfanitiesFilter(object):
-       def __init__(self, filterlist, ignore_case=True, replacements="$@%-?!", 
-                    complete=True, inside_words=True):
-           """
-           Inits the profanity filter.
-
-           filterlist -- a list of regular expressions that
-           matches words that are forbidden
-           ignore_case -- ignore capitalization
-           replacements -- string with characters to replace the forbidden word
-           complete -- completely remove the word or keep the first and last char?
-           inside_words -- search inside other words?
-
-           """
-
-           self.badwords = filterlist
-           self.ignore_case = ignore_case
-           self.replacements = replacements
-           self.complete = complete
-           self.inside_words = inside_words
-
-       def _make_clean_word(self, length):
-           """
-           Generates a random replacement string of a given length
-           using the chars in self.replacements.
-
-           """
-           return ''.join([random.choice(self.replacements) for i in
-                     range(length)])
-
-       def __replacer(self, match):
-           value = match.group()
-           if self.complete:
-               return self._make_clean_word(len(value))
-           else:
-               return value[0]+self._make_clean_word(len(value)-2)+value[-1]
-
-       def clean(self, text):
-           """Cleans a string from profanity."""
-
-           regexp_insidewords = {
-               True: r'(%s)',
-               False: r'\b(%s)\b',
-               }
-
-           regexp = (regexp_insidewords[self.inside_words] % 
-                     '|'.join(self.badwords))
-
-           r = re.compile(regexp, re.IGNORECASE if self.ignore_case else 0)
-
-           return r.sub(self.__replacer, text)
-
-       # f = ProfanitiesFilter(['bad', 'un\w+'], replacements="-")    
-       # example = "I am doing bad ungood badlike things."
-
-       # print f.clean(example)
-       # # Returns "I am doing --- ------ badlike things."
-
-       # f.inside_words = True    
-       # print f.clean(example)
-       # # Returns "I am doing --- ------ ---like things."
-
-       # f.complete = False    
-       # print f.clean(example)
-       # # Returns "I am doing b-d u----d b-dlike things."
-
-
-
    def button(msg,x,y,w,h,button_pressed,button_unpressed):
       ''' x: The x location of the top left coordinate of the button box.
 
@@ -113,6 +37,8 @@ def LoginClient():
             #LOGIN_TOP_SURFACE.blit(REFRESH_BUTTON_PRESSED, (1300, 700))
             print("THIS PRINTS IN THE BUTTON")
             request(x_panel_position, y_panel_position, y_offset)
+         if click[0] == 1 and msg == "Back":
+            return(True)
       else:
          # pygame.draw.rect(LOGIN_TOP_SURFACE, ic,(x,y,w,h))
          LOGIN_TOP_SURFACE.blit(button_unpressed, (x, y))
@@ -156,7 +82,7 @@ def LoginClient():
          LOGIN_TOP_SURFACE.blit(SERVER_FONT.render(str(server[1]), True, (0,0,0)), (x_panel_position + 50, y_panel_position + 25 + y_offset))
         
          # any room for password?
-         LOGIN_TOP_SURFACE.blit(JOIN_BUTTON, (x_panel_position + 1100, y_panel_position + 25 + y_offset))
+         LOGIN_TOP_SURFACE.blit(JOIN_BUTTON_UNPRESSED, (x_panel_position + 1100, y_panel_position + 25 + y_offset))
          l_join_spots.append((x_panel_position + 1100, y_panel_position + 25, server[0]))
          y_panel_position += 100
          #pygame.display.update()
@@ -195,14 +121,15 @@ def LoginClient():
    LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background.png")
    BLACK_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background2.png")
    SERVER_BAR = pygame.image.load(IMAGE_FILE_PATH + "Server.png")
-   JOIN_BUTTON = pygame.image.load(IMAGE_FILE_PATH + "JoinButton.png")
+   JOIN_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "JoinButton_pressed.png")
+   JOIN_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "JoinButton_unpressed.png")
    REFRESH_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "RefreshButton_unpressed.png")
    REFRESH_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "RefreshButton_pressed.png")
    UP_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "upArrow.png")
    DOWN_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "downArrow.png")
    USERNAME_BOX =  pygame.image.load(IMAGE_FILE_PATH + "username_box.png")
-   BACK_BUTTON = pygame.image.load(IMAGE_FILE_PATH + "back_button.png")
-
+   BACK_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_unpressed.png")
+   BACK_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_pressed.png")
    #specify that shift is not pressed
    shifted = False
 
@@ -234,352 +161,8 @@ def LoginClient():
    y_pos = 725
 
    # Initialize bad word filter
-   filter = ProfanitiesFilter([
-                              "damn"
-                              "2g1c",
-                              "2 girls 1 cup",
-                              "acrotomophilia",
-                              "anal",
-                              "anilingus",
-                              "anus",
-                              "arsehole",
-                              "ass",
-                              "asshole",
-                              "assmunch",
-                              "auto erotic",
-                              "autoerotic",
-                              "babeland",
-                              "baby batter",
-                              "ball gag",
-                              "ball gravy",
-                              "ball kicking",
-                              "ball licking",
-                              "ball sack",
-                              "ball sucking",
-                              "bangbros",
-                              "bareback",
-                              "barely legal",
-                              "barenaked",
-                              "bastardo",
-                              "bastinado",
-                              "bbw",
-                              "bdsm",
-                              "beaver cleaver",
-                              "beaver lips",
-                              "bestiality",
-                              "bi curious",
-                              "big black",
-                              "big breasts",
-                              "big knockers",
-                              "big tits",
-                              "bimbos",
-                              "birdlock",
-                              "bitch",
-                              "black cock",
-                              "blonde action",
-                              "blonde on blonde action",
-                              "blow j",
-                              "blow your l",
-                              "blue waffle",
-                              "blumpkin",
-                              "bollocks",
-                              "bondage",
-                              "boner",
-                              "boob",
-                              "boobs",
-                              "booty call",
-                              "brown showers",
-                              "brunette action",
-                              "bukkake",
-                              "bulldyke",
-                              "bullet vibe",
-                              "bung hole",
-                              "bunghole",
-                              "busty",
-                              "butt",
-                              "buttcheeks",
-                              "butthole",
-                              "camel toe",
-                              "camgirl",
-                              "camslut",
-                              "camwhore",
-                              "carpet muncher",
-                              "carpetmuncher",
-                              "chocolate rosebuds",
-                              "circlejerk",
-                              "cleveland steamer",
-                              "clit",
-                              "clitoris",
-                              "clover clamps",
-                              "clusterfuck",
-                              "cock",
-                              "cocks",
-                              "coprolagnia",
-                              "coprophilia",
-                              "cornhole",
-                              "cum",
-                              "cumming",
-                              "cunnilingus",
-                              "cunt",
-                              "darkie",
-                              "date rape",
-                              "daterape",
-                              "deep throat",
-                              "deepthroat",
-                              "dick",
-                              "dildo",
-                              "dirty pillows",
-                              "dirty sanchez",
-                              "dog style",
-                              "doggie style",
-                              "doggiestyle",
-                              "doggy style",
-                              "doggystyle",
-                              "dolcett",
-                              "domination",
-                              "dominatrix",
-                              "dommes",
-                              "donkey punch",
-                              "double dong",
-                              "double penetration",
-                              "dp action",
-                              "eat my ass",
-                              "ecchi",
-                              "ejaculation",
-                              "erotic",
-                              "erotism",
-                              "escort",
-                              "ethical slut",
-                              "eunuch",
-                              "faggot",
-                              "fecal",
-                              "felch",
-                              "fellatio",
-                              "feltch",
-                              "female squirting",
-                              "femdom",
-                              "figging",
-                              "fingering",
-                              "fisting",
-                              "foot fetish",
-                              "footjob",
-                              "frotting",
-                              "fuck",
-                              "fucking",
-                              "fuck buttons",
-                              "fudge packer",
-                              "fudgepacker",
-                              "futanari",
-                              "g-spot",
-                              "gang bang",
-                              "gay sex",
-                              "genitals",
-                              "giant cock",
-                              "girl on",
-                              "girl on top",
-                              "girls gone wild",
-                              "goatcx",
-                              "goatse",
-                              "gokkun",
-                              "golden shower",
-                              "goo girl",
-                              "goodpoop",
-                              "goregasm",
-                              "grope",
-                              "group sex",
-                              "guro",
-                              "hand job",
-                              "handjob",
-                              "hard core",
-                              "hardcore",
-                              "hentai",
-                              "homoerotic",
-                              "honkey",
-                              "hooker",
-                              "hot chick",
-                              "how to kill",
-                              "how to murder",
-                              "huge fat",
-                              "humping",
-                              "incest",
-                              "intercourse",
-                              "jack off",
-                              "jail bait",
-                              "jailbait",
-                              "jerk off",
-                              "jigaboo",
-                              "jiggaboo",
-                              "jiggerboo",
-                              "jizz",
-                              "juggs",
-                              "kike",
-                              "kinbaku",
-                              "kinkster",
-                              "kinky",
-                              "knobbing",
-                              "leather restraint",
-                              "leather straight jacket",
-                              "lemon party",
-                              "lolita",
-                              "lovemaking",
-                              "make me come",
-                              "male squirting",
-                              "masturbate",
-                              "menage a trois",
-                              "milf",
-                              "missionary position",
-                              "motherfucker",
-                              "mound of venus",
-                              "mr hands",
-                              "muff diver",
-                              "muffdiving",
-                              "nambla",
-                              "nawashi",
-                              "negro",
-                              "neonazi",
-                              "nig nog",
-                              "nigga",
-                              "nigger",
-                              "nimphomania",
-                              "nipple",
-                              "nipples",
-                              "nsfw images",
-                              "nude",
-                              "nudity",
-                              "nympho",
-                              "nymphomania",
-                              "octopussy",
-                              "omorashi",
-                              "one cup two girls",
-                              "one guy one jar",
-                              "orgasm",
-                              "orgy",
-                              "paedophile",
-                              "panties",
-                              "panty",
-                              "pedobear",
-                              "pedophile",
-                              "pegging",
-                              "penis",
-                              "phone sex",
-                              "piece of shit",
-                              "piss pig",
-                              "pissing",
-                              "pisspig",
-                              "playboy",
-                              "pleasure chest",
-                              "pole smoker",
-                              "ponyplay",
-                              "poof",
-                              "poop chute",
-                              "poopchute",
-                              "porn",
-                              "porno",
-                              "pornography",
-                              "prince albert piercing",
-                              "pthc",
-                              "pubes",
-                              "pussy",
-                              "queaf",
-                              "raghead",
-                              "raging boner",
-                              "rape",
-                              "raping",
-                              "rapist",
-                              "rectum",
-                              "reverse cowgirl",
-                              "rimjob",
-                              "rimming",
-                              "rosy palm",
-                              "rosy palm and her 5 sisters",
-                              "rusty trombone",
-                              "s&m",
-                              "sadism",
-                              "scat",
-                              "schlong",
-                              "scissoring",
-                              "semen",
-                              "sex",
-                              "sexo",
-                              "sexy",
-                              "shaved beaver",
-                              "shaved pussy",
-                              "shemale",
-                              "shibari",
-                              "shit",
-                              "shota",
-                              "shrimping",
-                              "slanteye",
-                              "slut",
-                              "smut",
-                              "snatch",
-                              "snowballing",
-                              "sodomize",
-                              "sodomy",
-                              "spic",
-                              "spooge",
-                              "spread legs",
-                              "strap on",
-                              "strapon",
-                              "strappado",
-                              "strip club",
-                              "style doggy",
-                              "suck",
-                              "sucks",
-                              "suicide girls",
-                              "sultry women",
-                              "swastika",
-                              "swinger",
-                              "tainted love",
-                              "taste my",
-                              "tea bagging",
-                              "threesome",
-                              "throating",
-                              "tied up",
-                              "tight white",
-                              "tit",
-                              "tits",
-                              "titties",
-                              "titty",
-                              "tongue in a",
-                              "topless",
-                              "tosser",
-                              "towelhead",
-                              "tranny",
-                              "tribadism",
-                              "tub girl",
-                              "tubgirl",
-                              "tushy",
-                              "twat",
-                              "twink",
-                              "twinkie",
-                              "two girls one cup",
-                              "undressing",
-                              "upskirt",
-                              "urethra play",
-                              "urophilia",
-                              "vagina",
-                              "venus mound",
-                              "vibrator",
-                              "violet blue",
-                              "violet wand",
-                              "vorarephilia",
-                              "voyeur",
-                              "vulva",
-                              "wank",
-                              "wet dream",
-                              "wetback",
-                              "white power",
-                              "women rapping",
-                              "wrapping men",
-                              "wrinkled starfish",
-                              "xx",
-                              "xxx",
-                              "yaoi",
-                              "yellow showers",
-                              "yiffy",
-                              "zoophilia"], replacements="-")
-   
+   filter = ProfanitiesFilter(filterlist=bad_things, replacements="!")
+
    # Colors for buttons
    l_colors = {
                BLACK :(0,0,0),
@@ -593,7 +176,7 @@ def LoginClient():
                }
 
    GRAY = (55,55,55)
-    
+
    BLOCK_COLOR = (53,115,255)
 
    # Position of back button
@@ -615,7 +198,9 @@ def LoginClient():
 
    # Offset for scrolling
    y_offset = 0
-
+   
+   pushed_back=False
+   
    # Declare the Surface
    LOGIN_TOP_SURFACE = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 
@@ -728,6 +313,7 @@ def LoginClient():
                elif event.key == K_COMMA: username += ","
                elif event.key == K_PERIOD: username += "."
                elif event.key == K_SLASH: username += "/"
+               elif event.key == K_TAB: pygame.display.iconify()
             elif shifted == True:
                print("Printing uppercase")
                if event.key == K_a: username += "A"
@@ -787,14 +373,14 @@ def LoginClient():
       LOGIN_TOP_SURFACE.blit(USERNAME_BOX, (280, y_pos))
       LOGIN_TOP_SURFACE.blit(username_prompt, (x_pos, y_pos))
       LOGIN_TOP_SURFACE.blit(username_graphics, (285, y_pos))
-      LOGIN_TOP_SURFACE.blit(BACK_BUTTON, (x_back_button, y_back_button))
       LOGIN_TOP_SURFACE.blit(DOWN_ARROW, (arrow_x_pos, down_arrow_y_pos))
       LOGIN_TOP_SURFACE.blit(UP_ARROW, (arrow_x_pos, up_arrow_y_pos))
-      # may be able to use buttons
-      # LOGIN_TOP_SURFACE.blit(REFRESH_BUTTON, (1300, 700))
       waiting_on_players = SERVER_FONT.render("Waiting on players:", 1, (0,255,255))
-      button("Refresh",refresh_x_pos,refresh_y_pos,200,100,REFRESH_BUTTON_PRESSED,REFRESH_BUTTON_UNPRESSED) # TUPLE OBJECT NOT COLLABLE
-      
+      button("Refresh",refresh_x_pos,refresh_y_pos,200,100,REFRESH_BUTTON_PRESSED,REFRESH_BUTTON_UNPRESSED)
+      pushed_back = button("Back",x_back_button,y_back_button,75,50,BACK_BUTTON_PRESSED,BACK_BUTTON_UNPRESSED)
+      if pushed_back == True:
+         client_socket.close()
+         return
       if username == "" and just_accessed != True:
          LOGIN_TOP_SURFACE.blit(no_username_message, (200, 800))
             
@@ -820,7 +406,8 @@ def LoginClient():
                      
             #click back button
             # if x_back_button <= x_mouse_position_main <= x_back_button + 75 and y_back_button <= y_mouse_position_main <= y_back_button + 50:
-               #return
+               # client_socket.close()
+               # return
                      
             # #click up arrow
             # if arrow_x_pos <= x_mouse_position_main <= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 50:
