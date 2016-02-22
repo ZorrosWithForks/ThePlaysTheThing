@@ -7,7 +7,7 @@ import time
 import select
 import SimpleServer
 import clientLogin
-from SimpleClient import play
+import SimpleClient
 import pygame, sys
 from pygame.locals import *
 import random
@@ -65,18 +65,24 @@ def MakeServer():
    def display_players(x_panel_position, y_panel_position):
       print("Number of clients: " + str(len(clients)))
       for i in clients:
-         DISPLAYSURFACE.blit(SERVER_BAR, (x_panel_position, y_panel_position))
+         DISPLAYSURF.blit(SERVER_BAR, (x_panel_position, y_panel_position))
          # display the name of the client
-         DISPLAYSURFACE.blit(SERVER_FONT.render(str(i[1]), True, (0,0,0)), (x_panel_position + 25, y_panel_position + 25))
-         DISPLAYSURFACE.blit(BOOT_BUTTON, (x_panel_position + 1300, y_panel_position + 25))
+         DISPLAYSURF.blit(SERVER_FONT.render(str(i[1]), True, (0,0,0)), (x_panel_position + 25, y_panel_position + 25))
+         DISPLAYSURF.blit(BOOT_BUTTON, (x_panel_position + 1200, y_panel_position + 25))
          l_boot_spots.append((x_panel_position, y_panel_position + 25, i[1]))
          y_panel_position += 100
          
    def start_game():
       for client in clients:
          client[0].sendto(host.encode("ascii"), client[2])
-      pygame.display.iconify()
-      SimpleServer.serve(len(clients))
+      addr = (host, 9998)
+      t_become_server = threading.Thread(target=SimpleServer.serve, args=(len(clients) + 1,))
+      t_become_server.daemon = True
+      t_become_server.start()
+      #subprocess.Popen(["Python","SimpleClient.py"] + [addr, servername])
+      #pygame.display.iconify()
+      server_socket.close()
+      SimpleClient.play(addr, servername)
 
    def begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients):
       print("this prints")
@@ -106,7 +112,7 @@ def MakeServer():
       click = pygame.mouse.get_pressed()
       
       if x+w > mouse[0] > x and y+h > mouse[1] > y:
-         DISPLAYSURFACE.blit(button_pressed, (x, y))
+         DISPLAYSURF.blit(button_pressed, (x, y))
          if click[0] == 1 and msg == "Start":
             if servername == "":
                just_accessed = False
@@ -114,14 +120,13 @@ def MakeServer():
             else:
                pygame.display.iconify()
                begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients)
-         if click[0] == 1 and msg == "Play" and len(clients) >= 1:
-            os.system("SimpleClient.py host servername")
+         if click[0] == 1 and msg == "Play":
             #SimpleClient.play(host, servername)
             start_game()
          if click[0] == 1 and msg == "Back":
             return(True)
       else:
-         DISPLAYSURFACE.blit(button_unpressed, (x, y))
+         DISPLAYSURF.blit(button_unpressed, (x, y))
          
       smallText = pygame.font.Font("freesansbold.ttf",20)
       textSurf, textRect = text_objects(msg, smallText, l_colors[WHITE])
@@ -179,7 +184,10 @@ def MakeServer():
    # Initialize servername
    servername = ""
    no_servername_message = SERVER_FONT.render("Please type your servername", 1, (255,0,0))
-               
+    
+   # Address
+   addr = ()
+    
    # Position of the text box
    x_pos = 100
    y_pos = 725
@@ -207,7 +215,7 @@ def MakeServer():
    pushed_back = False
    just_accessed = True
    # Declare the Surface
-   DISPLAYSURFACE = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+   DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 
    thread = []
    clients = set()
@@ -341,16 +349,16 @@ def MakeServer():
                elif event.key == K_SLASH: servername += "?"
                
       # Blit the stuffs onto the screen
-      DISPLAYSURFACE.blit(LOGIN_BACKGROUND, (0,0))
+      DISPLAYSURF.blit(LOGIN_BACKGROUND, (0,0))
       servername_prompt = SERVER_FONT.render("Server Name: ", 1, (0,255,0))
       servername = filter.clean(servername)
       servername_graphics = SERVER_FONT.render(servername, 1, (0,0,0))
-      DISPLAYSURFACE.blit(SERVERNAME_BOX, (330, y_pos))
-      DISPLAYSURFACE.blit(servername_prompt, (x_pos, y_pos))
-      DISPLAYSURFACE.blit(BACK_BUTTON_UNPRESSED, (x_back_button, y_back_button))
-      DISPLAYSURFACE.blit(servername_graphics, (335, y_pos))
-      #DISPLAYSURFACE.blit(PLAY_BUTTON, (1300, 700))
-      #DISPLAYSURFACE.blit(START_SERVER_BUTTON, (x_start_server_button, y_start_server_button))
+      DISPLAYSURF.blit(SERVERNAME_BOX, (330, y_pos))
+      DISPLAYSURF.blit(servername_prompt, (x_pos, y_pos))
+      DISPLAYSURF.blit(BACK_BUTTON_UNPRESSED, (x_back_button, y_back_button))
+      DISPLAYSURF.blit(servername_graphics, (335, y_pos))
+      #DISPLAYSURF.blit(PLAY_BUTTON, (1300, 700))
+      #DISPLAYSURF.blit(START_SERVER_BUTTON, (x_start_server_button, y_start_server_button))
       button("Start",x_start_server_button,y_start_server_button,150,75,START_SERVER_BUTTON_PRESSED,START_SERVER_BUTTON_UNPRESSED)
       button("Play",x_play_button,y_play_button,200,200,PLAY_BUTTON_PRESSED,PLAY_BUTTON_UNPRESSED)
       pushed_back = button("Back",x_back_button,y_back_button,75,50,BACK_BUTTON_PRESSED,BACK_BUTTON_UNPRESSED)
@@ -358,9 +366,12 @@ def MakeServer():
       if pushed_back == True:
          return
       if servername == "" and just_accessed == False:
-         DISPLAYSURFACE.blit(no_servername_message, (x_no_servername, y_no_servername))
+         DISPLAYSURF.blit(no_servername_message, (x_no_servername, y_no_servername))
       if event.type == MOUSEBUTTONDOWN:
          x_mouse_position_main, y_mouse_position_main = pygame.mouse.get_pos()
+      for boot_spot in l_boot_spots:
+         if boot_spot[0] <= x_mouse_position_main <= boot_spot[0] + 100 and boot_spot[1] <= y_mouse_position_main <= boot_spot[1] + 50:
+            
          #print(str(x_mouse_position_main) + str(y_mouse_position_main))
         # print("clicked mounce here")
          

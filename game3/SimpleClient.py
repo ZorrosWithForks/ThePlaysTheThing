@@ -635,11 +635,8 @@ def moveTroops(DISPLAYSURF, map):
 def play(host_address, player_name):
    #set up the display
    print("Enter play")
-   DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 
-   #initialize the movie
-   pygame.mixer.quit()
-   movie = pygame.movie.Movie('These Guys XD_mpeg1video.mpg')
+   print("here after display")
 
    #use list comprehension to create our tilemap
    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -669,7 +666,7 @@ def play(host_address, player_name):
    
    map.current_player = player_name
    print(player_name)
-   
+   DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN) 
    while True:
       placeUnits(DISPLAYSURF, map, player, s, host_address)
       declareAttacks(DISPLAYSURF, map, player, s, host_address)
@@ -678,3 +675,10 @@ def play(host_address, player_name):
       #sys.exit()
 
    s.close()
+
+if __name__ == '__main__':
+   host_address = sys.argv[1]
+   player_name = sys.argv[2]
+   print("host address: ",str(host_address))
+   print("player name: ",str(player_name))
+   play(host_address, player_name)
