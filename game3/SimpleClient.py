@@ -58,6 +58,8 @@ INFO_PISTOLEERS = pygame.image.load(IMAGE_FILE_PATH + "InfoPistoleers.png")
 INFO_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "InfoMusketeers.png")
 INFO_CANNONS = pygame.image.load(IMAGE_FILE_PATH + "InfoCannons.png")
 INFO_AIRSHIPS = pygame.image.load(IMAGE_FILE_PATH + "InfoAirships.png")
+INFO_BUTTON_OFF = pygame.image.load(IMAGE_FILE_PATH + "HelpButton.png")
+INFO_BUTTON_ON = pygame.image.load(IMAGE_FILE_PATH + "HelpButtonActive.png")
 
 ATK_LEFT_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Left.png')
 ATK_RIGHT_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Right.png')
@@ -91,8 +93,12 @@ def blitInfo(DISPLAYSURF, map, phase_info):
       DISPLAYSURF.blit(INFO_CANNONS, (0, 0))
    elif 575 <= curr_x <= 575 + 250 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175:
       DISPLAYSURF.blit(INFO_AIRSHIPS, (0, 0))
-   elif 1085 <= curr_x <= 1185 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 175:
+   
+   if 1085 <= curr_x <= 1185 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 175:
       DISPLAYSURF.blit(phase_info, (0, 0))
+      DISPLAYSURF.blit(INFO_BUTTON_ON, (1085, map.HEIGHT * TILESIZE + 70))
+   else:
+      DISPLAYSURF.blit(INFO_BUTTON_OFF, (1085, map.HEIGHT * TILESIZE + 70))
 
 def blitBattle(map, DISPLAYSURF, attack_coords, defend_coords):
    if min(attack_coords[0], defend_coords[0]) == 0 and max(attack_coords[0], defend_coords[0]) == map.WIDTH - 1:
@@ -451,7 +457,6 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
    d_attacks = {}
    l_attackers = []
    l_defenders = []
-   l_attacks = []
    
    while declaring:
        #get all the user events
@@ -469,13 +474,10 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
                      l_neighbors = []
                      selectedCountry = [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]
                   elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] != selectedCountry and selectedCountry != None: # if not clicking your selected country and there is a selected country
-                     if [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_neighbors: # if clicking neighboring country
+                     if not ([selectedCountry[0], selectedCountry[1]] in l_attackers) and [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_neighbors: # if selected country is not attacking and clicking neighboring country
                         l_attackers.append([selectedCountry[0], selectedCountry[1]])
                         l_defenders.append([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
-                        d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0)] #[defender, l_defend_coords attack force]
-                        if not ([selectedCountry[0], selectedCountry[1]] in l_attacks):
-                           l_attacks.append([selectedCountry[0], selectedCountry[1]], [])
-                        l_attacks[selectedCountry[0], selectedCountry[1]].append([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
+                        d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0), False] #[defender, attack force]
                      elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_defenders: # if clicking the country your selected country is attacking
                         l_defenders.remove([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
                         l_attackers.remove([selectedCountry[0], selectedCountry[1]])
@@ -484,46 +486,52 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
                      selectedCountry = None
              elif selectedCountry != None:
                 curr_country = map.ll_map[selectedCountry[1]][selectedCountry[0]]
-                attacker = d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]]
-                units = map.d_continents[curr_country[0]][curr_country[1]]
-                
-                if [selectedCountry[0], selectedCountry[1]] in l_attackers:
+                if selectedCountry in l_attackers:
+                  attacker = d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]]
                   #Pistoleers
-                  if 425 <= curr_x <= 475 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Pistoleers
-                    attacker[1].infantry = units.infantry
-                  elif 475 <= curr_x <= 525 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and attacker[1].infantry < units.infantry: # "+" for Pistoleers
-                    attacker[1].infantry += 1
-                  elif 525 <= curr_x <= 575 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Pistoleers
-                    if attacker[1].infantry > 0:
-                       attacker[1].infantry -= 1
+                  if 175 + 250 <= curr_x <= 175 + 300 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Pistoleers
+                     attacker[1].infantry = map.d_continents[curr_country[0]][curr_country[1]].unit_counts.infantry
+                  elif 175 + 300 <= curr_x <= 175 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and \
+                        attacker[1].infantry < map.d_continents[curr_country[0]][curr_country[1]].unit_counts.infantry: # "+" for Pistoleers
+                     attacker[1].infantry += 1
+                  elif 175 + 350 <= curr_x <= 175 + 400 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Pistoleers
+                     if attacker[1].infantry > 0:
+                        attacker[1].infantry -= 1
                         
                   #Musketeers
-                  if 830 <= curr_x <= 880 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Musketeers
-                    attacker[1].archers = units.archers
-                  elif 880 <= curr_x <= 930 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and attacker[1].archers < units.archers:# "+" for Musketeers
-                    attacker[1].archers += 1
-                  elif 930 <= curr_x <= 980 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Musketeers
-                    if attacker[1].archers > 0:
-                       attacker[1].archers -= 1
+                  if 580 + 250 <= curr_x <= 580 + 300 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Musketeers
+                     attacker[1].archers = map.d_continents[curr_country[0]][curr_country[1]].unit_counts.archers
+                  elif 580 + 300 <= curr_x <= 580 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and \
+                        attacker[1].archers < map.d_continents[curr_country[0]][curr_country[1]].unit_counts.archers:# "+" for Musketeers
+                     attacker[1].archers += 1
+                  elif 580 + 350 <= curr_x <= 580 + 400 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Musketeers
+                     if attacker[1].archers > 0:
+                        attacker[1].archers -= 1
                         
                    #Cannons
-                  if 425 <= curr_x <= 475 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Cannons
-                    attacker[1].cannons = units.cannons
-                  elif 475 <= curr_x <= 525 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and attacker[1].cannons < units.cannons: # "+" for Cannons
-                    attacker[1].cannons += 1
-                  elif 525 <= curr_x <= 575 and map.HEIGHT * TILESIZE + 125 < curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Cannons
-                    if attacker[1].cannons > 0:
-                       attacker[1].cannons -= 1
+                  if 175 + 250 <= curr_x <= 175 + 300 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Cannons
+                     attacker[1].cannons = map.d_continents[curr_country[0]][curr_country[1]].unit_counts.cannons
+                  elif 175 + 300 <= curr_x <= 175 + 350 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and \
+                        attacker[1].cannons < map.d_continents[curr_country[0]][curr_country[1]].unit_counts.cannons: # "+" for Cannons
+                     attacker[1].cannons += 1
+                  elif 175 + 350 <= curr_x <= 175 + 400 and map.HEIGHT * TILESIZE + 125 < curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Cannons
+                     if attacker[1].cannons > 0:
+                        attacker[1].cannons -= 1
                         
                   #Airships
-                  if 830 <= curr_x <= 880 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Airships
-                    attacker[1].champions = units.champions
-                  elif 880 <= curr_x <= 930 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and attacker[1].champions < units.champions: # "+" for Airships
-                    attacker[1].champions += 1
-                  elif 930 <= curr_x <= 980 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Airships
-                    if attacker[1].champions > 0:
-                       attacker[1].champions -= 1
-       
+                  if 580 + 250 <= curr_x <= 580 + 300 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Airships
+                     attacker[1].champions = map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions
+                  elif 580 + 300 <= curr_x <= 580 + 350 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and \
+                        attacker[1].champions < map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions: # "+" for Airships
+                     attacker[1].champions += 1
+                  elif 580 + 350 <= curr_x <= 580 + 400 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Airships
+                     if attacker[1].champions > 0:
+                        attacker[1].champions -= 1
+             #Done
+             if 980 <= curr_x <= 1080 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 175 and player.unit_counts == 0:
+               packet = pickle.dumps((l_attackers, l_defenders, d_attacks, player))
+               socket.sendto(packet, host_address)
+               declaring = False
        
        
        
@@ -538,54 +546,45 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
        if selectedCountry != None:
          DISPLAYSURF.blit(SELECTED_TILE, (selectedCountry[0] * TILESIZE, selectedCountry[1] * TILESIZE), special_flags=BLEND_ADD)
        
-       if selectedCountry != None:
+       if selectedCountry != None and not (selectedCountry in l_attackers):
 
          current_tile = map.ll_map[(selectedCountry[1] + 1) % map.HEIGHT][(selectedCountry[0] + 1) % map.WIDTH]
-         current_coords = [(selectedCountry[1] + 1) % map.HEIGHT, (selectedCountry[0] + 1) % map.WIDTH]
-         #index = l_attacks.index([selectedCountry[0], selectedCountry[1]]) #Bad idea
-         if (False if current_tile == map.WATER else (map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name and not (current_tile in d_attacks[selectedCountry[0], selectedCountry[1]]))):
+         if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
             DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] + 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1] + 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
             l_neighbors.append([(selectedCountry[0] + 1) % map.WIDTH, (selectedCountry[1] + 1) % map.HEIGHT])
             
          current_tile = map.ll_map[(selectedCountry[1] - 1) % map.HEIGHT][(selectedCountry[0] + 1) % map.WIDTH]
-         current_coords = [(selectedCountry[1] - 1) % map.HEIGHT, (selectedCountry[0] + 1) % map.WIDTH]
-         if (False if current_tile == map.WATER else (map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name and not (current_tile in d_attacks[selectedCountry[0], selectedCountry[1]]))):
+         if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
             DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] + 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1] - 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
             l_neighbors.append([(selectedCountry[0] + 1) % map.WIDTH, (selectedCountry[1] - 1) % map.HEIGHT])
             
          current_tile = map.ll_map[(selectedCountry[1]) % map.HEIGHT][(selectedCountry[0] + 1) % map.WIDTH]
-         current_coords = [(selectedCountry[1]) % map.HEIGHT, (selectedCountry[0] + 1) % map.WIDTH]
-         if (False if current_tile == map.WATER else (map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name and not (current_tile in d_attacks[selectedCountry[0], selectedCountry[1]]))):
+         if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
             DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] + 1) % map.WIDTH) * TILESIZE, (selectedCountry[1]) * TILESIZE), special_flags=BLEND_ADD)
             l_neighbors.append([(selectedCountry[0] + 1) % map.WIDTH, (selectedCountry[1])])
             
          current_tile = map.ll_map[(selectedCountry[1] + 1) % map.HEIGHT][(selectedCountry[0] - 1) % map.WIDTH]
-         current_coords = [(selectedCountry[1] + 1) % map.HEIGHT, (selectedCountry[0] - 1) % map.WIDTH]
-         if (False if current_tile == map.WATER else (map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name and not (current_tile in d_attacks[selectedCountry[0], selectedCountry[1]]))):
+         if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
             DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] - 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1] + 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
             l_neighbors.append([(selectedCountry[0] - 1) % map.WIDTH, (selectedCountry[1] + 1) % map.HEIGHT])
             
          current_tile = map.ll_map[(selectedCountry[1] - 1) % map.HEIGHT][(selectedCountry[0] - 1) % map.WIDTH]
-         current_coords = [(selectedCountry[1] - 1) % map.HEIGHT, (selectedCountry[0] - 1) % map.WIDTH]
-         if (False if current_tile == map.WATER else (map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name and not (current_tile in d_attacks[selectedCountry[0], selectedCountry[1]]))):
+         if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
             DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] - 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1] - 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
             l_neighbors.append([(selectedCountry[0] - 1) % map.WIDTH, (selectedCountry[1] - 1) % map.HEIGHT])
             
          current_tile = map.ll_map[selectedCountry[1]][(selectedCountry[0] - 1) % map.WIDTH]
-         current_coords = map.ll_map[selectedCountry[1], (selectedCountry[0] - 1) % map.WIDTH]
-         if (False if current_tile == map.WATER else (map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name and not (current_tile in d_attacks[selectedCountry[0], selectedCountry[1]]))):
+         if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
             DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] - 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1]) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
             l_neighbors.append([(selectedCountry[0] - 1) % map.WIDTH, (selectedCountry[1]) % map.HEIGHT])
             
          current_tile = map.ll_map[(selectedCountry[1] + 1) % map.HEIGHT][selectedCountry[0]]
-         current_coords = [(selectedCountry[1] + 1) % map.HEIGHT, selectedCountry[0]]
-         if (False if current_tile == map.WATER else (map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name and not (current_tile in d_attacks[selectedCountry[0], selectedCountry[1]]))):
+         if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
             DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0]) * TILESIZE, ((selectedCountry[1] + 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
             l_neighbors.append([(selectedCountry[0]), (selectedCountry[1] + 1) % map.HEIGHT])
             
          current_tile = map.ll_map[(selectedCountry[1] - 1) % map.HEIGHT][selectedCountry[0]]
-         current_coords = [(selectedCountry[1] - 1) % map.HEIGHT, selectedCountry[0]]
-         if (False if current_tile == map.WATER else (map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name and not (current_tile in d_attacks[selectedCountry[0], selectedCountry[1]]))):
+         if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner != player.user_name):
             DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0]) * TILESIZE, ((selectedCountry[1] - 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
             l_neighbors.append([(selectedCountry[0]), (selectedCountry[1] - 1) % map.HEIGHT])
        
@@ -605,20 +604,53 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
        #update the display
        pygame.display.update()
        
-def resolveBattles(DISPLAYSURF, map):
+attackResponse = None
+def resolveAttacks(DISPLAYSURF, map, player, socket, host_address):
    resolving = True
-
+   global refreshing
+   refreshing = True
+   def refresh():
+      global refreshing
+      global attackResponse
+      response = socket.recv(8192)
+      attackResponse = pickle.loads(response)
+      refreshing = False
+      print("set refreshing to false")
+      
+   t_updateScreen = threading.Thread(target=refresh)
+   t_updateScreen.start()
+   
+   while refreshing:
+      for event in pygame.event.get():
+         #if the user wants to quit
+         handleGeneral(event, map)
+      
+      printMap(map, DISPLAYSURF, standardInfo)
+      DISPLAYSURF.blit(WAITING, (70, map.HEIGHT * TILESIZE + 70))
+      #update the display
+      pygame.display.update()
+   print("Exited refreshing for resolve battles")
+   
+   map = attackResponse[0]
+   l_attacks = attackResponse[1]
+   l_attackers = l_attacks[0]
+   l_defenders = l_attacks[1]
    while resolving:
        #get all the user events
        for event in pygame.event.get():
            #if the user wants to quit
            handleGeneral(event, map)
+           
+       for battle in range(len(l_attackers)):
+         DISPLAYSURF.blit(DEFENDER, (l_defenders[battle][0] * TILESIZE, l_defenders[battle][1] * TILESIZE), special_flags=BLEND_ADD)
+         blitBattle(map, DISPLAYSURF, l_attackers[battle], l_defenders[battle])
+         DISPLAYSURF.blit(ATTACKER, (l_attackers[battle][0] * TILESIZE, l_attackers[battle][1] * TILESIZE), special_flags=BLEND_ADD)
+            
                   
-       printMap(map, DISPLAYSURF)
+       printMap(map, DISPLAYSURF, standardInfo)
        
        #update the display
        pygame.display.update()
-       #fpsClock.tick(50)
        
 def moveTroops(DISPLAYSURF, map):
    moving = True
@@ -677,6 +709,7 @@ def play(host_address, player_name):
    while True:
       placeUnits(DISPLAYSURF, map, player, s, host_address)
       declareAttacks(DISPLAYSURF, map, player, s, host_address)
+      resolveAttacks(DISPLAYSURF, map, player, s, host_address)
       print("Exited properly")
       #pygame.quit()
       #sys.exit()
