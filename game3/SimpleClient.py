@@ -487,12 +487,13 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
              elif selectedCountry != None:
                 curr_country = map.ll_map[selectedCountry[1]][selectedCountry[0]]
                 attacker = d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]]
+                units = map.d_continents[curr_country[0]][curr_country[1]].unit_counts
                 if selectedCountry in l_attackers:
                   #Pistoleers
                   if 175 + 250 <= curr_x <= 175 + 300 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Pistoleers
-                     attacker[1].infantry = map.d_continents[curr_country[0]][curr_country[1]].unit_counts.infantry
+                     attacker[1].infantry = units.infantry
                   elif 175 + 300 <= curr_x <= 175 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and \
-                        attacker[1].infantry < map.d_continents[curr_country[0]][curr_country[1]].unit_counts.infantry: # "+" for Pistoleers
+                        attacker[1].infantry < units.infantry: # "+" for Pistoleers
                      attacker[1].infantry += 1
                   elif 175 + 350 <= curr_x <= 175 + 400 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Pistoleers
                      if attacker[1].infantry > 0:
@@ -500,9 +501,9 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
                         
                   #Musketeers
                   if 580 + 250 <= curr_x <= 580 + 300 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Musketeers
-                     attacker[1].archers = map.d_continents[curr_country[0]][curr_country[1]].unit_counts.archers
+                     attacker[1].archers = units.archers
                   elif 580 + 300 <= curr_x <= 580 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and \
-                        attacker[1].archers < map.d_continents[curr_country[0]][curr_country[1]].unit_counts.archers:# "+" for Musketeers
+                        attacker[1].archers < units.archers:# "+" for Musketeers
                      attacker[1].archers += 1
                   elif 580 + 350 <= curr_x <= 580 + 400 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Musketeers
                      if attacker[1].archers > 0:
@@ -510,9 +511,9 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
                         
                    #Cannons
                   if 175 + 250 <= curr_x <= 175 + 300 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Cannons
-                     attacker[1].cannons = map.d_continents[curr_country[0]][curr_country[1]].unit_counts.cannons
+                     attacker[1].cannons = units.cannons
                   elif 175 + 300 <= curr_x <= 175 + 350 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and \
-                        attacker[1].cannons < map.d_continents[curr_country[0]][curr_country[1]].unit_counts.cannons: # "+" for Cannons
+                        attacker[1].cannons < units.cannons: # "+" for Cannons
                      attacker[1].cannons += 1
                   elif 175 + 350 <= curr_x <= 175 + 400 and map.HEIGHT * TILESIZE + 125 < curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Cannons
                      if attacker[1].cannons > 0:
@@ -520,9 +521,9 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
                         
                   #Airships
                   if 580 + 250 <= curr_x <= 580 + 300 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Airships
-                     attacker[1].champions = map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions
+                     attacker[1].champions = units.champions
                   elif 580 + 300 <= curr_x <= 580 + 350 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and \
-                        attacker[1].champions < map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions: # "+" for Airships
+                        attacker[1].champions < units.champions: # "+" for Airships
                      attacker[1].champions += 1
                   elif 580 + 350 <= curr_x <= 580 + 400 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Airships
                      if attacker[1].champions > 0:
