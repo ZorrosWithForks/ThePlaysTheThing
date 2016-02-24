@@ -477,7 +477,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
                      if not ([selectedCountry[0], selectedCountry[1]] in l_attackers) and [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_neighbors: # if selected country is not attacking and clicking neighboring country
                         l_attackers.append([selectedCountry[0], selectedCountry[1]])
                         l_defenders.append([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
-                        d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0)] #[defender, l_defend_coords attack force]
+                        d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0), False] #[defender, attack force]
                      elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_defenders: # if clicking the country your selected country is attacking
                         l_defenders.remove([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
                         l_attackers.remove([selectedCountry[0], selectedCountry[1]])
@@ -486,9 +486,9 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
                      selectedCountry = None
              elif selectedCountry != None:
                 curr_country = map.ll_map[selectedCountry[1]][selectedCountry[0]]
-                attacker = d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]]
                 units = map.d_continents[curr_country[0]][curr_country[1]].unit_counts
                 if selectedCountry in l_attackers:
+                  attacker = d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]]
                   #Pistoleers
                   if 175 + 250 <= curr_x <= 175 + 300 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Pistoleers
                      attacker[1].infantry = units.infantry
@@ -528,7 +528,11 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
                   elif 580 + 350 <= curr_x <= 580 + 400 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Airships
                      if attacker[1].champions > 0:
                         attacker[1].champions -= 1
-       
+             #Done
+             if 980 <= curr_x <= 1080 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 175 and player.unit_counts == 0:
+               packet = pickle.dumps((l_attackers, l_defenders, d_attacks, player))
+               socket.sendto(packet, host_address)
+               declaring = False
        
        
        
@@ -601,20 +605,53 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
        #update the display
        pygame.display.update()
        
-def resolveBattles(DISPLAYSURF, map):
+attackResponse = None
+def resolveAttacks(DISPLAYSURF, map, player, socket, host_address):
    resolving = True
-
+   global refreshing
+   refreshing = True
+   def refresh():
+      global refreshing
+      global attackResponse
+      response = socket.recv(8192)
+      attackResponse = pickle.loads(response)
+      refreshing = False
+      print("set refreshing to false")
+      
+   t_updateScreen = threading.Thread(target=refresh)
+   t_updateScreen.start()
+   
+   while refreshing:
+      for event in pygame.event.get():
+         #if the user wants to quit
+         handleGeneral(event, map)
+      
+      printMap(map, DISPLAYSURF, standardInfo)
+      DISPLAYSURF.blit(WAITING, (70, map.HEIGHT * TILESIZE + 70))
+      #update the display
+      pygame.display.update()
+   print("Exited refreshing for resolve battles")
+   
+   map = attackResponse[0]
+   l_attacks = attackResponse[1]
+   l_attackers = l_attacks[0]
+   l_defenders = l_attacks[1]
    while resolving:
        #get all the user events
        for event in pygame.event.get():
            #if the user wants to quit
            handleGeneral(event, map)
+           
+       for battle in range(len(l_attackers)):
+         DISPLAYSURF.blit(DEFENDER, (l_defenders[battle][0] * TILESIZE, l_defenders[battle][1] * TILESIZE), special_flags=BLEND_ADD)
+         blitBattle(map, DISPLAYSURF, l_attackers[battle], l_defenders[battle])
+         DISPLAYSURF.blit(ATTACKER, (l_attackers[battle][0] * TILESIZE, l_attackers[battle][1] * TILESIZE), special_flags=BLEND_ADD)
+            
                   
-       printMap(map, DISPLAYSURF)
+       printMap(map, DISPLAYSURF, standardInfo)
        
        #update the display
        pygame.display.update()
-       #fpsClock.tick(50)
        
 def moveTroops(DISPLAYSURF, map):
    moving = True
@@ -670,6 +707,7 @@ def play(host_address, player_name):
    while True:
       placeUnits(DISPLAYSURF, map, player, s, host_address)
       declareAttacks(DISPLAYSURF, map, player, s, host_address)
+      resolveAttacks(DISPLAYSURF, map, player, s, host_address)
       print("Exited properly")
       #pygame.quit()
       #sys.exit()
