@@ -38,6 +38,7 @@ def LoginClient():
             print("THIS PRINTS IN THE BUTTON")
             request(x_panel_position, y_panel_position, y_offset)
          if click[0] == 1 and msg == "Back":
+            client_socket.close()
             return(True)
       else:
          # pygame.draw.rect(LOGIN_TOP_SURFACE, ic,(x,y,w,h))
@@ -73,9 +74,9 @@ def LoginClient():
       
    def display_servers(x_panel_position, y_panel_position, y_offset):
       for server in l_servers:
-         print ("displaying servers")
+         # print ("displaying servers")
          #print("server name is: ", + server[2])
-         print("have a server from " + server[0])
+         # print("have a server from " + server[0])
          LOGIN_TOP_SURFACE.blit(SERVER_BAR, (x_panel_position, y_panel_position + y_offset))
         
          # display the name of the server

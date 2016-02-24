@@ -14,6 +14,7 @@ import random
 import re
 import os
 from bad_stuff import *
+import copy
 
 def MakeServer():
    def text_objects(text, font, color):
@@ -63,13 +64,13 @@ def MakeServer():
             client.close()
             
    def display_players(x_panel_position, y_panel_position):
-      print("Number of clients: " + str(len(clients)))
+      #print("Number of clients: " + str(len(clients)))
       for i in clients:
          DISPLAYSURF.blit(SERVER_BAR, (x_panel_position, y_panel_position))
          # display the name of the client
          DISPLAYSURF.blit(SERVER_FONT.render(str(i[1]), True, (0,0,0)), (x_panel_position + 25, y_panel_position + 25))
          DISPLAYSURF.blit(BOOT_BUTTON, (x_panel_position + 1200, y_panel_position + 25))
-         l_boot_spots.append((x_panel_position, y_panel_position + 25, i[1]))
+         l_boot_spots.append((x_panel_position + 1200, y_panel_position + 25, i[1]))
          y_panel_position += 100
          
    def start_game():
@@ -116,14 +117,14 @@ def MakeServer():
          if click[0] == 1 and msg == "Start":
             if servername == "":
                just_accessed = False
-               print(str(just_accessed))
             else:
-               pygame.display.iconify()
+               #pygame.display.iconify()
                begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients)
          if click[0] == 1 and msg == "Play":
             #SimpleClient.play(host, servername)
             start_game()
          if click[0] == 1 and msg == "Back":
+            server_socket.close()
             return(True)
       else:
          DISPLAYSURF.blit(button_unpressed, (x, y))
@@ -147,6 +148,7 @@ def MakeServer():
    # Graphics Constants
    IMAGE_FILE_PATH = "ImageFiles\\"
    LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background.png")
+   BLACK_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background2.png")
    SERVER_BAR = pygame.image.load(IMAGE_FILE_PATH + "Server.png")
    JOIN_BUTTON = pygame.image.load(IMAGE_FILE_PATH + "JoinButton_unpressed.png")
    REFRESH_BUTTON = pygame.image.load(IMAGE_FILE_PATH + "RefreshButton2.png")
@@ -159,6 +161,7 @@ def MakeServer():
    SERVER_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 35)
    BACK_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_unpressed.png")
    BACK_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_pressed.png")
+   WAITING_PANEL = pygame.image.load(IMAGE_FILE_PATH + "Waiting.png")
 
    BLACK = 1
    WHITE = 2
@@ -192,6 +195,9 @@ def MakeServer():
    x_pos = 100
    y_pos = 725
 
+   # Waiting for players
+   waiting_for_players = False
+   
    # Play button positions
    x_play_button = 1300
    y_play_button = 700
@@ -199,6 +205,10 @@ def MakeServer():
    # Position of back button
    x_back_button = 5
    y_back_button = 5
+   
+   # Position waiting panel
+   x_waiting_panel =750
+   y_waiting_panel =800
    
    # No servername positions
    x_no_servername = 350
@@ -347,7 +357,22 @@ def MakeServer():
                elif event.key == K_COMMA: servername += "<"
                elif event.key == K_PERIOD: servername += ">"
                elif event.key == K_SLASH: servername += "?"
-               
+         if event.type == MOUSEBUTTONDOWN:
+            print("MOUSEBUTTONDOWN")
+            x_mouse_position_main, y_mouse_position_main = pygame.mouse.get_pos()
+            if x_start_server_button <= x_mouse_position_main <= x_start_server_button + 150 and y_start_server_button <= y_mouse_position_main <= y_start_server_button + 75:
+               waiting_for_players = True
+            for boot_spot in l_boot_spots:
+               if boot_spot[0] <= x_mouse_position_main <= boot_spot[0] + 100 and boot_spot[1] <= y_mouse_position_main <= boot_spot[1] + 50:
+                  print(boot_spot[2])
+                  temp_client_set = copy.copy(clients)
+                  for client in temp_client_set:
+                     if client[1] == boot_spot[2]: # check to see if the names match
+                        print("\ndeleted: " + boot_spot[2] + client[1])
+                        DISPLAYSURF.blit(BLACK_BACKGROUND, (100, 100))
+                        clients.remove(client)   
+
+         
       # Blit the stuffs onto the screen
       DISPLAYSURF.blit(LOGIN_BACKGROUND, (0,0))
       servername_prompt = SERVER_FONT.render("Server Name: ", 1, (0,255,0))
@@ -362,16 +387,13 @@ def MakeServer():
       button("Start",x_start_server_button,y_start_server_button,150,75,START_SERVER_BUTTON_PRESSED,START_SERVER_BUTTON_UNPRESSED)
       button("Play",x_play_button,y_play_button,200,200,PLAY_BUTTON_PRESSED,PLAY_BUTTON_UNPRESSED)
       pushed_back = button("Back",x_back_button,y_back_button,75,50,BACK_BUTTON_PRESSED,BACK_BUTTON_UNPRESSED)
-      print(str(just_accessed))
+      if waiting_for_players == True:
+         DISPLAYSURF.blit(WAITING_PANEL, (x_waiting_panel, y_waiting_panel))
       if pushed_back == True:
+         server_socket.close()
          return
       if servername == "" and just_accessed == False:
          DISPLAYSURF.blit(no_servername_message, (x_no_servername, y_no_servername))
-      if event.type == MOUSEBUTTONDOWN:
-         x_mouse_position_main, y_mouse_position_main = pygame.mouse.get_pos()
-      # for boot_spot in l_boot_spots:
-         # if boot_spot[0] <= x_mouse_position_main <= boot_spot[0] + 100 and boot_spot[1] <= y_mouse_position_main <= boot_spot[1] + 50:
-            
          #print(str(x_mouse_position_main) + str(y_mouse_position_main))
         # print("clicked mounce here")
          
