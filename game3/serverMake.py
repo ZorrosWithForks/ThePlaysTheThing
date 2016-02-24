@@ -369,8 +369,8 @@ def MakeServer():
          DISPLAYSURF.blit(no_servername_message, (x_no_servername, y_no_servername))
       if event.type == MOUSEBUTTONDOWN:
          x_mouse_position_main, y_mouse_position_main = pygame.mouse.get_pos()
-      for boot_spot in l_boot_spots:
-         if boot_spot[0] <= x_mouse_position_main <= boot_spot[0] + 100 and boot_spot[1] <= y_mouse_position_main <= boot_spot[1] + 50:
+      # for boot_spot in l_boot_spots:
+         # if boot_spot[0] <= x_mouse_position_main <= boot_spot[0] + 100 and boot_spot[1] <= y_mouse_position_main <= boot_spot[1] + 50:
             
          #print(str(x_mouse_position_main) + str(y_mouse_position_main))
         # print("clicked mounce here")
