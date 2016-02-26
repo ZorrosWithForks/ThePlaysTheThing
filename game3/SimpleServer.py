@@ -201,6 +201,8 @@ def receiveAttacks(l_players, serversocket, map, address):
          l_players[i].connection = curr_connection
          print("Sent attacks to: " + l_players[i].user_name)
          
+      del l_attacks[:]
+      
       for player in l_players:
          response = player.connection.recv(8192)
          packet = pickle.loads(response)
