@@ -238,9 +238,11 @@ def MakeServer():
    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
    server_socket.bind(broadcast_address)
 
-
    # Play the game when the play button is pressed
    while True:
+      DISPLAYSURF.blit(BLACK_BACKGROUND, (100, 100))
+      display_players(x_panel_position, y_panel_position, None)
+      
       for event in pygame.event.get():
          if event.type == QUIT:
             #end game
@@ -389,8 +391,6 @@ def MakeServer():
                      if client[1] == boot_spot[2]: # check to see if the names match
                         clients.remove(client)
                         print("\ndeleted: " + boot_spot[2] + client[1])
-                        DISPLAYSURF.blit(BLACK_BACKGROUND, (100, 100))
-                        display_players(x_panel_position, y_panel_position, None)
   
 
          

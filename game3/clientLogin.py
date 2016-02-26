@@ -248,7 +248,6 @@ def LoginClient():
             if event.key == K_UP:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
                #if (len(l_servers) > 5):
-               LOGIN_TOP_SURFACE.blit(BLACK_BACKGROUND, (100, 100))
                y_offset -= 100
                display_servers(x_panel_position, y_panel_position, y_offset)
             if event.key == K_DOWN:
@@ -256,7 +255,6 @@ def LoginClient():
                if (SERVERS_AREA.x <= 100 and SERVERS_AREA.y <= 100):#put in server checking too need to find out how to get the position of a surface.
                   print("Servers area x is: " + str(SERVERS_AREA.x))
                   print("Servers area y is: " + str(SERVERS_AREA.y))
-                  LOGIN_TOP_SURFACE.blit(BLACK_BACKGROUND, (100, 100))
                   y_offset += 100
                   display_servers(x_panel_position, y_panel_position, y_offset)
             if event.key == K_BACKSPACE:
@@ -391,6 +389,7 @@ def LoginClient():
       username_prompt = SERVER_FONT.render("Username: ", 1, (0,255,0))
       username = filter.clean(username)
       username_graphics = SERVER_FONT.render(username, 1, (0,0,0))
+      LOGIN_TOP_SURFACE.blit(BLACK_BACKGROUND, (100, 100))
       display_servers(x_panel_position, y_panel_position, y_offset)
       LOGIN_TOP_SURFACE.blit(LOGIN_BACKGROUND, (0,0))
       LOGIN_TOP_SURFACE.blit(USERNAME_BOX, (280, y_pos))
