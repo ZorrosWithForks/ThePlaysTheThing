@@ -76,6 +76,13 @@ def MakeServer():
          DISPLAYSURF.blit(BOOT_BUTTON, (x_panel_position + 1200, y_panel_position + 25))
          y_panel_position += 100
          
+   def display_players_constantly(x_panel_position, y_panel_position, player_name):
+      for i in clients:
+         DISPLAYSURF.blit(SERVER_BAR, (x_panel_position, y_panel_position))
+         DISPLAYSURF.blit(SERVER_FONT.render(str(i[1]), True, (0,0,0)), (x_panel_position + 25, y_panel_position + 25))
+         DISPLAYSURF.blit(BOOT_BUTTON, (x_panel_position + 1200, y_panel_position + 25))
+         y_panel_position += 100
+         
    def start_game():
       for client in clients:
          client[0].sendto(host.encode("ascii"), client[2])
@@ -223,6 +230,11 @@ def MakeServer():
    x_start_server_button = 200
    y_start_server_button = 800
        
+   # Booted string
+   booted = "boot"
+   # Play string
+   play = "play"
+   
    pushed_back = False
    just_accessed = True
    # Declare the Surface
@@ -387,10 +399,12 @@ def MakeServer():
                   temp_client_set = copy.copy(clients)
                   for client in temp_client_set:
                      if client[1] == boot_spot[2]: # check to see if the names match
+                        client[0].sendto(booted.encode("ascii"), client[2])
                         clients.remove(client)
                         print("\ndeleted: " + boot_spot[2] + client[1])
                         DISPLAYSURF.blit(BLACK_BACKGROUND, (100, 100))
                         display_players(x_panel_position, y_panel_position, None)
+                        #send message to the client
   
 
          
@@ -429,7 +443,7 @@ def MakeServer():
             # pygame.display.iconify()
             # begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients)
 
-      #display_players(x_panel_position, y_panel_position)
+      display_players_constantly(x_panel_position, y_panel_position, servername)
       pygame.display.update()
       
 if __name__ == '__main__':

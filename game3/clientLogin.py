@@ -67,11 +67,17 @@ def LoginClient():
       s.connect(addr)
       s.sendto(username.encode('ascii'), addr)
       print("joined")
-
+      # put here? something that will tell if it has been booted. if so, return to the main menu
       new_server = (s.recv(1024).decode(), 9998)
+      if new_server[0] == "boot":
+         s.close()
+         return
+      else:
+         s.close()
+         SimpleClient.play(new_server, username)
       s.close()
       SimpleClient.play(new_server, username)
-      
+         
    def display_servers(x_panel_position, y_panel_position, y_offset):
       for server in l_servers:
          # print ("displaying servers")
@@ -154,7 +160,6 @@ def LoginClient():
    # Declare the username
    username = ""
    no_username_message = SERVER_FONT.render("Please type your username", 1, (255,0,0))
-   just_accessed = True
 
    # Position of the text box
    x_pos = 100
@@ -238,7 +243,6 @@ def LoginClient():
                shifted = False
                print("shifted is now false")
          if event.type == KEYDOWN:
-            just_accessed = False
             if event.key == K_ESCAPE:
                #and the game and close the window
                print(username)
@@ -377,7 +381,6 @@ def LoginClient():
             for join_button in l_join_spots:
                if join_button[0] <= x_mouse_position_main <= join_button[0] + 200 and join_button[1] <= y_mouse_position_main <= join_button[1] + 100:
                   if username == "":
-                     just_accessed = False
                      LOGIN_TOP_SURFACE.blit(no_username_message, (200, 800))
                   else:
                      joinGame(join_button[2])
@@ -404,7 +407,7 @@ def LoginClient():
       if pushed_back == True:
          client_socket.close()
          return
-      if username == "" and just_accessed != True:
+      if username == "":
          LOGIN_TOP_SURFACE.blit(no_username_message, (200, 800))
             
       # if event.type == MOUSEBUTTONDOWN:
