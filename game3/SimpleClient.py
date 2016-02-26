@@ -38,6 +38,8 @@ UNOCCUPIED = "Unoccupied"
 WATER = (0,0)
 DEEP_WATER = 10
 OVERLAY = 9
+HELP_COORDS = [1135, 820]
+
 
 class CursorGraphic:
    def __init__(self):
@@ -319,7 +321,7 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address):
    placing = True
    selectedCountry = None
    temp_map = Map(map_to_copy=map, copy_player_name=player.user_name)
-   
+   pygame.mouse.set_pos(HELP_COORDS)
    while placing:
        #get all the user events
        curr_x, curr_y = pygame.mouse.get_pos()
@@ -340,49 +342,49 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address):
                 curr_country = map.ll_map[selectedCountry[1]][selectedCountry[0]]
                 
                 #Pistoleers
-                if 175 + 250 <= curr_x <= 175 + 300 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Pistoleers
+                if 175 + 245 <= curr_x <= 175 + 295 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Pistoleers
                   map.d_continents[curr_country[0]][curr_country[1]].unit_counts.infantry += player.unit_counts
                   player.unit_counts = 0
-                elif 175 + 300 <= curr_x <= 175 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and player.unit_counts > 0: # "+" for Pistoleers
+                elif 175 + 295 <= curr_x <= 175 + 345 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and player.unit_counts > 0: # "+" for Pistoleers
                   map.d_continents[curr_country[0]][curr_country[1]].unit_counts.infantry += 1
                   player.unit_counts -= 1
-                elif 175 + 350 <= curr_x <= 175 + 400 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Pistoleers
+                elif 175 + 345 <= curr_x <= 175 + 395 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Pistoleers
                   if map.d_continents[curr_country[0]][curr_country[1]].unit_counts.infantry > temp_map.d_continents[curr_country[0]][curr_country[1]].unit_counts.infantry:
                      map.d_continents[curr_country[0]][curr_country[1]].unit_counts.infantry -= 1
                      player.unit_counts += 1
                 
                 #Musketeers
-                if 580 + 250 <= curr_x <= 580 + 300 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Musketeers
+                if 580 + 245 <= curr_x <= 580 + 295 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Musketeers
                   map.d_continents[curr_country[0]][curr_country[1]].unit_counts.archers += int(player.unit_counts / 2)
                   player.unit_counts = player.unit_counts % 2
-                elif 580 + 300 <= curr_x <= 580 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and player.unit_counts > 1: # "+" for Musketeers
+                elif 580 + 295 <= curr_x <= 580 + 345 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and player.unit_counts > 1: # "+" for Musketeers
                   map.d_continents[curr_country[0]][curr_country[1]].unit_counts.archers += 1
                   player.unit_counts -= 2
-                elif 580 + 350 <= curr_x <= 580 + 400 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Musketeers
+                elif 580 + 345 <= curr_x <= 580 + 395 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Musketeers
                   if map.d_continents[curr_country[0]][curr_country[1]].unit_counts.archers > temp_map.d_continents[curr_country[0]][curr_country[1]].unit_counts.archers:
                      map.d_continents[curr_country[0]][curr_country[1]].unit_counts.archers -= 1
                      player.unit_counts += 2
                      
                 #Cannons
-                if 175 + 250 <= curr_x <= 175 + 300 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Cannons
+                if 175 + 245 <= curr_x <= 175 + 295 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Cannons
                   map.d_continents[curr_country[0]][curr_country[1]].unit_counts.cannons += int(player.unit_counts / 2)
                   player.unit_counts = player.unit_counts % 2
-                elif 175 + 300 <= curr_x <= 175 + 350 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and player.unit_counts > 1: # "+" for Cannons
+                elif 175 + 295 <= curr_x <= 175 + 345 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and player.unit_counts > 1: # "+" for Cannons
                   map.d_continents[curr_country[0]][curr_country[1]].unit_counts.cannons += 1
                   player.unit_counts -= 2
-                elif 175 + 350 <= curr_x <= 175 + 400 and map.HEIGHT * TILESIZE + 125 < curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Cannons
+                elif 175 + 345 <= curr_x <= 175 + 395 and map.HEIGHT * TILESIZE + 125 < curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Cannons
                   if map.d_continents[curr_country[0]][curr_country[1]].unit_counts.cannons > temp_map.d_continents[curr_country[0]][curr_country[1]].unit_counts.cannons:
                      map.d_continents[curr_country[0]][curr_country[1]].unit_counts.cannons -= 1
                      player.unit_counts += 2
                      
                 #Airships
-                if 580 + 250 <= curr_x <= 580 + 300 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Airships
+                if 580 + 245 <= curr_x <= 580 + 295 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Airships
                   map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions += int(player.unit_counts / 5)
                   player.unit_counts = player.unit_counts % 5
-                elif 580 + 300 <= curr_x <= 580 + 350 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and player.unit_counts > 4: # "+" for Airships
+                elif 580 + 295 <= curr_x <= 580 + 345 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and player.unit_counts > 4: # "+" for Airships
                   map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions += 1
                   player.unit_counts -= 5
-                elif 580 + 350 <= curr_x <= 580 + 400 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Airships
+                elif 580 + 345 <= curr_x <= 580 + 395 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Airships
                   if map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions > temp_map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions:
                      map.d_continents[curr_country[0]][curr_country[1]].unit_counts.champions -= 1
                      player.unit_counts += 5
@@ -423,6 +425,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
    SEND_AIRSHIPS = pygame.image.load(IMAGE_FILE_PATH + "SendAirships.png")
    DONE_BUTTON = pygame.image.load(IMAGE_FILE_PATH + "DoneButton.png")
    DONE_BUTTON_ACTIVE = pygame.image.load(IMAGE_FILE_PATH + "DoneButtonActive.png")
+   pygame.mouse.set_pos(HELP_COORDS)
    global refreshing
    def refresh():
       global refreshing
@@ -490,42 +493,42 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
                 if selectedCountry in l_attackers:
                   attacker = d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]]
                   #Pistoleers
-                  if 175 + 250 <= curr_x <= 175 + 300 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Pistoleers
+                  if 175 + 245 <= curr_x <= 175 + 295 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Pistoleers
                      attacker[1].infantry = units.infantry
-                  elif 175 + 300 <= curr_x <= 175 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and \
+                  elif 175 + 295 <= curr_x <= 175 + 345 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and \
                         attacker[1].infantry < units.infantry: # "+" for Pistoleers
                      attacker[1].infantry += 1
-                  elif 175 + 350 <= curr_x <= 175 + 400 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Pistoleers
+                  elif 175 + 345 <= curr_x <= 175 + 395 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Pistoleers
                      if attacker[1].infantry > 0:
                         attacker[1].infantry -= 1
                         
                   #Musketeers
-                  if 580 + 250 <= curr_x <= 580 + 300 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Musketeers
+                  if 580 + 245 <= curr_x <= 580 + 295 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "All" for Musketeers
                      attacker[1].archers = units.archers
-                  elif 580 + 300 <= curr_x <= 580 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and \
+                  elif 580 + 295 <= curr_x <= 580 + 345 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120 and \
                         attacker[1].archers < units.archers:# "+" for Musketeers
                      attacker[1].archers += 1
-                  elif 580 + 350 <= curr_x <= 580 + 400 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Musketeers
+                  elif 580 + 345 <= curr_x <= 580 + 395 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120: # "-" for Musketeers
                      if attacker[1].archers > 0:
                         attacker[1].archers -= 1
                         
                    #Cannons
-                  if 175 + 250 <= curr_x <= 175 + 300 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Cannons
+                  if 175 + 245 <= curr_x <= 175 + 295 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Cannons
                      attacker[1].cannons = units.cannons
-                  elif 175 + 300 <= curr_x <= 175 + 350 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and \
+                  elif 175 + 295 <= curr_x <= 175 + 345 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and \
                         attacker[1].cannons < units.cannons: # "+" for Cannons
                      attacker[1].cannons += 1
-                  elif 175 + 350 <= curr_x <= 175 + 400 and map.HEIGHT * TILESIZE + 125 < curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Cannons
+                  elif 175 + 345 <= curr_x <= 175 + 395 and map.HEIGHT * TILESIZE + 125 < curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Cannons
                      if attacker[1].cannons > 0:
                         attacker[1].cannons -= 1
                         
                   #Airships
-                  if 580 + 250 <= curr_x <= 580 + 300 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Airships
+                  if 580 + 245 <= curr_x <= 580 + 295 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "All" for Airships
                      attacker[1].champions = units.champions
-                  elif 580 + 300 <= curr_x <= 580 + 350 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and \
+                  elif 580 + 295 <= curr_x <= 580 + 345 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175 and \
                         attacker[1].champions < units.champions: # "+" for Airships
                      attacker[1].champions += 1
-                  elif 580 + 350 <= curr_x <= 580 + 400 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Airships
+                  elif 580 + 345 <= curr_x <= 580 + 395 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175: # "-" for Airships
                      if attacker[1].champions > 0:
                         attacker[1].champions -= 1
              #Done
@@ -646,6 +649,7 @@ def resolveAttacks(DISPLAYSURF, map, player, socket, host_address):
          DISPLAYSURF.blit(DEFENDER, (l_defenders[battle][0] * TILESIZE, l_defenders[battle][1] * TILESIZE), special_flags=BLEND_ADD)
          blitBattle(map, DISPLAYSURF, l_attackers[battle], l_defenders[battle])
          DISPLAYSURF.blit(ATTACKER, (l_attackers[battle][0] * TILESIZE, l_attackers[battle][1] * TILESIZE), special_flags=BLEND_ADD)
+         print("printed a battle")
             
                   
        printMap(map, DISPLAYSURF, standardInfo)
