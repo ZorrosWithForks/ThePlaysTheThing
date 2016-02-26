@@ -37,19 +37,17 @@ def MakeServer():
       addr = (host, port)
       serversocket.bind((host, port))
       serversocket.listen(5)
-      while True:
+      while True: # this causes my join spots to go high
          client, client_address = serversocket.accept()
          player_name = client.recv(4096).decode()
          thread.append(Thread(target=listener, args = (client, client_address, clients, serversocket, player_name)).start())
-         display_players(x_panel_position, y_panel_position)
+         display_players(x_panel_position, y_panel_position, player_name)
 
    def listener(client, client_address, clients, serversocket, player_name):
       print("Accepted connection from: ", client_address)
       with clients_lock:
          l_temp = (client, player_name, client_address)
          clients.add(l_temp)#Array of clients
-         
-         #print(str(len(clients)))
       try:
          while True:
             ready_to_read, ready_to_write, in_error = \
@@ -63,14 +61,19 @@ def MakeServer():
             clients.remove(client)
             client.close()
             
-   def display_players(x_panel_position, y_panel_position):
+   def display_players(x_panel_position, y_panel_position, player_name):
       #print("Number of clients: " + str(len(clients)))
+      del l_boot_spots[:]
+      print("in display players")
+      print("client length " + str(len(clients)))
       for i in clients:
+         #length of clients is 1, but boot spots countinually grows....
          DISPLAYSURF.blit(SERVER_BAR, (x_panel_position, y_panel_position))
+         print("blitted bar")
+         l_boot_spots.append((x_panel_position + 1200, y_panel_position + 25, str(i[1])))
          # display the name of the client
          DISPLAYSURF.blit(SERVER_FONT.render(str(i[1]), True, (0,0,0)), (x_panel_position + 25, y_panel_position + 25))
          DISPLAYSURF.blit(BOOT_BUTTON, (x_panel_position + 1200, y_panel_position + 25))
-         l_boot_spots.append((x_panel_position + 1200, y_panel_position + 25, i[1]))
          y_panel_position += 100
          
    def start_game():
@@ -80,8 +83,6 @@ def MakeServer():
       t_become_server = threading.Thread(target=SimpleServer.serve, args=(len(clients) + 1,))
       t_become_server.daemon = True
       t_become_server.start()
-      #subprocess.Popen(["Python","SimpleClient.py"] + [addr, servername])
-      #pygame.display.iconify()
       server_socket.close()
       SimpleClient.play(addr, servername)
 
@@ -114,18 +115,18 @@ def MakeServer():
       
       if x+w > mouse[0] > x and y+h > mouse[1] > y:
          DISPLAYSURF.blit(button_pressed, (x, y))
-         if click[0] == 1 and msg == "Start":
-            if servername == "":
-               just_accessed = False
-            else:
-               #pygame.display.iconify()
-               begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients)
-         if click[0] == 1 and msg == "Play":
-            #SimpleClient.play(host, servername)
-            start_game()
-         if click[0] == 1 and msg == "Back":
-            server_socket.close()
-            return(True)
+         # if click[0] == 1 and msg == "Start":
+            # if servername == "":
+               # just_accessed = False
+            # else:
+               # #pygame.display.iconify()
+               # begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients)
+         # if click[0] == 1 and msg == "Play":
+            # #SimpleClient.play(host, servername)
+            # start_game()
+         # if click[0] == 1 and msg == "Back":
+            # server_socket.close()
+            # return(True)
       else:
          DISPLAYSURF.blit(button_unpressed, (x, y))
          
@@ -359,18 +360,38 @@ def MakeServer():
                elif event.key == K_SLASH: servername += "?"
          if event.type == MOUSEBUTTONDOWN:
             print("MOUSEBUTTONDOWN")
+            print(str(l_boot_spots)) # still exists
             x_mouse_position_main, y_mouse_position_main = pygame.mouse.get_pos()
-            if x_start_server_button <= x_mouse_position_main <= x_start_server_button + 150 and y_start_server_button <= y_mouse_position_main <= y_start_server_button + 75:
+            
+            # clicked start server
+            if x_start_server_button <= x_mouse_position_main <= x_start_server_button + 150 and y_start_server_button <= y_mouse_position_main <= y_start_server_button + 75 and servername != "":
                waiting_for_players = True
+               begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients)
+            if servername=="":
+               just_accessed = False
+               
+            # clicked play
+            if x_play_button <= x_mouse_position_main <= x_play_button + 200 and y_play_button <= y_mouse_position_main <= y_play_button + 200:
+               start_game()
+               
+            # clicked back
+            if x_back_button <= x_mouse_position_main <= x_back_button + 75 and y_back_button <= y_mouse_position_main <= y_back_button + 50:
+               server_socket.close()
+               return(True)
+               
+            # clicked boot
             for boot_spot in l_boot_spots:
+               print(str(boot_spot[0]) + ' ' +str(boot_spot[1]))
                if boot_spot[0] <= x_mouse_position_main <= boot_spot[0] + 100 and boot_spot[1] <= y_mouse_position_main <= boot_spot[1] + 50:
                   print(boot_spot[2])
                   temp_client_set = copy.copy(clients)
                   for client in temp_client_set:
                      if client[1] == boot_spot[2]: # check to see if the names match
+                        clients.remove(client)
                         print("\ndeleted: " + boot_spot[2] + client[1])
                         DISPLAYSURF.blit(BLACK_BACKGROUND, (100, 100))
-                        clients.remove(client)   
+                        display_players(x_panel_position, y_panel_position, None)
+  
 
          
       # Blit the stuffs onto the screen
@@ -407,7 +428,7 @@ def MakeServer():
             # pygame.display.iconify()
             # begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients)
 
-      display_players(x_panel_position, y_panel_position)
+      #display_players(x_panel_position, y_panel_position)
       pygame.display.update()
       
 if __name__ == '__main__':
