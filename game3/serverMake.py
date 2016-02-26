@@ -76,13 +76,6 @@ def MakeServer():
          DISPLAYSURF.blit(BOOT_BUTTON, (x_panel_position + 1200, y_panel_position + 25))
          y_panel_position += 100
          
-   def display_players_constantly(x_panel_position, y_panel_position, player_name):
-      for i in clients:
-         DISPLAYSURF.blit(SERVER_BAR, (x_panel_position, y_panel_position))
-         DISPLAYSURF.blit(SERVER_FONT.render(str(i[1]), True, (0,0,0)), (x_panel_position + 25, y_panel_position + 25))
-         DISPLAYSURF.blit(BOOT_BUTTON, (x_panel_position + 1200, y_panel_position + 25))
-         y_panel_position += 100
-         
    def start_game():
       for client in clients:
          client[0].sendto(host.encode("ascii"), client[2])
@@ -250,9 +243,11 @@ def MakeServer():
    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
    server_socket.bind(broadcast_address)
 
-
    # Play the game when the play button is pressed
    while True:
+      DISPLAYSURF.blit(BLACK_BACKGROUND, (100, 100))
+      display_players(x_panel_position, y_panel_position, None)
+      
       for event in pygame.event.get():
          if event.type == QUIT:
             #end game
@@ -402,9 +397,6 @@ def MakeServer():
                         client[0].sendto(booted.encode("ascii"), client[2])
                         clients.remove(client)
                         print("\ndeleted: " + boot_spot[2] + client[1])
-                        DISPLAYSURF.blit(BLACK_BACKGROUND, (100, 100))
-                        display_players(x_panel_position, y_panel_position, None)
-                        #send message to the client
   
 
          
@@ -429,7 +421,6 @@ def MakeServer():
          return
       if servername == "" and just_accessed == False:
          DISPLAYSURF.blit(no_servername_message, (x_no_servername, y_no_servername))
-         
          #print(str(x_mouse_position_main) + str(y_mouse_position_main))
         # print("clicked mounce here")
          
@@ -442,8 +433,6 @@ def MakeServer():
          # if x_start_server_button <= x_mouse_position_main <= x_mouse_position_main + 150 and y_start_server_button <= y_mouse_position_main <= y_start_server_button + 75:
             # pygame.display.iconify()
             # begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients)
-
-      display_players_constantly(x_panel_position, y_panel_position, servername)
       pygame.display.update()
       
 if __name__ == '__main__':
