@@ -185,7 +185,7 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
             print("got an attacker")
             numOfAttackers += 1
             attacker = map.ll_map[player[0][defender][1]][player[0][defender][0]]
-            attacking_player = map.d_continents[attacker[0]][attacker[1]].owner
+            attacking_player = player[2][attacker][3]
             attacking_army = player[2][attacker][1]
 
    if curr_unit_counts.infantry == 0 and curr_unit_counts.archers == 0 and curr_unit_counts.cannons == 0 and curr_unit_counts.champions == 0 and numOfAttackers == 1:
@@ -195,6 +195,21 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
       curr_unit_counts.archers = newUnits.archers
       curr_unit_counts.cannons = newUnits.cannons
       curr_unit_counts.champions = newUnits.champions
+      newUnits.infantry = 0
+      newUnits.archers = 0
+      newUnits.cannons = 0
+      newUnits.champions = 0
+         
+   l_tempAttacks = l_attacks
+   for player in range(len(l_tempAttacks)):
+      for attack in range(len(l_tempAttacks[player][0])):
+         country = map.ll_map[l_tempAttacks[player][0][attack][1]][l_tempAttacks[player][0][attack][0]]
+         units = l_tempAttacks[player][2][country][1]
+         if units.infantry == 0 and units.archers == 0 and units.cannons == 0 and units.champions == 0:
+            l_attacks[player][0].remove(l_tempAttacks[player][0][attack])
+            l_attacks[player][1].remove(l_tempAttacks[player][1][attack])
+            l_attacks[player][2][country] = None
+            print("Removed an attacker from the list")
          
 def receiveAttacks(l_players, serversocket, map, address):
    l_attacks = []   # list of tuples (l_attackers, l_defenders, d_attacks), each belonging to a different player

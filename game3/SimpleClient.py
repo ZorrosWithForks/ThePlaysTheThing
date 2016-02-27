@@ -494,7 +494,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
                      if not ([selectedCountry[0], selectedCountry[1]] in l_attackers) and [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_neighbors: # if selected country is not attacking and clicking neighboring country
                         l_attackers.append([selectedCountry[0], selectedCountry[1]])
                         l_defenders.append([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
-                        d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0), False] #[defender, attack force]
+                        d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0), False, player.user_name] #[defender, attack force]
                      elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_defenders: # if clicking the country your selected country is attacking
                         l_defenders.remove([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
                         l_attackers.remove([selectedCountry[0], selectedCountry[1]])
