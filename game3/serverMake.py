@@ -256,7 +256,7 @@ def MakeServer():
                servername = servername[:-1]
             elif event.key == K_LSHIFT or event.key == K_RSHIFT:
                shifted = True
-            if not shifted:
+            if not shifted and len(servername) < 25:
                if event.key == K_a: servername += "a"
                elif event.key == K_b: servername += "b"
                elif event.key == K_c: servername += "c"
@@ -305,7 +305,7 @@ def MakeServer():
                elif event.key == K_PERIOD: servername += "."
                elif event.key == K_SLASH: servername += "/"
                elif event.key == K_TAB: pygame.display.iconify()
-            elif shifted:
+            elif shifted and len(servername) < 25:
                if event.key == K_a: servername += "A"
                elif event.key == K_b: servername += "B"
                elif event.key == K_c: servername += "C"

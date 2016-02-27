@@ -247,7 +247,7 @@ def LoginClient():
             elif event.key == K_LSHIFT or event.key == K_RSHIFT:
                shifted = True
                print("shifted")
-            if shifted == False:
+            if shifted == False and len(username) < 25:
                print("printing lowercase")
                if event.key == K_a: username += "a"
                elif event.key == K_b: username += "b"
@@ -297,7 +297,7 @@ def LoginClient():
                elif event.key == K_PERIOD: username += "."
                elif event.key == K_SLASH: username += "/"
                elif event.key == K_TAB: pygame.display.iconify()
-            elif shifted == True:
+            elif shifted == True and len(username) < 25:
                print("Printing uppercase")
                if event.key == K_a: username += "A"
                elif event.key == K_b: username += "B"
