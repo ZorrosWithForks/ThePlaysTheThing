@@ -78,19 +78,9 @@ def receivePlacements(l_players, serversocket, map, address):
       
 def resolveAttacks(defender_coords, l_attacks, map, l_players):
    defending_country = map.ll_map[defender_coords[1]][defender_coords[0]]
-   defense_force = map.d_continents[defending_country[0]][defending_country[1]].unit_counts
-   for player in l_attacks:
-      for attack in player[0]:
-         if defender_coords == attack:
-            attacking_country = map.ll_map[attack[1]][attack[0]]
-            attack_force = map.d_continents[attack[0]][attack[1]].unit_counts
-            defense_force.infantry -= attack_force.infantry
-            defense_force.archers -= attack_force.archers
-            defense_force.cannons -= attack_force.cannons
-            defense_force.champions -= attack_force.champions
-            
    d_attackers = {}
    d_attacker_counts = {}
+   
    for player in l_players:
       d_attackers[player.user_name] = [UnitCounts(0,0,0,0), 0] #UnitCounts, country attack bonus
       d_attacker_counts[player.user_name] = 0
@@ -174,17 +164,43 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
             player[2][attacking_country][1].cannons = 0
          if player[2][attacking_country][1].champions < 0:
             player[2][attacking_country][1].champions = 0
-          
-   #l_tempAttacks = l_attacks
-   #for player in l_tempAttacks:
-      #attack in player[0]
-      ###################################################################
-	   # You were going to delete attackers that ran out of troops here  #
-	   ###################################################################
+            
+   l_tempAttacks = l_attacks
+   for player in range(len(l_tempAttacks)):
+      for attack in range(len(l_tempAttacks[player][0])):
+         country = map.ll_map[l_tempAttacks[player][0][attack][1]][l_tempAttacks[player][0][attack][0]]
+         units = l_tempAttacks[player][2][country][1]
+         if units.infantry == 0 and units.archers == 0 and units.cannons == 0 and units.champions == 0:
+            l_attacks[player][0].remove(l_tempAttacks[player][0][attack])
+            l_attacks[player][1].remove(l_tempAttacks[player][1][attack])
+            l_attacks[player][2][country] = None
+            print("Removed an attacker from the list")
+   
+   numOfAttackers = 0
+   attacking_player = None
+   for player in l_attacks:
+      for defender in range(len(player[1])):
+         if player[1][defender] == defender_coords:
+            print("got an attacker")
+            numOfAttackers += 1
+            attacker = map.ll_map[player[0][defender][1]][player[0][defender][0]]
+            attacking_player = map.d_continents[attacker[0]][attacker[1]].owner
+
+   if curr_unit_counts.infantry == 0 and curr_unit_counts.archers == 0 and curr_unit_counts.cannons == 0 and curr_unit_counts.champions == 0 and numOfAttackers == 1:
+      map.d_continents[defending_country[0]][defending_country[1]].owner = attacking_player
+      newUnits = map.d_continents[defending_country[0]][defending_country[1]].unit_counts
+      curr_unit_counts.infantry = newUnits.infantry
+      curr_unit_counts.archers = newUnits.archers
+      curr_unit_counts.cannons = newUnits.cannons
+      curr_unit_counts.champions = newUnits.champions
+      print("infantry: " + str(newUnits.infantry))
+      print("archers: " + str(newUnits.archers))
+      print("cannons: " + str(newUnits.cannons))
+      print("champions: " + str(newUnits.champions))
          
 def receiveAttacks(l_players, serversocket, map, address):
-   l_attacks = []
-   l_defenders = []
+   l_attacks = []   # list of tuples (l_attackers, l_defenders, d_attacks), each belonging to a different player
+   l_defenders = [] # list of defender_coords
    
    d_players = {}
    for player in l_players:

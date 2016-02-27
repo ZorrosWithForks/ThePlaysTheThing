@@ -64,8 +64,6 @@ def MakeServer():
    def display_players(x_panel_position, y_panel_position, player_name):
       #print("Number of clients: " + str(len(clients)))
       del l_boot_spots[:]
-      print("in display players")
-      print("client length " + str(len(clients)))
       for i in clients:
          #length of clients is 1, but boot spots countinually grows....
          DISPLAYSURF.blit(SERVER_BAR, (x_panel_position, y_panel_position))

@@ -673,7 +673,7 @@ def resolveAttacks(DISPLAYSURF, map, player, socket, host_address):
            #if the user wants to quit
            handleGeneral(event, map)
            
-       if l_attackers != None:
+       if l_attackers != None and len(l_attackers) > 0:
          printMap(map, DISPLAYSURF, battleInfo, (l_attackers[attack], l_attacks[2][map.ll_map[l_attackers[attack][1]][l_attackers[attack][0]]]))
        else:
          printMap(map, DISPLAYSURF, standardInfo)
