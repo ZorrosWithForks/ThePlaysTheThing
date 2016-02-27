@@ -40,19 +40,6 @@ DEEP_WATER = 10
 OVERLAY = 9
 HELP_COORDS = [1135, 820]
 
-
-class CursorGraphic:
-   def __init__(self):
-      self.CursorOver = False
-      self.ON = pygame.image.load(IMAGE_FILE_PATH + 'CursorOn.png')
-      
-   def updateCursor(self, DISPLAYSURF):
-      x, y = pygame.mouse.get_pos()
-      if self.CursorOver:
-         DISPLAYSURF.blit(self.ON, (x - 50, y - 50))
-
-playCursor = CursorGraphic()
-
 # Graphics Constants
 INFO_BUY_UNITS = pygame.image.load(IMAGE_FILE_PATH + "InfoBuyUnits.png")
 INFO_ATTACK = pygame.image.load(IMAGE_FILE_PATH + "InfoAttack.png")
