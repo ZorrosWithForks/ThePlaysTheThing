@@ -244,6 +244,33 @@ def attackInfo(map, DISPLAYSURF, params):
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.archers), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 375))
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.cannons), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 425))
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.champions), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 475))
+   
+def battleInfo(map, DISPLAYSURF, params):
+   attacker = map.ll_map[params[0][1]][params[0][0]]
+   defender = params[1][0]
+   attackerUnits = params[1][1]
+   
+   DISPLAYSURF.blit(COUNTRY_FONT.render(map.d_continents[attacker[0]][attacker[1]].name, True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 100, 125))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Attacking", True, (0,0,0)), (map.WIDTH * TILESIZE + 120, 165))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(map.d_continents[defender[0]][defender[1]].name, True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 140, 205))
+   
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Attacker", True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 210, 275))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Defender", True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 360, 275))
+   
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Pistoleers:", True, (0,0,0)), (map.WIDTH * TILESIZE + 75, 325))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Musketeers:", True, (0,0,0)), (map.WIDTH * TILESIZE + 75, 375))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Cannons:", True, (0,0,0)), (map.WIDTH * TILESIZE + 75, 425))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Airships:", True, (0,0,0)), (map.WIDTH * TILESIZE + 75, 475))
+   
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(attackerUnits.infantry), True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 250, 325))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(attackerUnits.archers), True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 250, 375))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(attackerUnits.cannons), True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 250, 425))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(attackerUnits.champions), True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 250, 475))
+   
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.infantry), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 325))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.archers), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 375))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.cannons), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 425))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.champions), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 475))
     
 def printMap(map, DISPLAYSURF, infoDisplay, params=None):
     #loop through each row
@@ -639,20 +666,23 @@ def resolveAttacks(DISPLAYSURF, map, player, socket, host_address):
    l_attacks = attackResponse[1]
    l_attackers = l_attacks[0]
    l_defenders = l_attacks[1]
+   attack = 0
    while resolving:
        #get all the user events
        for event in pygame.event.get():
            #if the user wants to quit
            handleGeneral(event, map)
            
+       if l_attackers != None:
+         printMap(map, DISPLAYSURF, battleInfo, (l_attackers[attack], l_attacks[2][map.ll_map[l_attackers[attack][1]][l_attackers[attack][0]]]))
+       else:
+         printMap(map, DISPLAYSURF, standardInfo)
+       
        for battle in range(len(l_attackers)):
          DISPLAYSURF.blit(DEFENDER, (l_defenders[battle][0] * TILESIZE, l_defenders[battle][1] * TILESIZE), special_flags=BLEND_ADD)
          blitBattle(map, DISPLAYSURF, l_attackers[battle], l_defenders[battle])
          DISPLAYSURF.blit(ATTACKER, (l_attackers[battle][0] * TILESIZE, l_attackers[battle][1] * TILESIZE), special_flags=BLEND_ADD)
-         print("printed a battle")
-            
-                  
-       printMap(map, DISPLAYSURF, standardInfo)
+         
        
        #update the display
        pygame.display.update()

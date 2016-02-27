@@ -223,6 +223,11 @@ def MakeServer():
    x_start_server_button = 200
    y_start_server_button = 800
        
+   # Booted string
+   booted = "boot"
+   # Play string
+   play = "play"
+   
    pushed_back = False
    just_accessed = True
    # Declare the Surface
@@ -389,6 +394,7 @@ def MakeServer():
                   temp_client_set = copy.copy(clients)
                   for client in temp_client_set:
                      if client[1] == boot_spot[2]: # check to see if the names match
+                        client[0].sendto(booted.encode("ascii"), client[2])
                         clients.remove(client)
                         print("\ndeleted: " + boot_spot[2] + client[1])
   
@@ -427,8 +433,6 @@ def MakeServer():
          # if x_start_server_button <= x_mouse_position_main <= x_mouse_position_main + 150 and y_start_server_button <= y_mouse_position_main <= y_start_server_button + 75:
             # pygame.display.iconify()
             # begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients)
-
-      #display_players(x_panel_position, y_panel_position)
       pygame.display.update()
       
 if __name__ == '__main__':
