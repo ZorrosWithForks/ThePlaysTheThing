@@ -122,7 +122,7 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
                                d_attackers[attacker.user_name][0].champions * 3) \
                                * (d_attackers[attacker.user_name][1] / 100 + 1))
    
-   curr_unit_counts = map.d_continents[defending_country[0]][defending_country[1]].unit_counts
+   curr_unit_counts = map.d_continents[defending_country[0]][defending_country[1]].unit_counts # defending countries army
    total_unit_count = curr_unit_counts.infantry + \
                       curr_unit_counts.archers + \
                       curr_unit_counts.cannons + \
@@ -223,6 +223,11 @@ def receiveAttacks(l_players, serversocket, map, address):
       response = player.connection.recv(8192)
       packet = pickle.loads(response)
       l_attacks.append(packet)
+   
+   attackCount = 0
+   for player in l_attacks:
+      for attack in player[0]:
+         attackCount += 1
       
    # Take attacking units out of their countries
    for player in l_attacks:
@@ -234,21 +239,27 @@ def receiveAttacks(l_players, serversocket, map, address):
          attack_force.cannons -= player[2][current_attacker][1].cannons
          attack_force.champions -= player[2][current_attacker][1].champions
       
-   while True:
-      for player in l_attacks:
-         for attacker in player[0]:
-            current_attacker = map.ll_map[attacker[1]][attacker[0]]
-            if player[2][current_attacker][2] == True:
+   while attackCount > 0:
+      # Handle retreating armies
+      l_tempAttacks = l_attacks
+      for player in range(len(l_tempAttacks)):
+         for attack in range(len(l_tempAttacks[player][0])):
+            current_attacker = map.ll_map[l_tempAttacks[player][0][attack][1]][l_tempAttacks[player][0][attack][0]]
+            if l_tempAttacks[player][2][current_attacker][2] == True:
                attack_force = map.d_continents[current_attacker[0]][current_attacker[1]].unit_counts
-               attack_force.infantry += player[2][current_attacker][1].infantry
-               attack_force.archers += player[2][current_attacker][1].archers
-               attack_force.cannons += player[2][current_attacker][1].cannons
-               attack_force.champions += player[2][current_attacker][1].champions
-      
+               attack_force.infantry += l_tempAttacks[player][2][current_attacker][1].infantry
+               attack_force.archers += l_tempAttacks[player][2][current_attacker][1].archers
+               attack_force.cannons += l_tempAttacks[player][2][current_attacker][1].cannons
+               attack_force.champions += l_tempAttacks[player][2][current_attacker][1].champions
+               l_attacks[player][0].remove(l_tempAttacks[player][0][attack])
+               l_attacks[player][1].remove(l_tempAttacks[player][1][attack])
+               l_attacks[player][2][current_attacker] = None
+      del l_defenders[:]
       for player in l_attacks:
          for defender in player[1]:
             if defender not in l_defenders:
                l_defenders.append(defender)
+               print(defender)
       
       for defender in l_defenders: # defender is a set of coords
          resolveAttacks(defender, l_attacks, map, l_players)
@@ -256,17 +267,29 @@ def receiveAttacks(l_players, serversocket, map, address):
       for i in range(len(l_players)):
          curr_connection = l_players[i].connection
          l_players[i].connection = None
-         packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=l_players[i].user_name), l_attacks[i]))
+         packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=l_players[i].user_name), l_attacks[i], True))
          curr_connection.sendto(packet, address)
          l_players[i].connection = curr_connection
          print("Sent attacks to: " + l_players[i].user_name)
-         
-      del l_attacks[:]
       
+      attackCount = 0
+      for player in l_attacks:
+         for attack in player[0]:
+            attackCount += 1
+            
+      del l_attacks[:]
       for player in l_players:
          response = player.connection.recv(8192)
          packet = pickle.loads(response)
          l_attacks.append(packet)
+            
+   for i in range(len(l_players)):
+      curr_connection = l_players[i].connection
+      l_players[i].connection = None
+      packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=l_players[i].user_name), l_attacks[i], False))
+      curr_connection.sendto(packet, address)
+      l_players[i].connection = curr_connection
+      print("Sent final map to: " + l_players[i].user_name)
       
 def serve(player_count):   
    l_players = []
@@ -314,5 +337,7 @@ def serve(player_count):
    while True:
       receivePlacements(l_players, serversocket, map, addr)
       receiveAttacks(l_players, serversocket, map, addr)
+      print("Server: exited receiveAttacks")
+      #temp = input("pausing the server")
    
    serversocket.close()
