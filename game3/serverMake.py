@@ -64,8 +64,6 @@ def MakeServer():
    def display_players(x_panel_position, y_panel_position, player_name):
       #print("Number of clients: " + str(len(clients)))
       del l_boot_spots[:]
-      print("in display players")
-      print("client length " + str(len(clients)))
       for i in clients:
          #length of clients is 1, but boot spots countinually grows....
          DISPLAYSURF.blit(SERVER_BAR, (x_panel_position, y_panel_position))
@@ -115,18 +113,6 @@ def MakeServer():
       
       if x+w > mouse[0] > x and y+h > mouse[1] > y:
          DISPLAYSURF.blit(button_pressed, (x, y))
-         # if click[0] == 1 and msg == "Start":
-            # if servername == "":
-               # just_accessed = False
-            # else:
-               # #pygame.display.iconify()
-               # begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients)
-         # if click[0] == 1 and msg == "Play":
-            # #SimpleClient.play(host, servername)
-            # start_game()
-         # if click[0] == 1 and msg == "Back":
-            # server_socket.close()
-            # return(True)
       else:
          DISPLAYSURF.blit(button_unpressed, (x, y))
          
@@ -148,7 +134,7 @@ def MakeServer():
 
    # Graphics Constants
    IMAGE_FILE_PATH = "ImageFiles\\"
-   LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background.png")
+   LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "server_login_background.png")
    BLACK_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background2.png")
    SERVER_BAR = pygame.image.load(IMAGE_FILE_PATH + "Server.png")
    JOIN_BUTTON = pygame.image.load(IMAGE_FILE_PATH + "JoinButton_unpressed.png")
@@ -268,7 +254,7 @@ def MakeServer():
                servername = servername[:-1]
             elif event.key == K_LSHIFT or event.key == K_RSHIFT:
                shifted = True
-            if not shifted:
+            if not shifted and len(servername) < 25:
                if event.key == K_a: servername += "a"
                elif event.key == K_b: servername += "b"
                elif event.key == K_c: servername += "c"
@@ -317,7 +303,7 @@ def MakeServer():
                elif event.key == K_PERIOD: servername += "."
                elif event.key == K_SLASH: servername += "/"
                elif event.key == K_TAB: pygame.display.iconify()
-            elif shifted:
+            elif shifted and len(servername) < 25:
                if event.key == K_a: servername += "A"
                elif event.key == K_b: servername += "B"
                elif event.key == K_c: servername += "C"
@@ -402,13 +388,12 @@ def MakeServer():
          
       # Blit the stuffs onto the screen
       DISPLAYSURF.blit(LOGIN_BACKGROUND, (0,0))
-      servername_prompt = SERVER_FONT.render("Server Name: ", 1, (0,255,0))
       servername = filter.clean(servername)
       servername_graphics = SERVER_FONT.render(servername, 1, (0,0,0))
-      DISPLAYSURF.blit(SERVERNAME_BOX, (330, y_pos))
-      DISPLAYSURF.blit(servername_prompt, (x_pos, y_pos))
+      #DISPLAYSURF.blit(SERVERNAME_BOX, (330, y_pos))
+      #DISPLAYSURF.blit(SERVER_FONT.render("Server Name: ", 1, (0,255,0)), (x_pos, y_pos))
       DISPLAYSURF.blit(BACK_BUTTON_UNPRESSED, (x_back_button, y_back_button))
-      DISPLAYSURF.blit(servername_graphics, (335, y_pos))
+      DISPLAYSURF.blit(servername_graphics, (285, y_pos))
       #DISPLAYSURF.blit(PLAY_BUTTON, (1300, 700))
       #DISPLAYSURF.blit(START_SERVER_BUTTON, (x_start_server_button, y_start_server_button))
       button("Start",x_start_server_button,y_start_server_button,150,75,START_SERVER_BUTTON_PRESSED,START_SERVER_BUTTON_UNPRESSED)
