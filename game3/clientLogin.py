@@ -15,7 +15,7 @@ from bad_stuff import *
 import clientWait
 
 def LoginClient():
-   def button(msg,x,y,w,h,button_pressed,button_unpressed):
+   def button(msg, x, y, w, h, button_pressed,button_unpressed):
       ''' x: The x location of the top left coordinate of the button box.
 
           y: The y location of the top left coordinate of the button box.
@@ -32,23 +32,13 @@ def LoginClient():
       click = pygame.mouse.get_pressed()
       
       if x+w > mouse[0] > x and y+h > mouse[1] > y:
-         # # pygame.draw.rect(LOGIN_TOP_SURFACE, ac,(x,y,w,h))
          LOGIN_TOP_SURFACE.blit(button_pressed, (x, y))
-         # if click[0] == 1 and msg == "Refresh":
-            # #LOGIN_TOP_SURFACE.blit(REFRESH_BUTTON_PRESSED, (1300, 700))
-            # print("THIS PRINTS IN THE BUTTON")
-            # request(x_panel_position, y_panel_position, y_offset)
-         # if click[0] == 1 and msg == "Back":
-            # client_socket.close()
-            # return(True)
       else:
-         # pygame.draw.rect(LOGIN_TOP_SURFACE, ic,(x,y,w,h))
          LOGIN_TOP_SURFACE.blit(button_unpressed, (x, y))
          
       smallText = pygame.font.Font("freesansbold.ttf",20)
       textSurf, textRect = text_objects(msg, smallText, l_colors[WHITE])
       textRect.center = ( (x+(w/2)), (y+(h/2)) )
-      #LOGIN_TOP_SURFACE.blit(textSurf, textRect)
 
 
 
@@ -68,29 +58,27 @@ def LoginClient():
       s.connect(addr)
       s.sendto(username.encode('ascii'), addr)
       print("joined")
-
-      #new_server = (s.recv(1024).decode(), 9998)
-      #s.close()
-      #SimpleClient.play(new_server, username)
-      if clientWait.clientWait(s, username) == True:
+      # put here? something that will tell if it has been booted. if so, return to the main menu
+      new_server = (s.recv(1024).decode(), 9998)
+      if new_server[0] == "boot":
          s.close()
          return
+      else:
+         s.close()
+         SimpleClient.play(new_server, username)
+      s.close()
+      SimpleClient.play(new_server, username)
       
    def display_servers(x_panel_position, y_panel_position, y_offset):
       for server in l_servers:
-         # print ("displaying servers")
-         #print("server name is: ", + server[2])
-         # print("have a server from " + server[0])
          LOGIN_TOP_SURFACE.blit(SERVER_BAR, (x_panel_position, y_panel_position + y_offset))
         
          # display the name of the server
          LOGIN_TOP_SURFACE.blit(SERVER_FONT.render(str(server[1]), True, (0,0,0)), (x_panel_position + 50, y_panel_position + 25 + y_offset))
-        
-         # any room for password?
          LOGIN_TOP_SURFACE.blit(JOIN_BUTTON_UNPRESSED, (x_panel_position + 1100, y_panel_position + 25 + y_offset))
          l_join_spots.append((x_panel_position + 1100, y_panel_position + 25, server[0]))
          y_panel_position += 100
-         #pygame.display.update()
+         
    def search(x_panel_position, y_panel_position, y_offset):
       while True:
          packet, addr = client_socket.recvfrom(4096)
@@ -114,9 +102,6 @@ def LoginClient():
       print("servers after deleeting: ", str(l_servers))
       client_socket.sendto(data.encode('ascii'), address)
 
-      
-
-   #def Loginclient():
    # Initialize pygame
    pygame.init()
 
@@ -131,7 +116,7 @@ def LoginClient():
    REFRESH_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "RefreshButton_pressed.png")
    UP_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "upArrow.png")
    DOWN_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "downArrow.png")
-   USERNAME_BOX =  pygame.image.load(IMAGE_FILE_PATH + "username_box.png")
+   #USERNAME_BOX =  pygame.image.load(IMAGE_FILE_PATH + "username_box.png")
    BACK_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_unpressed.png")
    BACK_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_pressed.png")
    #specify that shift is not pressed
@@ -158,11 +143,10 @@ def LoginClient():
    # Declare the username
    username = ""
    no_username_message = SERVER_FONT.render("Please type your username", 1, (255,0,0))
-   just_accessed = True
 
    # Position of the text box
-   x_pos = 100
-   y_pos = 725
+   X_POS = 100
+   Y_POS = 725
 
    # Initialize bad word filter
    filter = ProfanitiesFilter(filterlist=bad_things, replacements="!")
@@ -242,16 +226,14 @@ def LoginClient():
                shifted = False
                print("shifted is now false")
          if event.type == KEYDOWN:
-            just_accessed = False
             if event.key == K_ESCAPE:
-               #and the game and close the window
+               #end the game and close the window
                print(username)
                print("something")
                pygame.quit()
                sys.exit()
             if event.key == K_UP:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
-               #if (len(l_servers) > 5):
                y_offset -= 100
                display_servers(x_panel_position, y_panel_position, y_offset)
             if event.key == K_DOWN:
@@ -266,7 +248,7 @@ def LoginClient():
             elif event.key == K_LSHIFT or event.key == K_RSHIFT:
                shifted = True
                print("shifted")
-            if shifted == False:
+            if shifted == False and len(username) < 25:
                print("printing lowercase")
                if event.key == K_a: username += "a"
                elif event.key == K_b: username += "b"
@@ -316,7 +298,7 @@ def LoginClient():
                elif event.key == K_PERIOD: username += "."
                elif event.key == K_SLASH: username += "/"
                elif event.key == K_TAB: pygame.display.iconify()
-            elif shifted == True:
+            elif shifted == True and len(username) < 25:
                print("Printing uppercase")
                if event.key == K_a: username += "A"
                elif event.key == K_b: username += "B"
@@ -379,7 +361,6 @@ def LoginClient():
             for join_button in l_join_spots:
                if join_button[0] <= x_mouse_position_main <= join_button[0] + 200 and join_button[1] <= y_mouse_position_main <= join_button[1] + 100:
                   if username == "":
-                     just_accessed = False
                      LOGIN_TOP_SURFACE.blit(no_username_message, (200, 800))
                   else:
                      joinGame(join_button[2])
@@ -390,15 +371,13 @@ def LoginClient():
                return(True)
                         
       # Blit the stuffs onto the screen
-      username_prompt = SERVER_FONT.render("Username: ", 1, (0,255,0))
       username = filter.clean(username)
-      username_graphics = SERVER_FONT.render(username, 1, (0,0,0))
       LOGIN_TOP_SURFACE.blit(BLACK_BACKGROUND, (100, 100))
       display_servers(x_panel_position, y_panel_position, y_offset)
       LOGIN_TOP_SURFACE.blit(LOGIN_BACKGROUND, (0,0))
-      LOGIN_TOP_SURFACE.blit(USERNAME_BOX, (280, y_pos))
-      LOGIN_TOP_SURFACE.blit(username_prompt, (x_pos, y_pos))
-      LOGIN_TOP_SURFACE.blit(username_graphics, (285, y_pos))
+      #LOGIN_TOP_SURFACE.blit(USERNAME_BOX, (280, Y_POS))
+      #LOGIN_TOP_SURFACE.blit(SERVER_FONT.render("Username: ", 1, (0,0,0)), (X_POS, Y_POS))
+      LOGIN_TOP_SURFACE.blit(SERVER_FONT.render(username, 1, (0,0,0)), (285, Y_POS))
       LOGIN_TOP_SURFACE.blit(DOWN_ARROW, (arrow_x_pos, down_arrow_y_pos))
       LOGIN_TOP_SURFACE.blit(UP_ARROW, (arrow_x_pos, up_arrow_y_pos))
       waiting_on_players = SERVER_FONT.render("Waiting on players:", 1, (0,255,255))
@@ -407,40 +386,8 @@ def LoginClient():
       if pushed_back == True:
          client_socket.close()
          return
-      if username == "": #and just_accessed != True:
+      if username == "":
          LOGIN_TOP_SURFACE.blit(no_username_message, (200, 800))
-            
-      # if event.type == MOUSEBUTTONDOWN:
-            # x_mouse_position_main, y_mouse_position_main = pygame.mouse.get_pos()
-            # print(str(x_mouse_position_main) + str(y_mouse_position_main))
-            # print("clicked mounce here")
-            
-            #click refresh
-            # if refresh_x_pos <= x_mouse_position_main <= refresh_x_pos + 200 and refresh_y_pos <= y_mouse_position_main <= refresh_y_pos + 100:
-               # print("clicked refresh")
-               # request(x_panel_position, y_panel_position, y_offset)
-            
-            #click a join
-            # for join_button in l_join_spots:
-               # if join_button[0] <= x_mouse_position_main <= join_button[0] + 200 and join_button[1] <= y_mouse_position_main <= join_button[1] + 100:
-                  # if username == "":
-                     # just_accessed = False
-                     # LOGIN_TOP_SURFACE.blit(no_username_message, (200, 800))
-                  # else:
-                     # pygame.display.iconify()
-                     # joinGame(join_button[2])
-                     
-            #click back button
-            # if x_back_button <= x_mouse_position_main <= x_back_button + 75 and y_back_button <= y_mouse_position_main <= y_back_button + 50:
-               # client_socket.close()
-               # return
-                     
-            # #click up arrow
-            # if arrow_x_pos <= x_mouse_position_main <= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 50:
-               # SERVERS_SURFACE.scroll(0, -100)
-            # #click down arrow
-            # if arrow_x_pos <= x_mouse_position_main <= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 50:
-               # SERVERS_SURFACE.scroll(0, 100)
                
       pygame.display.update()
       
