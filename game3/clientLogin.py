@@ -12,6 +12,7 @@ import random
 import re
 from bad_stuff import *
 #import main_menu
+import clientWait
 
 def LoginClient():
    def button(msg,x,y,w,h,button_pressed,button_unpressed):
@@ -68,9 +69,12 @@ def LoginClient():
       s.sendto(username.encode('ascii'), addr)
       print("joined")
 
-      new_server = (s.recv(1024).decode(), 9998)
-      s.close()
-      SimpleClient.play(new_server, username)
+      #new_server = (s.recv(1024).decode(), 9998)
+      #s.close()
+      #SimpleClient.play(new_server, username)
+      if clientWait.clientWait(s, username) == True:
+         s.close()
+         return
       
    def display_servers(x_panel_position, y_panel_position, y_offset):
       for server in l_servers:

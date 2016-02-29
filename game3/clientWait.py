@@ -13,7 +13,7 @@ import re
 from bad_stuff import *
 #import main_menu
 
-def clientWait(ip):
+def clientWait(s, username):
    def button(msg,x,y,w,h,button_pressed,button_unpressed):
       ''' x: The x location of the top left coordinate of the button box.
 
@@ -89,18 +89,10 @@ def clientWait(ip):
       print("servers after deleting: ", str(l_servers))
       client_socket.sendto(data.encode('ascii'), address)
 
-   def joinGame(ip):
-      print("attempting to join " + ip)
-      s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-      addr = (ip, 9999)
-      
-      s.connect(addr)
-      s.sendto(username.encode('ascii'), addr)
-      #print("joined")
-
-      new_server = (s.recv(1024).decode(), 9998)
-      s.close()
-      SimpleClient.play(new_server, username)
+   def beginGame(s):
+      new_server = (s[0].recv(1024).decode(), 9998)
+      s[0].close()
+      SimpleClient.play(new_server, s[1])
 
    #def Loginclient():
    # Initialize pygame
@@ -170,7 +162,7 @@ def clientWait(ip):
    down_arrow_y_pos = 50
 
    # Position of refresh button
-   refresh_x_pos = 1300
+   refresh_x_pos = 1500
    refresh_y_pos = 700
 
    # Position of the Server Panel
@@ -187,8 +179,8 @@ def clientWait(ip):
 
    waiting_for_response = SERVER_FONT.render("Waiting for Server response...", 1, (255,0,0))
    
-   socket_exists = False
-   
+   #socket_exists = False
+   '''
    # Client network stuff
    l_servers = []
    address = ('255.255.255.255', 8080)
@@ -201,8 +193,9 @@ def clientWait(ip):
       client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
       client_socket.bind((host, 8080))
       client_socket.sendto(data.encode('ascii'), address)
-
-   t_connect = threading.Thread(target=joinGame, args=(ip,))
+   '''
+   
+   t_connect = threading.Thread(target=beginGame, args=(s,username))
    t_connect.daemon = True
    t_connect.start()
 
@@ -244,6 +237,18 @@ def clientWait(ip):
                   y_offset += 100
                   #display_servers(x_panel_position, y_panel_position, y_offset)
 
+         if event.type == MOUSEBUTTONDOWN:
+            x_mouse_position_main, y_mouse_position_main = pygame.mouse.get_pos()
+            print(str(x_mouse_position_main) + str(y_mouse_position_main))
+            print("clicked mounce here")
+            
+            #click refresh
+            if refresh_x_pos <= x_mouse_position_main <= refresh_x_pos + 200 and refresh_y_pos <= y_mouse_position_main <= refresh_y_pos + 100:
+               # print("clicked refresh")
+               # request(x_panel_position, y_panel_position, y_offset)
+               t_connect._stop()
+               s.close()
+               return(True)
       # Blit the stuffs onto the screen
       #display_servers(x_panel_position, y_panel_position, y_offset)
       LOGIN_TOP_SURFACE.blit(LOGIN_BACKGROUND, (0,0))
@@ -253,23 +258,8 @@ def clientWait(ip):
       LOGIN_TOP_SURFACE.blit(waiting_for_response, (200, 800))
       pushed_back = button("Quit",refresh_x_pos,refresh_y_pos,200,100,REFRESH_BUTTON_PRESSED,REFRESH_BUTTON_UNPRESSED)
       pushed_back = button("Back",x_back_button,y_back_button,75,50,BACK_BUTTON_PRESSED,BACK_BUTTON_UNPRESSED)
-      if pushed_back == True:
-         t_connect.kill()
-         client_socket.close()
-         return
             
-      if event.type == MOUSEBUTTONDOWN:
-            x_mouse_position_main, y_mouse_position_main = pygame.mouse.get_pos()
-            print(str(x_mouse_position_main) + str(y_mouse_position_main))
-            print("clicked mounce here")
-            
-            #click refresh
-            if refresh_x_pos <= x_mouse_position_main <= refresh_x_pos + 200 and refresh_y_pos <= y_mouse_position_main <= refresh_y_pos + 100:
-               # print("clicked refresh")
-               # request(x_panel_position, y_panel_position, y_offset)
-               t_connect.close()
-               client_socket.close()
-               return
+      
                      
             #click back button
             # if x_back_button <= x_mouse_position_main <= x_back_button + 75 and y_back_button <= y_mouse_position_main <= y_back_button + 50:
