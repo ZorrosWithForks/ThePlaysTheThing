@@ -1,0 +1,24 @@
+Conflict function- client-side
+Phase 1-player selects a country he owns to progress to phase 2, or clicks 'done' to end the Scene.
+Phase 2-Once country is selected, the map will highlight adjacent enemy countries and disallow 
+clicking on further allied counries; cancel button will return them to phase 1
+Phase 3-when Player clicks on enemy country, is given a GUI to allocate units from their country to send 
+to battle (or decline and return to phase 2)
+Once phase 3 is complete, conflict is saved to send to server, and player returns to phase 1
+
+Conflict function- server-side
+-server receives a list of conflicts sent by the players
+-server runs conflicts through 'attack' algorithm, adjusts respective country populations
+-if a country's population hits 0, ownership is changed to its conqueror and 
+
+Moving units
+Phase 1-Phase 1-player selects a country he owns to progress to phase 2, or clicks 'done' to end the Scene.
+Phase 2-Once country is selected, map will highlight all allied countries and disallow selecting enemy
+countries; cancel button returns to phase 1.
+Phase 3- when second allied country is selected, GUI prompt lets player decide how many of each unit he
+wishes to send over, cancel aborts and returns to phase 2.
+Once phase 4 is complete, move request is saved to send to server, and the player returns to phase 1
+
+Moving units- server side
+-server receives new unit populations from players
+-server adjusts map from each respective player and sends the new, modified map back to all players.

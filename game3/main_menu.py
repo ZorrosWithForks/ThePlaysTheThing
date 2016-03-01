@@ -2,8 +2,9 @@ import pygame
 import time
 import random
 #import clientSetup
-import serverMake
+#import serverSetup
 import clientLogin
+import serverMake
 
 #^Imported libraries MUST have the function/if_MAIN thing at the end or else they will be run
 # immediately upon import
@@ -48,7 +49,7 @@ def text_objects(text, font, color):
    return textSurface, textSurface.get_rect()
  
 def message_display(text):
-   largeText = pygame.font.Font('freesansbold.ttf',115)
+   largeText = pygame.font.Font('OldNewspaperTypes.ttf',115)
    TextSurf, TextRect = text_objects(text, largeText, black)
    TextRect.center = ((display_width/2),(display_height/2))
    gameDisplay.blit(TextSurf, TextRect)
@@ -83,7 +84,7 @@ def button(msg,x,y,w,h,ic,ac,action=None):
    else:
       pygame.draw.rect(gameDisplay, ic,(x,y,w,h))
 
-   smallText = pygame.font.Font("freesansbold.ttf",20)
+   smallText = pygame.font.Font("OldNewspaperTypes.ttf",24)
    textSurf, textRect = text_objects(msg, smallText, ac)
    textRect.center = ( (x+(w/2)), (y+(h/2)) )
    gameDisplay.blit(textSurf, textRect)
@@ -103,16 +104,16 @@ def game_intro():
             quit()
                 
       gameDisplay.fill(white)
-      largeText = pygame.font.Font('freesansbold.ttf',190)
+      largeText = pygame.font.Font('OldNewspaperTypes.ttf',190)
       TextSurf, TextRect = text_objects("Staged Conflict", largeText, black)
       TextRect.center = ((display_width/2),(display_height/2) - 150)
       gameDisplay.blit(TextSurf, TextRect)
         
       mouse = pygame.mouse.get_pos()
         
-      button("Host Game",450,450,700,100,green,bright_green, serverMake.MakeServer)
-      button("Join Game",450,600,700,100,red,bright_red, clientLogin.LoginClient)
-      button("Quit",450,750,700,100,black,grey,quitgame)
+      button("Host Game",100,450,700,100,green,bright_green, serverMake.MakeServer)
+      button("Join Game",100,600,700,100,red,bright_red, clientLogin.LoginClient)
+      button("Quit",100,750,700,100,black,grey,quitgame)
 
       pygame.display.update()
       clock.tick(15)

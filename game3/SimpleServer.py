@@ -151,10 +151,10 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
                       player[2][attacking_country][1].champions
       
          attacker_name = map.d_continents[attacking_country[0]][attacking_country[1]].owner
-         player[2][attacking_country][1].infantry -= int(random.randrange(int(d_damage_sum[attacker_name] / 15), int(d_damage_sum[attacker_name] / 10) + 6) * (player[2][attacking_country][1].infantry / max(total_unit_count, 1)) / d_attacker_counts[attacker_name])
-         player[2][attacking_country][1].archers -= int(random.randrange(int(d_damage_sum[attacker_name] / 20), int(d_damage_sum[attacker_name] / 10) + 6) * (player[2][attacking_country][1].archers / max(total_unit_count, 1)) / d_attacker_counts[attacker_name])
-         player[2][attacking_country][1].cannons -= int(random.randrange(int(d_damage_sum[attacker_name] / 25), int(d_damage_sum[attacker_name] / 15) + 4) * (player[2][attacking_country][1].cannons / max(total_unit_count, 1)) / d_attacker_counts[attacker_name])
-         player[2][attacking_country][1].champions -= int(random.randrange(int(d_damage_sum[attacker_name] / 25), int(d_damage_sum[attacker_name] / 20) + 2) * (player[2][attacking_country][1].champions / max(total_unit_count, 1)) / d_attacker_counts[attacker_name])
+         player[2][attacking_country][1].infantry -= int(random.randrange(int(d_damage_sum[attacker_name] / 30), int(d_damage_sum[attacker_name] / 20) + 6) * player[2][attacking_country][1].infantry / max(total_unit_count, 1))
+         player[2][attacking_country][1].archers -= int(random.randrange(int(d_damage_sum[attacker_name] / 40), int(d_damage_sum[attacker_name] / 20) + 6) * player[2][attacking_country][1].archers / max(total_unit_count, 1))
+         player[2][attacking_country][1].cannons -= int(random.randrange(int(d_damage_sum[attacker_name] / 50), int(d_damage_sum[attacker_name] / 30) + 4) * player[2][attacking_country][1].cannons / max(total_unit_count, 1))
+         player[2][attacking_country][1].champions -= int(random.randrange(int(d_damage_sum[attacker_name] / 50), int(d_damage_sum[attacker_name] / 40) + 2) * player[2][attacking_country][1].champions / max(total_unit_count, 1))
         
          if player[2][attacking_country][1].infantry < 0:
             player[2][attacking_country][1].infantry = 0
