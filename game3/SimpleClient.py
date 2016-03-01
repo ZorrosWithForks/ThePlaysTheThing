@@ -39,8 +39,6 @@ WATER = (0,0)
 DEEP_WATER = 10
 OVERLAY = 9
 HELP_COORDS = [1135, 820]
-ATTACK_COORDS = (575, 770)
-RETREAT_COORDS = (875, 770)
 
 # Graphics Constants
 INFO_BUY_UNITS = pygame.image.load(IMAGE_FILE_PATH + "InfoBuyUnits.png")
@@ -72,10 +70,6 @@ ATTACK_OPTION = pygame.image.load(IMAGE_FILE_PATH + "AttackOption.png")
 ATTACKER = pygame.image.load(IMAGE_FILE_PATH + "Attacker.png")
 DEFENDER = pygame.image.load(IMAGE_FILE_PATH + "Defender.png")
 WAITING = pygame.image.load(IMAGE_FILE_PATH + "Waiting.png")
-ATTACK = pygame.image.load(IMAGE_FILE_PATH + "Attack.png")
-ATTACKLIT = pygame.image.load(IMAGE_FILE_PATH + "AttackLit.png")
-RETREAT = pygame.image.load(IMAGE_FILE_PATH + "Retreat.png")
-RETREATLIT = pygame.image.load(IMAGE_FILE_PATH + "RetreatLit.png")
 
 def blitInfo(DISPLAYSURF, map, phase_info):
    curr_x, curr_y = pygame.mouse.get_pos()
@@ -445,7 +439,6 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
    SEND_AIRSHIPS = pygame.image.load(IMAGE_FILE_PATH + "SendAirships.png")
    DONE_BUTTON = pygame.image.load(IMAGE_FILE_PATH + "DoneButton.png")
    DONE_BUTTON_ACTIVE = pygame.image.load(IMAGE_FILE_PATH + "DoneButtonActive.png")
-   pygame.mouse.set_pos(HELP_COORDS)
    global refreshing
    def refresh():
       global refreshing
@@ -482,6 +475,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
    l_attackers = []
    l_defenders = []
    
+   pygame.mouse.set_pos(HELP_COORDS)
    while declaring:
        #get all the user events
        curr_x, curr_y = pygame.mouse.get_pos()
@@ -632,6 +626,13 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
 attackResponse = None
 responses = 0
 def resolveAttacks(DISPLAYSURF, map, player, socket, host_address):
+   ATTACK = pygame.image.load(IMAGE_FILE_PATH + "Attack.png")
+   ATTACKLIT = pygame.image.load(IMAGE_FILE_PATH + "AttackLit.png")
+   RETREAT = pygame.image.load(IMAGE_FILE_PATH + "Retreat.png")
+   RETREATLIT = pygame.image.load(IMAGE_FILE_PATH + "RetreatLit.png")
+   
+   ATTACK_COORDS = (575, 770)
+   RETREAT_COORDS = (780, 770)
    global resolving
    resolving = True
    global refreshing
@@ -702,8 +703,15 @@ def resolveAttacks(DISPLAYSURF, map, player, socket, host_address):
             blitBattle(map, DISPLAYSURF, l_attackers[battle], l_defenders[battle])
             DISPLAYSURF.blit(ATTACKER, (l_attackers[battle][0] * TILESIZE, l_attackers[battle][1] * TILESIZE), special_flags=BLEND_ADD)
             
-          DISPLAYSURF.blit(ATTACKLIT, (ATTACK_COORDS[0], ATTACK_COORDS[1]))
-          DISPLAYSURF.blit(RETREATLIT, (RETREAT_COORDS[0], RETREAT_COORDS[1]))
+          if ATTACK_COORDS[0] <= curr_x <= ATTACK_COORDS[0] + 200 and ATTACK_COORDS[1] <= curr_y <= ATTACK_COORDS[1] + 100:
+            DISPLAYSURF.blit(ATTACKLIT, (ATTACK_COORDS[0], ATTACK_COORDS[1]))
+          else:
+            DISPLAYSURF.blit(ATTACK, (ATTACK_COORDS[0], ATTACK_COORDS[1]))
+            
+          if RETREAT_COORDS[0] <= curr_x <= RETREAT_COORDS[0] + 200 and RETREAT_COORDS[1] <= curr_y <= RETREAT_COORDS[1] + 100:
+            DISPLAYSURF.blit(RETREATLIT, (RETREAT_COORDS[0], RETREAT_COORDS[1]))
+          else:
+            DISPLAYSURF.blit(RETREAT, (RETREAT_COORDS[0], RETREAT_COORDS[1]))
           
           #update the display
           pygame.display.update()

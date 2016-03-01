@@ -12,6 +12,7 @@ import random
 import re
 from bad_stuff import *
 #import main_menu
+import clientWait
 
 def LoginClient():
    def button(msg, x, y, w, h, button_pressed,button_unpressed):
@@ -66,7 +67,7 @@ def LoginClient():
       else:
          s.close()
          SimpleClient.play(new_server, username)
-         
+
    def display_servers(x_panel_position, y_panel_position, y_offset):
       for server in l_servers:
          LOGIN_TOP_SURFACE.blit(SERVER_BAR, (x_panel_position, y_panel_position + y_offset))
