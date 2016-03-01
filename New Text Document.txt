@@ -1,0 +1,7 @@
+You have to translate the mouse position on the screen to the world coordinates. When you scroll your map, you generate an offset, and you have to use that for translation.
+
+Say if the map is not scrolled ((0, 0) of the map is at (0, 0) of the screen), and a player clicks on (12, 12), you know she clicked on (12, 12) of the world.
+
+When this player scrolled the map to the right (let's say 100px), then you blit the map surface at (-100, 0) of the screen. Now if the player clicks on (12, 12), you can calculate that (12, 12) of the screen is actually (112, 12) on the map (screenX - scrollX, screenY - scrollY).
+
+So if you want to determinate which country a player clicked on, always use the translated coordinates (not the screen coordinates), and the issue you describe disappears.
