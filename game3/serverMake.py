@@ -67,12 +67,17 @@ def MakeServer():
       for i in clients:
          #length of clients is 1, but boot spots countinually grows....
          DISPLAYSURF.blit(SERVER_BAR, (x_panel_position, y_panel_position))
-         print("blitted bar")
+         #print("blitted bar")
          l_boot_spots.append((x_panel_position + 1200, y_panel_position + 25, str(i[1])))
          # display the name of the client
          DISPLAYSURF.blit(SERVER_FONT.render(str(i[1]), True, (0,0,0)), (x_panel_position + 25, y_panel_position + 25))
          DISPLAYSURF.blit(BOOT_BUTTON, (x_panel_position + 1200, y_panel_position + 25))
          y_panel_position += 100
+         
+   # def append_boot_spots(x_panel_position, y_panel_position)
+      # del l_boot_spots[:]
+      # for i in clients:
+         # l_boot_spots.append((x_panel_position + 1200, y_panel_position + 25
          
    def start_game():
       for client in clients:
@@ -374,6 +379,7 @@ def MakeServer():
                
             # clicked boot
             for boot_spot in l_boot_spots:
+               print(str(len(l_boot_spots)))
                print(str(boot_spot[0]) + ' ' +str(boot_spot[1]))
                if boot_spot[0] <= x_mouse_position_main <= boot_spot[0] + 100 and boot_spot[1] <= y_mouse_position_main <= boot_spot[1] + 50:
                   print(boot_spot[2])
