@@ -9,6 +9,7 @@ from pygame.locals import *
 import pickle
 from Maps import *
 import Player
+import copy
 
 clients_lock = threading.Lock()
 th = []
@@ -93,26 +94,27 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
                d_attackers[player.user_name][0].champions += attacker[2][map.ll_map[attack[1]][attack[0]]][1].champions
                
                attacking_country = map.ll_map[attack[1]][attack[0]]
-               d_attackers[player.user_name][1] += map.d_continents[attacking_country[0]][attacking_country[1]].attack_bonus
+               #d_attackers[player.user_name][1] += map.d_continents[attacking_country[0]][attacking_country[1]].attack_bonus
                d_attacker_counts[player.user_name] += 1 # Number of countries to divide losses into
    
    d_damage_sum = {}
    for player in l_players:
       d_damage_sum[player.user_name] = 0
+      
       for attacker in l_players:
          if attacker.user_name != player.user_name:
             d_damage_sum[player.user_name] += int((d_attackers[attacker.user_name][0].infantry + \
                                               d_attackers[attacker.user_name][0].archers * 2 + \
                                               d_attackers[attacker.user_name][0].cannons + \
-                                              d_attackers[attacker.user_name][0].champions * 3) \
-                                              * (d_attackers[attacker.user_name][1] / 100 + 1))
+                                              d_attackers[attacker.user_name][0].champions * 3)) \
+                                              #* (d_attackers[attacker.user_name][1] / 100 + 1))
       
       defending_country_data = map.d_continents[defending_country[0]][defending_country[1]]
       d_damage_sum[player.user_name] += int((defending_country_data.unit_counts.infantry + \
                                         defending_country_data.unit_counts.archers * 2 + \
                                         defending_country_data.unit_counts.cannons + \
-                                        defending_country_data.unit_counts.champions * 3) \
-                                        * (defending_country_data.defense_bonus / 100 + 1))
+                                        defending_country_data.unit_counts.champions * 3)) \
+                                        #* (defending_country_data.defense_bonus / 100 + 1))
 
    defender_damage_sum = 0
    for attacker in l_players:
@@ -166,7 +168,7 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
             if player[2][attacking_country][1].champions < 0:
                player[2][attacking_country][1].champions = 0
             
-   l_tempAttacks = l_attacks
+   l_tempAttacks = copy.deepcopy(l_attacks)
    for player in range(len(l_tempAttacks)):
       for attack in range(len(l_tempAttacks[player][0])):
          country = map.ll_map[l_tempAttacks[player][0][attack][1]][l_tempAttacks[player][0][attack][0]]
@@ -201,7 +203,7 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
       newUnits.cannons = 0
       newUnits.champions = 0
          
-   l_tempAttacks = l_attacks
+   l_tempAttacks = copy.deepcopy(l_attacks)
    for player in range(len(l_tempAttacks)):
       for attack in range(len(l_tempAttacks[player][0])):
          country = map.ll_map[l_tempAttacks[player][0][attack][1]][l_tempAttacks[player][0][attack][0]]
@@ -242,7 +244,7 @@ def receiveAttacks(l_players, serversocket, map, address):
       
    while attackCount > 0:
       # Handle retreating armies
-      l_tempAttacks = l_attacks
+      l_tempAttacks = copy.deepcopy(l_attacks)
       for player in range(len(l_tempAttacks)):
          for attack in range(len(l_tempAttacks[player][0])):
             current_attacker = map.ll_map[l_tempAttacks[player][0][attack][1]][l_tempAttacks[player][0][attack][0]]
@@ -292,6 +294,47 @@ def receiveAttacks(l_players, serversocket, map, address):
       l_players[i].connection = curr_connection
       print("Sent final map to: " + l_players[i].user_name)
       
+def receiveMoves(l_players, serversocket, map, address):
+   l_moves = [] # list of tuples (l_senders, l_receivers, d_moves)
+   
+   for player in l_players:
+      response = player.connection.recv(8192)
+      packet = pickle.loads(response)
+      l_moves.append(packet)
+      player.unit_counts = 0
+      
+   for player in l_moves:
+      for send in range(len(player[0])):
+         sending_country = map.ll_map[player[0][send][1]][player[0][send][0]]
+         sending_units = map.d_continents[sending_country[0]][sending_country[1]].unit_counts
+         receiving_country = map.ll_map[player[1][send][1]][player[1][send][0]] # Continent and country name (tuple) of the receiving country: courtesy of Caleb
+         receiving_units = map.d_continents[receiving_country[0]][receiving_country[1]].unit_counts
+         sent_units = player[2][sending_country][1]
+         # Take the units sent out of the sending country
+         sending_units.infantry -= sent_units.infantry
+         sending_units.archers -= sent_units.archers
+         sending_units.cannons -= sent_units.cannons
+         sending_units.champions -= sent_units.champions
+         # Put the units sent into the receiving country
+         receiving_units.infantry += sent_units.infantry
+         receiving_units.archers += sent_units.archers
+         receiving_units.cannons += sent_units.cannons
+         receiving_units.champions += sent_units.champions
+   
+   for player in l_players:
+      for continent in map.l_continent_names:
+         for country_i in range(len(map.d_continents[continent])):
+            if map.d_continents[continent][country_i].owner == player.user_name:
+               player.unit_counts += 3
+         
+   for player in l_players:
+      curr_connection = player.connection
+      player.connection = None
+      packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=player.user_name), player))
+      curr_connection.sendto(packet, address)
+      player.connection = curr_connection
+      print("Sent moves to: " + player.user_name)
+      
 def serve(player_count):   
    l_players = []
    
@@ -339,6 +382,7 @@ def serve(player_count):
       receivePlacements(l_players, serversocket, map, addr)
       receiveAttacks(l_players, serversocket, map, addr)
       print("Server: exited receiveAttacks")
+      receiveMoves(l_players, serversocket, map, addr)
       #temp = input("pausing the server")
    
    serversocket.close()
