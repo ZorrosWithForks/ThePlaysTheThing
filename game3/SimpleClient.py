@@ -59,6 +59,15 @@ ATK_TOP_BOTTOM = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_T_B.png')
 ATK_UPLEFT_DOWNRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_UL_BR.png')
 ATK_DOWNLEFT_UPRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_UR_BL.png')
 
+MOVE_LEFT_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Left.png')
+MOVE_RIGHT_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_Edge_Right.png')
+MOVE_TOP_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Top.png')
+MOVE_BOTTOM_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_Edge_Bottom.png')
+MOVE_LEFT_RIGHT = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_L_R.png')
+MOVE_TOP_BOTTOM = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_T_B.png')
+MOVE_UPLEFT_DOWNRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_UL_BR.png')
+MOVE_DOWNLEFT_UPRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_UR_BL.png')
+
 MOUSE_OVER = pygame.image.load(IMAGE_FILE_PATH + 'MouseOver.png')
 MOUSE_OVER_UNKNOWN = pygame.image.load(IMAGE_FILE_PATH + 'MouseOverUnknown.png')
 INFO_MARQUEE = pygame.image.load(IMAGE_FILE_PATH + "InfoMarque.png")
@@ -77,6 +86,11 @@ SEND_CANNONS = pygame.image.load(IMAGE_FILE_PATH + "SendCannons.png")
 SEND_AIRSHIPS = pygame.image.load(IMAGE_FILE_PATH + "SendAirships.png")
 DONE_BUTTON = pygame.image.load(IMAGE_FILE_PATH + "DoneButton.png")
 DONE_BUTTON_ACTIVE = pygame.image.load(IMAGE_FILE_PATH + "DoneButtonActive.png")
+
+MOVE_PISTOLEERS = pygame.image.load(IMAGE_FILE_PATH + "MovePistoleers.png")
+MOVE_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "MoveMusketeers.png")
+MOVE_CANNONS    = pygame.image.load(IMAGE_FILE_PATH + "MoveCannons.png")
+MOVE_AIRSHIPS   = pygame.image.load(IMAGE_FILE_PATH + "MoveAirships.png")
 
 def blitInfo(DISPLAYSURF, map, phase_info):
    curr_x, curr_y = pygame.mouse.get_pos()
@@ -868,10 +882,10 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address):
          blitBattle(map, DISPLAYSURF, l_senders[army], l_receivers[army])
          DISPLAYSURF.blit(ATTACKER, (l_senders[army][0] * TILESIZE, l_senders[army][1] * TILESIZE), special_flags=BLEND_ADD)
     
-      DISPLAYSURF.blit(SEND_PISTOLEERS, (170, map.HEIGHT * TILESIZE + 70))
-      DISPLAYSURF.blit(SEND_MUSKETEERS, (575, map.HEIGHT * TILESIZE + 70))
-      DISPLAYSURF.blit(SEND_CANNONS, (170, map.HEIGHT * TILESIZE + 125))
-      DISPLAYSURF.blit(SEND_AIRSHIPS, (575, map.HEIGHT * TILESIZE + 125))
+      DISPLAYSURF.blit(MOVE_PISTOLEERS, (170, map.HEIGHT * TILESIZE + 70))
+      DISPLAYSURF.blit(MOVE_MUSKETEERS, (575, map.HEIGHT * TILESIZE + 70))
+      DISPLAYSURF.blit(MOVE_CANNONS, (170, map.HEIGHT * TILESIZE + 125))
+      DISPLAYSURF.blit(MOVE_AIRSHIPS, (575, map.HEIGHT * TILESIZE + 125))
       DISPLAYSURF.blit(DONE_BUTTON if player.unit_counts > 0 else DONE_BUTTON_ACTIVE, (980, map.HEIGHT * TILESIZE + 70))
     
       blitInfo(DISPLAYSURF, map, INFO_ATTACK)

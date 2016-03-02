@@ -94,26 +94,27 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
                d_attackers[player.user_name][0].champions += attacker[2][map.ll_map[attack[1]][attack[0]]][1].champions
                
                attacking_country = map.ll_map[attack[1]][attack[0]]
-               d_attackers[player.user_name][1] += map.d_continents[attacking_country[0]][attacking_country[1]].attack_bonus
+               #d_attackers[player.user_name][1] += map.d_continents[attacking_country[0]][attacking_country[1]].attack_bonus
                d_attacker_counts[player.user_name] += 1 # Number of countries to divide losses into
    
    d_damage_sum = {}
    for player in l_players:
       d_damage_sum[player.user_name] = 0
+      
       for attacker in l_players:
          if attacker.user_name != player.user_name:
             d_damage_sum[player.user_name] += int((d_attackers[attacker.user_name][0].infantry + \
                                               d_attackers[attacker.user_name][0].archers * 2 + \
                                               d_attackers[attacker.user_name][0].cannons + \
-                                              d_attackers[attacker.user_name][0].champions * 3) \
-                                              * (d_attackers[attacker.user_name][1] / 100 + 1))
+                                              d_attackers[attacker.user_name][0].champions * 3)) \
+                                              #* (d_attackers[attacker.user_name][1] / 100 + 1))
       
       defending_country_data = map.d_continents[defending_country[0]][defending_country[1]]
       d_damage_sum[player.user_name] += int((defending_country_data.unit_counts.infantry + \
                                         defending_country_data.unit_counts.archers * 2 + \
                                         defending_country_data.unit_counts.cannons + \
-                                        defending_country_data.unit_counts.champions * 3) \
-                                        * (defending_country_data.defense_bonus / 100 + 1))
+                                        defending_country_data.unit_counts.champions * 3)) \
+                                        #* (defending_country_data.defense_bonus / 100 + 1))
 
    defender_damage_sum = 0
    for attacker in l_players:
