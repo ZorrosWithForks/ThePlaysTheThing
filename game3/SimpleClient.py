@@ -436,11 +436,13 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address):
        
        #update the display
        pygame.display.update()
+   return map
 refreshing = True
 oldMap = None
 
 def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
    global refreshing
+   refreshing = True
    def refresh():
       global refreshing
       global oldMap
@@ -623,6 +625,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
          
        #update the display
        pygame.display.update()
+   return map
        
 attackResponse = None
 responses = 0
@@ -876,16 +879,18 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address):
       #update the display
       pygame.display.update()
       #fpsClock.tick(50)
-  
+   return map
+
+newMap = None
 def getMoney(DISPLAYSURF, map, player, socket, host_address):
    global refreshing
    refreshing = True
    print("Inside getMoney")
    def refresh():
       global refreshing
-      global oldMap
+      global newMap
       response = socket.recv(8192)
-      oldMap = pickle.loads(response)
+      newMap = pickle.loads(response)
       refreshing = False
       print("set refreshing to false")
       return
@@ -904,7 +909,7 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address):
       #update the display
       pygame.display.update()
       
-   return oldMap
+   return newMap
          
 def play(host_address, player_name):
    #set up the display
@@ -942,10 +947,10 @@ def play(host_address, player_name):
    DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN) 
    while True:
       map.current_player = player_name
-      placeUnits(DISPLAYSURF, map, player, s, host_address)
-      declareAttacks(DISPLAYSURF, map, player, s, host_address)
+      map = placeUnits(DISPLAYSURF, map, player, s, host_address)
+      map = declareAttacks(DISPLAYSURF, map, player, s, host_address)
       map = resolveAttacks(DISPLAYSURF, map, player, s, host_address)
-      moveTroops(DISPLAYSURF, map, player, s, host_address)
+      map = moveTroops(DISPLAYSURF, map, player, s, host_address)
       info = getMoney(DISPLAYSURF, map, player, s, host_address)
       map = info[0]
       player = info[1]

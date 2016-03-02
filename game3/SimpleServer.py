@@ -166,7 +166,7 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
          if player[2][attacking_country][1].champions < 0:
             player[2][attacking_country][1].champions = 0
             
-   l_tempAttacks = l_attacks
+   l_tempAttacks = copy.deepcopy(l_attacks)
    for player in range(len(l_tempAttacks)):
       for attack in range(len(l_tempAttacks[player][0])):
          country = map.ll_map[l_tempAttacks[player][0][attack][1]][l_tempAttacks[player][0][attack][0]]
