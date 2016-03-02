@@ -1,0 +1,26 @@
+Exited refreshing
+I have the map!
+Waiting for new map info
+Waiting for new map info
+Got false
+Client: inside moveTroops
+Traceback (most recent call last):
+  File "\\csmain\Classes\SE_Project\Development\16-DiningPhilosophers\Jake\game3\main_menu.py", line 125, in <module>
+    game_intro()
+  File "\\csmain\Classes\SE_Project\Development\16-DiningPhilosophers\Jake\game3\main_menu.py", line 115, in game_intro
+    button("Join Game",100,600,700,100,red,bright_red, clientLogin.LoginClient)
+  File "\\csmain\Classes\SE_Project\Development\16-DiningPhilosophers\Jake\game3\main_menu.py", line 83, in button
+    action()
+  File "\\csmain\Classes\SE_Project\Development\16-DiningPhilosophers\Jake\game3\clientLogin.py", line 367, in LoginClient
+    joinGame(join_button[2])
+  File "\\csmain\Classes\SE_Project\Development\16-DiningPhilosophers\Jake\game3\clientLogin.py", line 69, in joinGame
+    SimpleClient.play(new_server, username)
+  File "\\csmain\Classes\SE_Project\Development\16-DiningPhilosophers\Jake\game3\SimpleClient.py", line 1019, in play
+    map = moveTroops(DISPLAYSURF, map, player, s, host_address)
+  File "\\csmain\Classes\SE_Project\Development\16-DiningPhilosophers\Jake\game3\SimpleClient.py", line 934, in moveTroops
+    blitMove(map, DISPLAYSURF, l_senders[army], l_receivers[army])
+  File "\\csmain\Classes\SE_Project\Development\16-DiningPhilosophers\Jake\game3\SimpleClient.py", line 153, in blitMove
+    DISPLAYSURF.blit(MOVE_DOWNLEFT_UPRIGHT, (min(attack_coords[0], dest_coords[0]) * TILESIZE, min(attack_coords[1], dest_coords[1]) * TILESIZE))
+NameError: name 'attack_coords' is not defined
+
+Z:\SE_Project\Development\16-DiningPhilosophers\Jake\game3>
