@@ -92,7 +92,7 @@ MOVE_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "MoveMusketeers.png")
 MOVE_CANNONS    = pygame.image.load(IMAGE_FILE_PATH + "MoveCannons.png")
 MOVE_AIRSHIPS   = pygame.image.load(IMAGE_FILE_PATH + "MoveAirships.png")
 
-def blitInfo(DISPLAYSURF, map, phase_info):
+def blitInfo(DISPLAYSURF, map, phase_info, blitUnitInfo=True):
    curr_x, curr_y = pygame.mouse.get_pos()
    
    if 170 <= curr_x <= 70 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120:
