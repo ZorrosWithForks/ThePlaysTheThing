@@ -1,5 +1,18 @@
-def LoginClient():
-   def display_players(x_panel_position, y_panel_position, y_offset):
+import pickle
+import threading
+from threading import Thread
+import _thread
+import socket
+import os
+import pygame, sys, random
+from pygame.locals import *
+from pygame import font
+from Maps import *
+import Player
+import SimpleClient
+
+def LoginClient(username, s):
+   def displayPlayers(x_panel_position, y_panel_position, y_offset):
       for player in l_players:
          LOGIN_TOP_SURFACE.blit(SERVER_BAR, (x_panel_position, y_panel_position + y_offset))
         
@@ -9,6 +22,21 @@ def LoginClient():
          l_join_spots.append((x_panel_position + 1100, y_panel_position + 25, player[0]))
          y_panel_position += 100
    
+   def getPlayers():
+      while True:
+         packet = s.recv(4096)
+         info = pickle.loads(packet)
+         if info[0]:
+            break
+         else:
+            del l_players[:]
+            l_players = info[1]
+            
+      newServer = info[1]
+      SimpleClient.play(newServer, username)
+      
+            
+         
    
    # Initialize pygame
    pygame.init()
@@ -18,10 +46,6 @@ def LoginClient():
    LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background.png")
    BLACK_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background2.png")
    SERVER_BAR = pygame.image.load(IMAGE_FILE_PATH + "Server.png")
-   JOIN_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "JoinButton_pressed.png")
-   JOIN_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "JoinButton_unpressed.png")
-   REFRESH_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "RefreshButton_unpressed.png")
-   REFRESH_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "RefreshButton_pressed.png")
    UP_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "upArrow.png")
    DOWN_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "downArrow.png")
    BACK_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_unpressed.png")
@@ -31,25 +55,12 @@ def LoginClient():
    SERVER_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 35)
    width, height = SERVER_FONT.size("Username:")
 
-   BLACK = 1
-   WHITE = 2
-   RED = 3
-   GREEN = 4
-   BLUE = 5
-   BABY_BLUE = 6
-   BRIGHT_RED = 7
-   BRIGHT_GREEN = 8
-
    # Declare the username
    username = ""
-   no_username_message = SERVER_FONT.render("Please type your username", 1, (255,0,0))
 
    # Position of the text box
    X_POS = 100
    Y_POS = 725
-
-   # Initialize bad word filter
-   filter = ProfanitiesFilter(filterlist=bad_things, replacements="!")
 
    # Position of back button
    x_back_button = 5
@@ -117,14 +128,12 @@ def LoginClient():
             if event.key == K_UP:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
                y_offset -= 100
-               display_servers(x_panel_position, y_panel_position, y_offset)
             if event.key == K_DOWN:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
                if (SERVERS_AREA.x <= 100 and SERVERS_AREA.y <= 100):#put in server checking too need to find out how to get the position of a surface.
                   print("Servers area x is: " + str(SERVERS_AREA.x))
                   print("Servers area y is: " + str(SERVERS_AREA.y))
                   y_offset += 100
-                  display_servers(x_panel_position, y_panel_position, y_offset)
          if event.type == MOUSEBUTTONDOWN:
             # clicked back button
             if x_back_button <= curr_x <= x_back_button + 75 and y_back_button <= curr_y <= y_back_button + 50:
@@ -134,7 +143,7 @@ def LoginClient():
       # Blit the stuffs onto the screen
       username = filter.clean(username)
       LOGIN_TOP_SURFACE.blit(BLACK_BACKGROUND, (100, 100))
-      display_servers(x_panel_position, y_panel_position, y_offset)
+      displayPlayers(x_panel_position, y_panel_position, y_offset)
       LOGIN_TOP_SURFACE.blit(LOGIN_BACKGROUND, (0,0))
       LOGIN_TOP_SURFACE.blit(SERVER_FONT.render(username, 1, (0,0,0)), (285, Y_POS))
       LOGIN_TOP_SURFACE.blit(DOWN_ARROW, (arrow_x_pos, down_arrow_y_pos))

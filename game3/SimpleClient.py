@@ -43,6 +43,8 @@ HELP_COORDS = [1135, 820]
 # Graphics Constants
 INFO_BUY_UNITS = pygame.image.load(IMAGE_FILE_PATH + "InfoBuyUnits.png")
 INFO_ATTACK = pygame.image.load(IMAGE_FILE_PATH + "InfoAttack.png")
+INFO_RESOLVE = pygame.image.load(IMAGE_FILE_PATH + "InfoBattle.png")
+INFO_MOVE = pygame.image.load(IMAGE_FILE_PATH + "InfoMove.png")
 INFO_PISTOLEERS = pygame.image.load(IMAGE_FILE_PATH + "InfoPistoleers.png")
 INFO_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "InfoMusketeers.png")
 INFO_CANNONS = pygame.image.load(IMAGE_FILE_PATH + "InfoCannons.png")
@@ -76,8 +78,11 @@ MAP_FRAME = pygame.image.load(IMAGE_FILE_PATH + "MapFrame.png")
 MAP_LIGHT = pygame.image.load(IMAGE_FILE_PATH + "MapLighting.png")
 SELECTED_TILE = pygame.image.load(IMAGE_FILE_PATH + "Selected.png")
 ATTACK_OPTION = pygame.image.load(IMAGE_FILE_PATH + "AttackOption.png")
+MOVE_OPTION = pygame.image.load(IMAGE_FILE_PATH + "MoveOption.png")
 ATTACKER = pygame.image.load(IMAGE_FILE_PATH + "Attacker.png")
 DEFENDER = pygame.image.load(IMAGE_FILE_PATH + "Defender.png")
+SOURCE = pygame.image.load(IMAGE_FILE_PATH + "MoveSource.png")
+DESTINATION = pygame.image.load(IMAGE_FILE_PATH + "MoveDestination.png")
 WAITING = pygame.image.load(IMAGE_FILE_PATH + "Waiting.png")
 
 SEND_PISTOLEERS = pygame.image.load(IMAGE_FILE_PATH + "SendPistoleers.png")
@@ -92,17 +97,19 @@ MOVE_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "MoveMusketeers.png")
 MOVE_CANNONS    = pygame.image.load(IMAGE_FILE_PATH + "MoveCannons.png")
 MOVE_AIRSHIPS   = pygame.image.load(IMAGE_FILE_PATH + "MoveAirships.png")
 
-def blitInfo(DISPLAYSURF, map, phase_info, blitUnitInfo=True):
+
+def blitInfo(DISPLAYSURF, map, phase_info, displayUnitThings=True):
    curr_x, curr_y = pygame.mouse.get_pos()
    
-   if 170 <= curr_x <= 70 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120:
-      DISPLAYSURF.blit(INFO_PISTOLEERS, (0, 0))
-   elif 575 <= curr_x <= 575 + 250 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120:
-      DISPLAYSURF.blit(INFO_MUSKETEERS, (0, 0))
-   elif 170 <= curr_x <= 70 + 350 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175:
-      DISPLAYSURF.blit(INFO_CANNONS, (0, 0))
-   elif 575 <= curr_x <= 575 + 250 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175:
-      DISPLAYSURF.blit(INFO_AIRSHIPS, (0, 0))
+   if displayUnitThings:
+      if 170 <= curr_x <= 70 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120:
+         DISPLAYSURF.blit(INFO_PISTOLEERS, (0, 0))
+      elif 575 <= curr_x <= 575 + 250 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120:
+         DISPLAYSURF.blit(INFO_MUSKETEERS, (0, 0))
+      elif 170 <= curr_x <= 70 + 350 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175:
+         DISPLAYSURF.blit(INFO_CANNONS, (0, 0))
+      elif 575 <= curr_x <= 575 + 250 and map.HEIGHT * TILESIZE + 125 <= curr_y <= map.HEIGHT * TILESIZE + 175:
+         DISPLAYSURF.blit(INFO_AIRSHIPS, (0, 0))
    
    if 1085 <= curr_x <= 1185 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 175:
       DISPLAYSURF.blit(phase_info, (0, 0))
@@ -127,6 +134,24 @@ def blitBattle(map, DISPLAYSURF, attack_coords, defend_coords):
       DISPLAYSURF.blit(ATK_UPLEFT_DOWNRIGHT, (defend_coords[0] * TILESIZE, defend_coords[1] * TILESIZE))
    else:
       DISPLAYSURF.blit(ATK_DOWNLEFT_UPRIGHT, (min(attack_coords[0], defend_coords[0]) * TILESIZE, min(attack_coords[1], defend_coords[1]) * TILESIZE))
+
+def blitMove(map, DISPLAYSURF, source_coords, dest_coords):
+   if min(source_coords[0], dest_coords[0]) == 0 and max(source_coords[0], dest_coords[0]) == map.WIDTH - 1:
+      DISPLAYSURF.blit(MOVE_LEFT_EDGE, (0, (source_coords[1] if source_coords[0] == 0 else dest_coords[1]) * TILESIZE))
+      DISPLAYSURF.blit(MOVE_RIGHT_EDGE, ((map.WIDTH - 1) * TILESIZE, (source_coords[1] if dest_coords[0] == 0 else dest_coords[1]) * TILESIZE))
+   elif min(source_coords[1], dest_coords[1]) == 0 and max(source_coords[1], dest_coords[1]) == map.HEIGHT - 1:
+      DISPLAYSURF.blit(MOVE_TOP_EDGE, ((source_coords[0] if source_coords[1] == 0 else dest_coords[0]) * TILESIZE, 0))
+      DISPLAYSURF.blit(MOVE_BOTTOM_EDGE, ((source_coords[0] if dest_coords[1] == 0 else dest_coords[0]) * TILESIZE, (map.HEIGHT - 1) * TILESIZE))
+   elif source_coords[0] == dest_coords[0]:
+      DISPLAYSURF.blit(MOVE_TOP_BOTTOM, (source_coords[0] * TILESIZE, min(source_coords[1], dest_coords[1]) * TILESIZE))
+   elif source_coords[1] == dest_coords[1]:
+      DISPLAYSURF.blit(MOVE_LEFT_RIGHT, (min(source_coords[0], dest_coords[0]) * TILESIZE, source_coords[1] * TILESIZE))
+   elif source_coords[0] < dest_coords[0] and source_coords[1] < dest_coords[1]:
+      DISPLAYSURF.blit(MOVE_UPLEFT_DOWNRIGHT, (source_coords[0] * TILESIZE, source_coords[1] * TILESIZE))
+   elif source_coords[0] > dest_coords[0] and source_coords[1] > dest_coords[1]:
+      DISPLAYSURF.blit(MOVE_UPLEFT_DOWNRIGHT, (dest_coords[0] * TILESIZE, dest_coords[1] * TILESIZE))
+   else:
+      DISPLAYSURF.blit(MOVE_DOWNLEFT_UPRIGHT, (min(source_coords[0], dest_coords[0]) * TILESIZE, min(source_coords[1], dest_coords[1]) * TILESIZE))
 
 #a dictionary linking resources to textures
 textures =   {
@@ -252,6 +277,32 @@ def attackInfo(map, DISPLAYSURF, params):
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.archers), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 375))
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.cannons), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 425))
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.champions), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 475))
+    
+def moveInfo(map, DISPLAYSURF, params):
+   attacker = map.ll_map[params[0][1]][params[0][0]]
+   defender = params[1][0]
+   attackerUnits = params[1][1]
+   
+   DISPLAYSURF.blit(COUNTRY_FONT.render("From " + map.d_continents[attacker[0]][attacker[1]].name, True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 125))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("To " + map.d_continents[defender[0]][defender[1]].name, True, (0,0,0)), (map.WIDTH * TILESIZE + 120, 165))
+   
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Source", True, (0,0,0)), (map.WIDTH * TILESIZE + 210, 275))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Destination", True, (0,0,0)), (map.WIDTH * TILESIZE + 360, 275))
+   
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Pistoleers:", True, (0,0,0)), (map.WIDTH * TILESIZE + 75, 325))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Musketeers:", True, (0,0,0)), (map.WIDTH * TILESIZE + 75, 375))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Cannons:", True, (0,0,0)), (map.WIDTH * TILESIZE + 75, 425))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Airships:", True, (0,0,0)), (map.WIDTH * TILESIZE + 75, 475))
+   
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(attackerUnits.infantry) + "/" + str(map.d_continents[attacker[0]][attacker[1]].unit_counts.infantry), True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 325))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(attackerUnits.archers) + "/" + str(map.d_continents[attacker[0]][attacker[1]].unit_counts.archers), True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 375))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(attackerUnits.cannons) + "/" + str(map.d_continents[attacker[0]][attacker[1]].unit_counts.cannons), True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 425))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(attackerUnits.champions) + "/" + str(map.d_continents[attacker[0]][attacker[1]].unit_counts.champions), True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 475))
+   
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.infantry), True, (0,0,0)), (map.WIDTH * TILESIZE + 400, 325))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.archers), True, (0,0,0)), (map.WIDTH * TILESIZE + 400, 375))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.cannons), True, (0,0,0)), (map.WIDTH * TILESIZE + 400, 425))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.champions), True, (0,0,0)), (map.WIDTH * TILESIZE + 400, 475))
    
 def battleInfo(map, DISPLAYSURF, params):
    attacker = map.ll_map[params[0][1]][params[0][0]]
@@ -709,7 +760,7 @@ def resolveAttacks(DISPLAYSURF, map, player, socket, host_address):
                if RETREAT_COORDS[0] <= curr_x <= RETREAT_COORDS[0] + 200 and RETREAT_COORDS[1] <= curr_y <= RETREAT_COORDS[1] + 100:
                   l_attacks[2][map.ll_map[l_attackers[attack][1]][l_attackers[attack][0]]][2] = True
                   attack += 1
-          if l_attackers != None and len(l_attackers) > attack:
+          if len(l_attackers) > attack:
             printMap(map, DISPLAYSURF, battleInfo, (l_attackers[attack], l_attacks[2][map.ll_map[l_attackers[attack][1]][l_attackers[attack][0]]]))
           else:
             printMap(map, DISPLAYSURF, standardInfo)
@@ -730,6 +781,8 @@ def resolveAttacks(DISPLAYSURF, map, player, socket, host_address):
             DISPLAYSURF.blit(RETREATLIT, (RETREAT_COORDS[0], RETREAT_COORDS[1]))
           else:
             DISPLAYSURF.blit(RETREAT, (RETREAT_COORDS[0], RETREAT_COORDS[1]))
+    
+          blitInfo(DISPLAYSURF, map, INFO_RESOLVE, False)
           
           #update the display
           pygame.display.update()
@@ -829,7 +882,7 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address):
          printMap(map, DISPLAYSURF, standardInfo)
       else:
          if [selectedCountry[0], selectedCountry[1]] in l_senders:
-            printMap(map,  DISPLAYSURF, attackInfo, (selectedCountry, d_moves[map.ll_map[selectedCountry[1]][selectedCountry[0]]]))
+            printMap(map,  DISPLAYSURF, moveInfo, (selectedCountry, d_moves[map.ll_map[selectedCountry[1]][selectedCountry[0]]]))
          else:
             printMap(map, DISPLAYSURF, selectedInfo, selectedCountry)
 
@@ -839,48 +892,48 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address):
       if selectedCountry != None and not (selectedCountry in l_senders):
          current_tile = map.ll_map[(selectedCountry[1] + 1) % map.HEIGHT][(selectedCountry[0] + 1) % map.WIDTH]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner == player.user_name):
-            DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] + 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1] + 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
+            DISPLAYSURF.blit(MOVE_OPTION, (((selectedCountry[0] + 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1] + 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
             l_neighbors.append([(selectedCountry[0] + 1) % map.WIDTH, (selectedCountry[1] + 1) % map.HEIGHT])
             
          current_tile = map.ll_map[(selectedCountry[1] - 1) % map.HEIGHT][(selectedCountry[0] + 1) % map.WIDTH]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner == player.user_name):
-            DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] + 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1] - 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
+            DISPLAYSURF.blit(MOVE_OPTION, (((selectedCountry[0] + 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1] - 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
             l_neighbors.append([(selectedCountry[0] + 1) % map.WIDTH, (selectedCountry[1] - 1) % map.HEIGHT])
             
          current_tile = map.ll_map[(selectedCountry[1]) % map.HEIGHT][(selectedCountry[0] + 1) % map.WIDTH]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner == player.user_name):
-            DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] + 1) % map.WIDTH) * TILESIZE, (selectedCountry[1]) * TILESIZE), special_flags=BLEND_ADD)
+            DISPLAYSURF.blit(MOVE_OPTION, (((selectedCountry[0] + 1) % map.WIDTH) * TILESIZE, (selectedCountry[1]) * TILESIZE), special_flags=BLEND_ADD)
             l_neighbors.append([(selectedCountry[0] + 1) % map.WIDTH, (selectedCountry[1])])
             
          current_tile = map.ll_map[(selectedCountry[1] + 1) % map.HEIGHT][(selectedCountry[0] - 1) % map.WIDTH]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner == player.user_name):
-            DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] - 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1] + 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
+            DISPLAYSURF.blit(MOVE_OPTION, (((selectedCountry[0] - 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1] + 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
             l_neighbors.append([(selectedCountry[0] - 1) % map.WIDTH, (selectedCountry[1] + 1) % map.HEIGHT])
             
          current_tile = map.ll_map[(selectedCountry[1] - 1) % map.HEIGHT][(selectedCountry[0] - 1) % map.WIDTH]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner == player.user_name):
-            DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] - 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1] - 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
+            DISPLAYSURF.blit(MOVE_OPTION, (((selectedCountry[0] - 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1] - 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
             l_neighbors.append([(selectedCountry[0] - 1) % map.WIDTH, (selectedCountry[1] - 1) % map.HEIGHT])
             
          current_tile = map.ll_map[selectedCountry[1]][(selectedCountry[0] - 1) % map.WIDTH]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner == player.user_name):
-            DISPLAYSURF.blit(ATTACK_OPTION, (((selectedCountry[0] - 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1]) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
+            DISPLAYSURF.blit(MOVE_OPTION, (((selectedCountry[0] - 1) % map.WIDTH) * TILESIZE, ((selectedCountry[1]) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
             l_neighbors.append([(selectedCountry[0] - 1) % map.WIDTH, (selectedCountry[1]) % map.HEIGHT])
             
          current_tile = map.ll_map[(selectedCountry[1] + 1) % map.HEIGHT][selectedCountry[0]]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner == player.user_name):
-            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0]) * TILESIZE, ((selectedCountry[1] + 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
+            DISPLAYSURF.blit(MOVE_OPTION, ((selectedCountry[0]) * TILESIZE, ((selectedCountry[1] + 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
             l_neighbors.append([(selectedCountry[0]), (selectedCountry[1] + 1) % map.HEIGHT])
             
          current_tile = map.ll_map[(selectedCountry[1] - 1) % map.HEIGHT][selectedCountry[0]]
          if (False if current_tile == map.WATER else map.d_continents[current_tile[0]][current_tile[1]].owner == player.user_name):
-            DISPLAYSURF.blit(ATTACK_OPTION, ((selectedCountry[0]) * TILESIZE, ((selectedCountry[1] - 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
+            DISPLAYSURF.blit(MOVE_OPTION, ((selectedCountry[0]) * TILESIZE, ((selectedCountry[1] - 1) % map.HEIGHT) * TILESIZE), special_flags=BLEND_ADD)
             l_neighbors.append([(selectedCountry[0]), (selectedCountry[1] - 1) % map.HEIGHT])
             
       for army in range(len(l_senders)):
-         DISPLAYSURF.blit(DEFENDER, (l_receivers[army][0] * TILESIZE, l_receivers[army][1] * TILESIZE), special_flags=BLEND_ADD)
-         blitBattle(map, DISPLAYSURF, l_senders[army], l_receivers[army])
-         DISPLAYSURF.blit(ATTACKER, (l_senders[army][0] * TILESIZE, l_senders[army][1] * TILESIZE), special_flags=BLEND_ADD)
+         DISPLAYSURF.blit(DESTINATION, (l_receivers[army][0] * TILESIZE, l_receivers[army][1] * TILESIZE), special_flags=BLEND_ADD)
+         blitMove(map, DISPLAYSURF, l_senders[army], l_receivers[army])
+         DISPLAYSURF.blit(SOURCE, (l_senders[army][0] * TILESIZE, l_senders[army][1] * TILESIZE), special_flags=BLEND_ADD)
     
       DISPLAYSURF.blit(MOVE_PISTOLEERS, (170, map.HEIGHT * TILESIZE + 70))
       DISPLAYSURF.blit(MOVE_MUSKETEERS, (575, map.HEIGHT * TILESIZE + 70))
@@ -888,7 +941,7 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address):
       DISPLAYSURF.blit(MOVE_AIRSHIPS, (575, map.HEIGHT * TILESIZE + 125))
       DISPLAYSURF.blit(DONE_BUTTON if player.unit_counts > 0 else DONE_BUTTON_ACTIVE, (980, map.HEIGHT * TILESIZE + 70))
     
-      blitInfo(DISPLAYSURF, map, INFO_ATTACK)
+      blitInfo(DISPLAYSURF, map, INFO_MOVE)
     
       #update the display
       pygame.display.update()

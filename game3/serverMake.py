@@ -410,7 +410,7 @@ def MakeServer():
       if pushed_back == True:
          server_socket.close()
          return
-      if servername == "" and just_accessed == False:
+      if servername == "":
          DISPLAYSURF.blit(no_servername_message, (x_no_servername, y_no_servername))
          #print(str(x_mouse_position_main) + str(y_mouse_position_main))
         # print("clicked mounce here")
