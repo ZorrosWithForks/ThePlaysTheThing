@@ -97,6 +97,7 @@ MOVE_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "MoveMusketeers.png")
 MOVE_CANNONS    = pygame.image.load(IMAGE_FILE_PATH + "MoveCannons.png")
 MOVE_AIRSHIPS   = pygame.image.load(IMAGE_FILE_PATH + "MoveAirships.png")
 
+
 def blitInfo(DISPLAYSURF, map, phase_info, displayUnitThings=True):
    curr_x, curr_y = pygame.mouse.get_pos()
    
@@ -242,8 +243,8 @@ def selectedInfo(map, DISPLAYSURF, params):
    DISPLAYSURF.blit(COUNTRY_FONT.render("Airships: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.champions), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 300))
     
    # Country bonuses
-   DISPLAYSURF.blit(COUNTRY_FONT.render("Attack Bonus: " + str(map.d_continents[current_tile[0]][current_tile[1]].attack_bonus), True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 100, 350))
-   DISPLAYSURF.blit(COUNTRY_FONT.render("Defense Bonus: " + str(map.d_continents[current_tile[0]][current_tile[1]].defense_bonus), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 100, 375))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Attack Bonus: " + str(map.d_continents[current_tile[0]][current_tile[1]].attack_bonus) + "%" , True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 100, 350))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Defense Bonus: " + str(map.d_continents[current_tile[0]][current_tile[1]].defense_bonus) + "%", True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 100, 375))
     
    # Owner
    DISPLAYSURF.blit(COUNTRY_FONT.render("Owner: " + str(map.d_continents[current_tile[0]][current_tile[1]].owner if map.d_continents[current_tile[0]][current_tile[1]].owner != None else "Neutral"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 425))
@@ -406,7 +407,6 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address):
    placing = True
    selectedCountry = None
    temp_map = Map(map_to_copy=map, copy_player_name=player.user_name)
-   pygame.mouse.set_pos(HELP_COORDS)
    while placing:
        #get all the user events
        curr_x, curr_y = pygame.mouse.get_pos()
@@ -542,7 +542,6 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
    l_attackers = []
    l_defenders = []
    
-   pygame.mouse.set_pos(HELP_COORDS)
    while declaring:
        #get all the user events
        curr_x, curr_y = pygame.mouse.get_pos()
@@ -788,6 +787,8 @@ def resolveAttacks(DISPLAYSURF, map, player, socket, host_address):
       if resolving:    
          packet = pickle.dumps((l_attackers, l_defenders, l_attacks[2], player))
          socket.sendto(packet, host_address)
+         
+      detectGameEnd(DISPLAYSURF, map, player, socket)
    return map
 
 
@@ -800,7 +801,6 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address):
    l_receivers = []
    moving = True
    
-   pygame.mouse.set_pos(HELP_COORDS)
    while moving:
       #get all the user events
       curr_x, curr_y = pygame.mouse.get_pos()
@@ -976,7 +976,43 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address):
       pygame.display.update()
       
    return newMap
+
+def detectGameEnd(DISPLAYSURF, map, player, socket):
+   Won = True
+   Lost = True
+
+   for cont_name in map.d_continents.keys():
+      for country in map.d_continents[cont_name]:
+         if country.owner == player.user_name:
+            Lost = False
+         else:
+            Won = False
+   
+   if Lost:
+      LOSER = pygame.image.load(IMAGE_FILE_PATH + "InfoDefeat.png")
+      while True:
+         for event in pygame.event.get():
+            #if the user wants to quit
+            handleGeneral(event, map)
          
+         printMap(map, DISPLAYSURF, standardInfo)
+         DISPLAYSURF.fill((255, 20, 20), special_flags=BLEND_MULT)
+         DISPLAYSURF.blit(LOSER, (0, 0))
+         #update the display
+         pygame.display.update()
+   elif Won:
+      WINNER = pygame.image.load(IMAGE_FILE_PATH + "InfoVictory.png")
+      while True:
+         for event in pygame.event.get():
+            #if the user wants to quit
+            handleGeneral(event, map)
+         
+         printMap(map, DISPLAYSURF, standardInfo)
+         DISPLAYSURF.fill((50, 120, 255), special_flags=BLEND_MULT)
+         DISPLAYSURF.blit(WINNER, (0, 0))
+         #update the display
+         pygame.display.update()
+   
 def play(host_address, player_name):
    #set up the display
    print("Enter play")
