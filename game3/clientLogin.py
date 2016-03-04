@@ -49,16 +49,7 @@ def LoginClient():
    def printme():
       print ("printme")
 
-   # Program functions
-   def joinGame(ip):
-      print("attempting to join " + ip)
-      s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-      addr = (ip, 9999)
-      
-      s.connect(addr)
-      s.sendto(username.encode('ascii'), addr)
-      print("joined")
-      # put here? something that will tell if it has been booted. if so, return to the main menu
+   def joined(username, s):
       new_server = (s.recv(1024).decode(), 9998)
       if new_server[0] == "boot":
          s.close()
@@ -68,6 +59,22 @@ def LoginClient():
       else:
          s.close()
          SimpleClient.play(new_server, username)
+         
+   # Program functions
+   def joinGame(ip):
+      print("attempting to join " + ip)
+      s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      addr = (ip, 9999)
+      
+      s.connect(addr)
+      s.sendto(username.encode('ascii'), addr)
+      print("joined")
+      # When joined the server, spin thread to wait for server response
+      t_joined = threading.Thread(target=joined, args=(username, s))
+      t_joined.daemon = True
+      t_joined.start()
+
+      clientJoined.Joined()
 
    def display_servers(x_panel_position, y_panel_position, y_offset):
       for server in l_servers:
