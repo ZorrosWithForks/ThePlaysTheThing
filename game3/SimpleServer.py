@@ -291,6 +291,15 @@ def receiveAttacks(l_players, serversocket, map, address):
          response = player.connection.recv(8192)
          packet = pickle.loads(response)
          l_attacks.append(packet)
+      
+      l_temp_players = []
+      for player in l_players:
+         for name, continent in map.d_continents.items():
+            for country in continent:
+               if country.owner == player.user_name and player not in l_temp_players:
+                  l_temp_players.append(player)
+      
+      l_players = l_temp_players
             
    for i in range(len(l_players)):
       curr_connection = l_players[i].connection
@@ -299,6 +308,8 @@ def receiveAttacks(l_players, serversocket, map, address):
       curr_connection.sendto(packet, address)
       l_players[i].connection = curr_connection
       print("Sent final map to: " + l_players[i].user_name)
+      
+   return l_players
       
 def receiveMoves(l_players, serversocket, map, address):
    l_moves = [] # list of tuples (l_senders, l_receivers, d_moves)
@@ -341,7 +352,20 @@ def receiveMoves(l_players, serversocket, map, address):
       curr_connection.sendto(packet, address)
       player.connection = curr_connection
       print("Sent moves to: " + player.user_name)
-      
+
+def applyContinentBonuses(l_players, map):
+   for player in l_players:
+      for continent_name, continent in map.d_continents.items():
+         owns_continent = True
+         i = 0
+         while i < len(continent) and owns_continent:
+            owns_continent = continent[i].owner == player.user_name
+            i += 1
+         
+         if owns_continent:
+            player.unit_counts += map.d_bonuses[continent_name]
+            print("Awarding bonus for " + continent_name + " to " + player.user_name + ".")
+
 def serve(player_count):   
    l_players = []
    
@@ -387,9 +411,10 @@ def serve(player_count):
    
    while True:
       receivePlacements(l_players, serversocket, map, addr)
-      receiveAttacks(l_players, serversocket, map, addr)
+      l_players = receiveAttacks(l_players, serversocket, map, addr)
       print("Server: exited receiveAttacks")
       receiveMoves(l_players, serversocket, map, addr)
+      applyContinentBonuses(l_players, map)
       #temp = input("pausing the server")
    
    serversocket.close()
