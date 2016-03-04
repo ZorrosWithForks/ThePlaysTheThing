@@ -62,8 +62,9 @@ def LoginClient():
       new_server = (s.recv(1024).decode(), 9998)
       if new_server[0] == "boot":
          s.close()
+         client_socket.close()
          print("Got booted")
-         return
+         LoginClient()
       else:
          s.close()
          SimpleClient.play(new_server, username)
@@ -359,11 +360,9 @@ def LoginClient():
             # clicked join
             for join_button in l_join_spots:
                if join_button[0] <= x_mouse_position_main <= join_button[0] + 200 and join_button[1] <= y_mouse_position_main <= join_button[1] + 100:
-                  print("\nhow many times does this print?\n")
                   if username == "":
                      LOGIN_TOP_SURFACE.blit(no_username_message, (200, 800))
                   else:
-                     print("ME IS HERE TOO MUCH")
                      joinGame(join_button[2])
                   x_mouse_position_main = 0
                   y_mouse_position_main = 0

@@ -334,7 +334,6 @@ bad_things = [
                "rusty trombone",
                "s&m",
                "sadism",
-               "scat",
                "schlong",
                "scissoring",
                "semen",
