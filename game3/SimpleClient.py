@@ -780,11 +780,11 @@ def resolveAttacks(DISPLAYSURF, map, player, socket, host_address):
             DISPLAYSURF.blit(RETREATLIT, (RETREAT_COORDS[0], RETREAT_COORDS[1]))
           else:
             DISPLAYSURF.blit(RETREAT, (RETREAT_COORDS[0], RETREAT_COORDS[1]))
-    
-          blitInfo(DISPLAYSURF, map, INFO_RESOLVE, False)
           
           if len(l_attackers) > attack:
             DISPLAYSURF.blit(HIGHLIGHT_ATTACK, (l_attackers[attack][0] * TILESIZE - 50, l_attackers[attack][1] * TILESIZE - 50), special_flags=BLEND_ADD)
+    
+          blitInfo(DISPLAYSURF, map, INFO_RESOLVE, False)
           
           #update the display
           pygame.display.update()
@@ -826,6 +826,9 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address):
                         l_receivers.remove([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
                         l_senders.remove([selectedCountry[0], selectedCountry[1]])
                         d_moves[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = None
+                     elif [selectedCountry[0], selectedCountry[1]] in l_senders:
+                        l_neighbors = []
+                        selectedCountry = [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]
                   elif map.d_continents[curr_country[0]][curr_country[1]].owner == player.user_name and selectedCountry != [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]: # if the user clicked his own country and not a selected country
                      l_neighbors = []
                      selectedCountry = [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]
