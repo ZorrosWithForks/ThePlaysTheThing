@@ -43,10 +43,21 @@ def receivePlacements(l_players, serversocket, map, address):
    for player in l_players:
       d_players[player.user_name] = player
    
-   for player in l_players:
-      response = player.connection.recv(8192)
-      placement = pickle.loads(response)
-      l_placements.append(placement)
+   tempPlayers = copy.copy(l_players)
+   for player in tempPlayers:
+      try:
+         response = player.connection.recv(8192)
+         placement = pickle.loads(response)
+         l_placements.append(placement)
+      except:
+         l_players.remove(player)
+         for continent in map.l_continent_names:
+            for country in range(len(map.d_continents[continent])):
+               if map.d_continents[continent][country].owner == player.user_name:
+                  map.d_continents[continent][country].owner = "Unoccupied"
+               
+               
+         
    
    #print("I got it! Yay!")
 
@@ -228,10 +239,18 @@ def receiveAttacks(l_players, serversocket, map, address):
    for player in l_players:
       d_players[player.user_name] = player
    
-   for player in l_players:
-      response = player.connection.recv(8192)
-      packet = pickle.loads(response)
-      l_attacks.append(packet)
+   tempPlayers = copy.copy(l_players)
+   for player in tempPlayers:
+      try:
+         response = player.connection.recv(8192)
+         packet = pickle.loads(response)
+         l_attacks.append(packet)
+      except:
+         l_players.remove(player)
+         for continent in map.l_continent_names:
+            for country in range(len(map.d_continents[continent])):
+               if map.d_continents[continent][country].owner == player.user_name:
+                  map.d_continents[continent][country].owner = "Unoccupied"
    
    attackCount = 0
    for player in l_attacks:
@@ -287,10 +306,18 @@ def receiveAttacks(l_players, serversocket, map, address):
             attackCount += 1
             
       del l_attacks[:]
+      tempPlayers = copy.copy(l_players)
       for player in l_players:
-         response = player.connection.recv(8192)
-         packet = pickle.loads(response)
-         l_attacks.append(packet)
+         try:
+            response = player.connection.recv(8192)
+            packet = pickle.loads(response)
+            l_attacks.append(packet)
+         except:
+            l_players.remove(player)
+            for continent in map.l_continent_names:
+               for country in range(len(map.d_continents[continent])):
+                  if map.d_continents[continent][country].owner == player.user_name:
+                     map.d_continents[continent][country].owner = "Unoccupied"
       
       l_temp_players = []
       for player in l_players:
@@ -314,11 +341,19 @@ def receiveAttacks(l_players, serversocket, map, address):
 def receiveMoves(l_players, serversocket, map, address):
    l_moves = [] # list of tuples (l_senders, l_receivers, d_moves)
    
+   tempPlayers = copy.copy(l_players)
    for player in l_players:
-      response = player.connection.recv(8192)
-      packet = pickle.loads(response)
-      l_moves.append(packet)
-      player.unit_counts = 0
+      try:
+         response = player.connection.recv(8192)
+         packet = pickle.loads(response)
+         l_moves.append(packet)
+         player.unit_counts = 0
+      except:
+         l_players.remove(player)
+         for continent in map.l_continent_names:
+            for country in range(len(map.d_continents[continent])):
+               if map.d_continents[continent][country].owner == player.user_name:
+                  map.d_continents[continent][country].owner = "Unoccupied"
       
    for player in l_moves:
       for send in range(len(player[0])):

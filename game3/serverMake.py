@@ -30,6 +30,17 @@ def MakeServer():
          packet = pickle.dumps((host, servername)) 
          server_socket.sendto(packet, addr)
 
+   def sendToJoinedClient(clients):
+      send_to_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      send_to_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
+      port = 9997
+      addr = (host, port)
+      send_to_socket.bind(addr)
+      recv_data, client_addr = send_to_socket.recvfrom(4096)
+      host_clients_servername = pickle.dumps((host, clients, servername))
+      send_to_socket.sendto(host_clients_servername, client_addr)
+      #ended seeing if this will connect
+         
    def acceptPlayers():
       print("made it to accept players")
       serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -37,7 +48,7 @@ def MakeServer():
       addr = (host, port)
       serversocket.bind((host, port))
       serversocket.listen(5)
-      while True: # this causes my join spots to go high
+      while True:
          client, client_address = serversocket.accept()
          player_name = client.recv(4096).decode()
          thread.append(Thread(target=listener, args = (client, client_address, clients, serversocket, player_name)).start())
@@ -61,6 +72,10 @@ def MakeServer():
             clients.remove(client)
             client.close()
             
+      t_connected_client = threading.Thread(target=sendToJoinedClient, args=(clients,))
+      t_connected_client.daemon = True
+      t_connected_client.start()
+      
    def display_players(x_panel_position, y_panel_position, player_name):
       #print("Number of clients: " + str(len(clients)))
       del l_boot_spots[:]
