@@ -72,6 +72,7 @@ MOVE_DOWNLEFT_UPRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_UR_BL.png
 
 MOUSE_OVER = pygame.image.load(IMAGE_FILE_PATH + 'MouseOver.png')
 MOUSE_OVER_UNKNOWN = pygame.image.load(IMAGE_FILE_PATH + 'MouseOverUnknown.png')
+HIGHLIGHT_ATTACK = pygame.image.load(IMAGE_FILE_PATH + 'CurrentAttack.png')
 INFO_MARQUEE = pygame.image.load(IMAGE_FILE_PATH + "InfoMarque.png")
 INFO_OVERLAY = pygame.image.load(IMAGE_FILE_PATH + "InfoMarqueOverlay.png")
 MAP_FRAME = pygame.image.load(IMAGE_FILE_PATH + "MapFrame.png")
@@ -209,8 +210,8 @@ def standardInfo(map, DISPLAYSURF, params):
       DISPLAYSURF.blit(COUNTRY_FONT.render("Airships: " + (str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.champions) if country_known else "?"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 300))
       
       # Country bonuses
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Attack Bonus: " + (str(map.d_continents[current_tile[0]][current_tile[1]].attack_bonus) if country_known else "?"), True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 100, 350))
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Defense Bonus: " + (str(map.d_continents[current_tile[0]][current_tile[1]].defense_bonus) if country_known else "?"), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 100, 375))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Attack Bonus: " + (str(map.d_continents[current_tile[0]][current_tile[1]].attack_bonus) + "%" if country_known else "?"), True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 100, 350))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Defense Bonus: " + (str(map.d_continents[current_tile[0]][current_tile[1]].defense_bonus) + "%" if country_known else "?"), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 100, 375))
       
       # Owner
       DISPLAYSURF.blit(COUNTRY_FONT.render("Owner: " + (str(map.d_continents[current_tile[0]][current_tile[1]].owner) if country_known else "?"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 425))
@@ -781,6 +782,9 @@ def resolveAttacks(DISPLAYSURF, map, player, socket, host_address):
             DISPLAYSURF.blit(RETREAT, (RETREAT_COORDS[0], RETREAT_COORDS[1]))
     
           blitInfo(DISPLAYSURF, map, INFO_RESOLVE, False)
+          
+          if len(l_attackers) > attack:
+            DISPLAYSURF.blit(HIGHLIGHT_ATTACK, (l_attackers[attack][0] * TILESIZE - 50, l_attackers[attack][1] * TILESIZE - 50), special_flags=BLEND_ADD)
           
           #update the display
           pygame.display.update()
