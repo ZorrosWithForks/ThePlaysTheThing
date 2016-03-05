@@ -10,37 +10,46 @@ from pygame import font
 from Maps import *
 import Player
 import SimpleClient
+import copy
 
+l_players = []
 def LoginClient(username, s):
    def displayPlayers(x_panel_position, y_panel_position, y_offset):
-      for player in l_players:
+      tempPlayers = copy.copy(l_players)
+      for player in tempPlayers:
          LOGIN_TOP_SURFACE.blit(SERVER_BAR, (x_panel_position, y_panel_position + y_offset))
         
          # display the name of the player
-         LOGIN_TOP_SURFACE.blit(SERVER_FONT.render(str(player[1]), True, (0,0,0)), (x_panel_position + 50, y_panel_position + 25 + y_offset))
-         LOGIN_TOP_SURFACE.blit(JOIN_BUTTON_UNPRESSED, (x_panel_position + 1100, y_panel_position + 25 + y_offset))
-         l_join_spots.append((x_panel_position + 1100, y_panel_position + 25, player[0]))
+         LOGIN_TOP_SURFACE.blit(SERVER_FONT.render(player, True, (0,0,0)), (x_panel_position + 50, y_panel_position + 25 + y_offset))
          y_panel_position += 100
    
    def getPlayers():
+      global joined
+      global l_players
       while True:
          packet = s.recv(4096)
          info = pickle.loads(packet)
          if info[0]:
-            break
+            newServer = (info[1], 9998)
+            s.close()
+            SimpleClient.play(newServer, username)
          else:
-            del l_players[:]
-            l_players = info[1]
-            
-      newServer = info[1]
-      SimpleClient.play(newServer, username)
+            if info[2] == "boot":
+               s.close()
+               print("Got booted")
+               joined = False
+               return
+            else:
+               if len(l_players) > 0:
+                  del l_players[:]
+               l_players = copy.copy(info[1])
+               l_players.insert(0, info[2])
       
-            
-         
    
    # Initialize pygame
    pygame.init()
 
+   
    # Graphics Constants
    IMAGE_FILE_PATH = "ImageFiles\\"
    LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background.png")
@@ -54,9 +63,6 @@ def LoginClient(username, s):
    # Declare Server Font
    SERVER_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 35)
    width, height = SERVER_FONT.size("Username:")
-
-   # Declare the username
-   username = ""
 
    # Position of the text box
    X_POS = 100
@@ -85,26 +91,12 @@ def LoginClient(username, s):
    # Declare the Surface
    LOGIN_TOP_SURFACE = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 
-   # Client network stuff
-   l_servers = []
-   address = ('255.255.255.255', 8080)
-   data = "Request"
-   temp = socket.gethostbyname_ex(socket.gethostname())[-1]
-   host = temp[-1]
-   # Main starts here
-   client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-   client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-   client_socket.bind((host, 8080))
-   client_socket.sendto(data.encode('ascii'), address)
-
-   print("Made it")
-   t_search = threading.Thread(target=search, args=(x_panel_position, y_panel_position, y_offset))
+   t_search = threading.Thread(target=getPlayers)
    t_search.daemon = True
    t_search.start()
-   print("Am I here?")
-   
+   joined = True
    # Get the username
-   while True:
+   while joined:
       curr_x, curr_y = pygame.mouse.get_pos()
       
       #get user events
@@ -137,11 +129,10 @@ def LoginClient(username, s):
          if event.type == MOUSEBUTTONDOWN:
             # clicked back button
             if x_back_button <= curr_x <= x_back_button + 75 and y_back_button <= curr_y <= y_back_button + 50:
-               client_socket.close()
+               s.close()
                return(True)
                         
       # Blit the stuffs onto the screen
-      username = filter.clean(username)
       LOGIN_TOP_SURFACE.blit(BLACK_BACKGROUND, (100, 100))
       displayPlayers(x_panel_position, y_panel_position, y_offset)
       LOGIN_TOP_SURFACE.blit(LOGIN_BACKGROUND, (0,0))
@@ -155,3 +146,5 @@ def LoginClient(username, s):
       waiting_on_players = SERVER_FONT.render("Waiting on players:", 1, (0,255,255))
                
       pygame.display.update()
+      
+   return

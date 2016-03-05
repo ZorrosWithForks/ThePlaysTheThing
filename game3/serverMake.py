@@ -37,29 +37,23 @@ def MakeServer():
       addr = (host, port)
       serversocket.bind((host, port))
       serversocket.listen(5)
-      while True: # this causes my join spots to go high
+      while True:
          client, client_address = serversocket.accept()
          player_name = client.recv(4096).decode()
-         thread.append(Thread(target=listener, args = (client, client_address, clients, serversocket, player_name)).start())
-         display_players(x_panel_position, y_panel_position, player_name)
-
-   def listener(client, client_address, clients, serversocket, player_name):
-      print("Accepted connection from: ", client_address)
-      with clients_lock:
          l_temp = (client, player_name, client_address)
-         clients.add(l_temp)#Array of clients
-      try:
-         while True:
-            ready_to_read, ready_to_write, in_error = \
-               select.select([serversocket,], [serversocket,], [], 5)
+         clients.append(l_temp) #Array of clients
+         tempClients = copy.copy(clients)
+         for player in tempClients:
+            l_playerNames = []
+            for name in clients:
+               l_playerNames.append(name[1])
+            packet = pickle.dumps((False, l_playerNames, servername))
+            try:
+               player[0].sendto(packet, player[2])
+            except:
+               clients.remove(player)
+               print("Removed client: " + player[1])
                
-      except select.error:
-         print("connection error")
-               
-      finally:
-         with clients_lock:
-            clients.remove(client)
-            client.close()
             
    def display_players(x_panel_position, y_panel_position, player_name):
       #print("Number of clients: " + str(len(clients)))
@@ -82,7 +76,8 @@ def MakeServer():
          
    def start_game():
       for client in clients:
-         client[0].sendto(host.encode("ascii"), client[2])
+         packet = pickle.dumps((True, host))
+         client[0].sendto(packet, client[2])
       addr = (host, 9998)
       t_become_server = threading.Thread(target=SimpleServer.serve, args=(len(clients) + 1,))
       t_become_server.daemon = True
@@ -226,7 +221,7 @@ def MakeServer():
    DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 
    thread = []
-   clients = set()
+   clients = []
    clients_lock = threading.Lock()
    temp = socket.gethostbyname_ex(socket.gethostname())[-1]
    host = temp[-1]
@@ -238,6 +233,7 @@ def MakeServer():
    # Play the game when the play button is pressed
    while True:
       DISPLAYSURF.blit(BLACK_BACKGROUND, (100, 100))
+      tempPlayers = copy.copy(clients)
       display_players(x_panel_position, y_panel_position, None)
       
       for event in pygame.event.get():
@@ -387,8 +383,15 @@ def MakeServer():
                   temp_client_set = copy.copy(clients)
                   for client in temp_client_set:
                      if client[1] == boot_spot[2]: # check to see if the names match
-                        client[0].sendto(booted.encode("ascii"), client[2])
+                        packet = pickle.dumps((False, [], booted))
+                        client[0].sendto(packet, client[2])
                         clients.remove(client)
+                        for player in clients:
+                           l_playerNames = []
+                           for name in clients:
+                              l_playerNames.append(name[1])
+                           packet = pickle.dumps((False, l_playerNames, servername))
+                           player[0].sendto(packet, player[2])
                         print("\ndeleted: " + boot_spot[2] + client[1])
   
 

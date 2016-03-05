@@ -12,7 +12,7 @@ import random
 import re
 from bad_stuff import *
 #import main_menu
-import clientWait
+import clientJoined
 
 def LoginClient():
    def button(msg, x, y, w, h, button_pressed,button_unpressed):
@@ -59,15 +59,8 @@ def LoginClient():
       s.sendto(username.encode('ascii'), addr)
       print("joined")
       # put here? something that will tell if it has been booted. if so, return to the main menu
-      new_server = (s.recv(1024).decode(), 9998)
-      if new_server[0] == "boot":
-         s.close()
-         client_socket.close()
-         print("Got booted")
-         LoginClient()
-      else:
-         s.close()
-         SimpleClient.play(new_server, username)
+      clientJoined.LoginClient(username, s)
+      print("returned from clientJoined")
 
    def display_servers(x_panel_position, y_panel_position, y_offset):
       for server in l_servers:
@@ -99,7 +92,7 @@ def LoginClient():
       print("requesting servers")
       del l_servers[:]
       y_offset = 0
-      print("servers after deleeting: ", str(l_servers))
+      print("servers after deleting: ", str(l_servers))
       client_socket.sendto(data.encode('ascii'), address)
 
    # Initialize pygame
