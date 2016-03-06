@@ -13,6 +13,8 @@ import SimpleClient
 import copy
 
 l_players = []
+play = False
+newServer = None
 def LoginClient(username, s):
    def displayPlayers(x_panel_position, y_panel_position, y_offset):
       tempPlayers = copy.copy(l_players)
@@ -26,13 +28,15 @@ def LoginClient(username, s):
    def getPlayers():
       global joined
       global l_players
+      global play
+      global newServer
       while True:
          packet = s.recv(4096)
          info = pickle.loads(packet)
          if info[0]:
             newServer = (info[1], 9998)
             s.close()
-            SimpleClient.play(newServer, username)
+            play = True
          else:
             if info[2] == "boot":
                s.close()
@@ -144,7 +148,10 @@ def LoginClient(username, s):
       else:
          LOGIN_TOP_SURFACE.blit(BACK_BUTTON_UNPRESSED, (x_back_button,y_back_button))
       waiting_on_players = SERVER_FONT.render("Waiting on players:", 1, (0,255,255))
-               
-      pygame.display.update()
+      
+      if play:
+         SimpleClient.play(newServer, username)
+      else:
+         pygame.display.update()
       
    return
