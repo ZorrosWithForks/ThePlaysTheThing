@@ -347,7 +347,6 @@ def receiveMoves(l_players, serversocket, map, address):
          response = player.connection.recv(8192)
          packet = pickle.loads(response)
          l_moves.append(packet)
-         player.unit_counts = 0
       except:
          l_players.remove(player)
          for continent in map.l_continent_names:
@@ -374,6 +373,7 @@ def receiveMoves(l_players, serversocket, map, address):
          receiving_units.champions += sent_units.champions
    
    for player in l_players:
+      player.unit_counts = 0
       for continent in map.l_continent_names:
          for country_i in range(len(map.d_continents[continent])):
             if map.d_continents[continent][country_i].owner == player.user_name:
@@ -393,7 +393,10 @@ def receiveMoves(l_players, serversocket, map, address):
                   map.d_continents[continent][country_i].unit_production = 0
                else:
                   map.d_continents[continent][country_i].unit_production += 1
-               
+   
+   
+   applyContinentBonuses(l_players, map)
+   
    for player in l_players:
       curr_connection = player.connection
       player.connection = None
@@ -408,12 +411,13 @@ def applyContinentBonuses(l_players, map):
          owns_continent = True
          i = 0
          while i < len(continent) and owns_continent:
-            owns_continent = continent[i].owner == player.user_name
+            owns_continent = owns_continent and continent[i].owner == player.user_name
             i += 1
          
          if owns_continent:
             player.unit_counts += map.d_bonuses[continent_name]
             print("Awarding bonus for " + continent_name + " to " + player.user_name + ".")
+            print(str(player.user_name) + ": " + str(player.unit_counts))
 
 def serve(player_count):   
    l_players = []
@@ -463,7 +467,6 @@ def serve(player_count):
       l_players = receiveAttacks(l_players, serversocket, map, addr)
       print("Server: exited receiveAttacks")
       receiveMoves(l_players, serversocket, map, addr)
-      applyContinentBonuses(l_players, map)
       #temp = input("pausing the server")
    
    serversocket.close()

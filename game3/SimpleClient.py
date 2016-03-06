@@ -24,8 +24,11 @@ CONTINENT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 40)
 COUNTRY_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 25)
 UNIT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 35)
 MONEY_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 22)
+COUNT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 20)
 ATTACK_COLOR = (100, 0, 0)
 DEFEND_COLOR = (50, 50, 0)
+ATTACK_COUNT_COLOR = (255, 0, 0)
+DEFEND_COUNT_COLOR = (255, 255, 0)
 CONTINENT_1 = 1
 CONTINENT_2 = 2
 CONTINENT_3 = 3
@@ -72,7 +75,8 @@ MOVE_DOWNLEFT_UPRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_UR_BL.png
 
 MOUSE_OVER = pygame.image.load(IMAGE_FILE_PATH + 'MouseOver.png')
 MOUSE_OVER_UNKNOWN = pygame.image.load(IMAGE_FILE_PATH + 'MouseOverUnknown.png')
-HIGHLIGHT_ATTACK = pygame.image.load(IMAGE_FILE_PATH + 'CurrentAttack.png')
+ATTACK_COUNTS = pygame.image.load(IMAGE_FILE_PATH + 'BattleCounts.png')
+HIGHLIGHT_ATTACK = pygame.image.load(IMAGE_FILE_PATH + 'BattleCountsHighlight.png')
 INFO_MARQUEE = pygame.image.load(IMAGE_FILE_PATH + "InfoMarque.png")
 INFO_OVERLAY = pygame.image.load(IMAGE_FILE_PATH + "InfoMarqueOverlay.png")
 MAP_FRAME = pygame.image.load(IMAGE_FILE_PATH + "MapFrame.png")
@@ -225,7 +229,7 @@ def standardInfo(map, DISPLAYSURF, params):
          DISPLAYSURF.blit(COUNTRY_FONT.render(name, True, (0,0,0)), (map.WIDTH * TILESIZE + x_offset, y_offset))
          y_offset += 25
       y_offset += 25
-      DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Strengths:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, y_offset))
+      DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonuses:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, y_offset))
       y_offset += 20
       for continent_name in map.l_continent_names:
          y_offset += 25
@@ -268,16 +272,19 @@ def attackInfo(map, DISPLAYSURF, params):
    DISPLAYSURF.blit(COUNTRY_FONT.render("Musketeers:", True, (0,0,0)), (map.WIDTH * TILESIZE + 75, 375))
    DISPLAYSURF.blit(COUNTRY_FONT.render("Cannons:", True, (0,0,0)), (map.WIDTH * TILESIZE + 75, 425))
    DISPLAYSURF.blit(COUNTRY_FONT.render("Airships:", True, (0,0,0)), (map.WIDTH * TILESIZE + 75, 475))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Bonus:", True, (0,0,0)), (map.WIDTH * TILESIZE + 75, 525))
    
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(attackerUnits.infantry) + "/" + str(map.d_continents[attacker[0]][attacker[1]].unit_counts.infantry), True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 250, 325))
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(attackerUnits.archers) + "/" + str(map.d_continents[attacker[0]][attacker[1]].unit_counts.archers), True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 250, 375))
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(attackerUnits.cannons) + "/" + str(map.d_continents[attacker[0]][attacker[1]].unit_counts.cannons), True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 250, 425))
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(attackerUnits.champions) + "/" + str(map.d_continents[attacker[0]][attacker[1]].unit_counts.champions), True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 250, 475))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[attacker[0]][attacker[1]].attack_bonus) + "%", True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 250, 525))
    
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.infantry), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 325))
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.archers), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 375))
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.cannons), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 425))
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.champions), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 475))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].defense_bonus) + "%", True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 525))
     
 def moveInfo(map, DISPLAYSURF, params):
    attacker = map.ll_map[params[0][1]][params[0][0]]
@@ -744,6 +751,7 @@ def resolveAttacks(DISPLAYSURF, map, player, socket, host_address):
       l_attacks = attackResponse[1]
       l_attackers = l_attacks[0]
       l_defenders = l_attacks[1]
+      d_attacks = l_attacks[2]
       attack = 0
       # While the user is choosing whether to attack or retreat
       while choosing:
@@ -754,10 +762,10 @@ def resolveAttacks(DISPLAYSURF, map, player, socket, host_address):
             handleGeneral(event, map)
             if event.type == MOUSEBUTTONDOWN:
                if ATTACK_COORDS[0] <= curr_x <= ATTACK_COORDS[0] + 200 and ATTACK_COORDS[1] <= curr_y <= ATTACK_COORDS[1] + 100:
-                  l_attacks[2][map.ll_map[l_attackers[attack][1]][l_attackers[attack][0]]][2] = False
+                  d_attacks[map.ll_map[l_attackers[attack][1]][l_attackers[attack][0]]][2] = False
                   attack += 1
                if RETREAT_COORDS[0] <= curr_x <= RETREAT_COORDS[0] + 200 and RETREAT_COORDS[1] <= curr_y <= RETREAT_COORDS[1] + 100:
-                  l_attacks[2][map.ll_map[l_attackers[attack][1]][l_attackers[attack][0]]][2] = True
+                  d_attacks[map.ll_map[l_attackers[attack][1]][l_attackers[attack][0]]][2] = True
                   attack += 1
           if len(l_attackers) > attack:
             printMap(map, DISPLAYSURF, battleInfo, (l_attackers[attack], l_attacks[2][map.ll_map[l_attackers[attack][1]][l_attackers[attack][0]]]))
@@ -780,9 +788,27 @@ def resolveAttacks(DISPLAYSURF, map, player, socket, host_address):
             DISPLAYSURF.blit(RETREATLIT, (RETREAT_COORDS[0], RETREAT_COORDS[1]))
           else:
             DISPLAYSURF.blit(RETREAT, (RETREAT_COORDS[0], RETREAT_COORDS[1]))
+            
+          #l_attacks[2][map.ll_map[l_attackers[attack][1]][l_attackers[attack][0]]][1]
+          for defender in l_defenders:
+            current_defender = map.ll_map[defender[1]][defender[0]]
+            DISPLAYSURF.blit(ATTACK_COUNTS, (defender[0] * TILESIZE, defender[1] * TILESIZE))
+            
+            defend_counts = COUNT_FONT.render(str(map.d_continents[current_defender[0]][current_defender[1]].unit_counts.getSummaryCount()), True, DEFEND_COUNT_COLOR)
+            DISPLAYSURF.blit(defend_counts, (defender[0] * TILESIZE + 8, defender[1] * TILESIZE + 35))
+            
+            attack_unit_counts = 0
+            for attack_key in d_attacks.keys():
+               if map.d_continents[attack_key[0]][attack_key[1]].owner == player.user_name \
+               and d_attacks[attack_key] != None \
+               and d_attacks[attack_key][0] == map.ll_map[defender[1]][defender[0]]:
+                  attack_unit_counts += d_attacks[attack_key][1].getSummaryCount()
+                  
+            attack_counts = COUNT_FONT.render(str(attack_unit_counts), True, ATTACK_COUNT_COLOR)
+            DISPLAYSURF.blit(attack_counts, (defender[0] * TILESIZE + 58, defender[1] * TILESIZE + 35))
           
-          if len(l_attackers) > attack:
-            DISPLAYSURF.blit(HIGHLIGHT_ATTACK, (l_attackers[attack][0] * TILESIZE - 50, l_attackers[attack][1] * TILESIZE - 50), special_flags=BLEND_ADD)
+          if len(l_defenders) > attack:               
+            DISPLAYSURF.blit(HIGHLIGHT_ATTACK, (l_defenders[attack][0] * TILESIZE, l_defenders[attack][1] * TILESIZE ), special_flags=BLEND_ADD)
     
           blitInfo(DISPLAYSURF, map, INFO_RESOLVE, False)
           
