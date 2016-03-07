@@ -100,7 +100,7 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
          for attack in attacker[0]:
             attacking_country = map.ll_map[attack[1]][attack[0]]
             attacking_user = map.d_continents[attacking_country[0]][attacking_country[1]].owner
-            if attacker[2][map.ll_map[attack[1]][attack[0]]][0] == defending_country and attacking_user == player.user_name:
+            if attacker[2][attacking_country][0] == defending_country and attacking_user == player.user_name:
                d_attackers[player.user_name][0].infantry += attacker[2][map.ll_map[attack[1]][attack[0]]][1].infantry
                d_attackers[player.user_name][0].archers += attacker[2][map.ll_map[attack[1]][attack[0]]][1].archers
                d_attackers[player.user_name][0].cannons += attacker[2][map.ll_map[attack[1]][attack[0]]][1].cannons
@@ -196,29 +196,38 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
             print("Removed an attacker from the list")
    
    numOfAttackers = 0
-   attacking_army = None
-   attacking_player = None
-   for player in l_attacks:
-      for defender in range(len(player[1])):
-         if player[1][defender] == defender_coords:
-            print("got an attacker")
-            numOfAttackers += 1
-            attacker = map.ll_map[player[0][defender][1]][player[0][defender][0]]
-            attacking_player = player[2][attacker][3]
-            attacking_army = player[2][attacker][1]
+   for player in l_players:
+      attacking = False
+      for attack_packet in l_attacks:
+         d_attacks = attack_packet[2]
+         for attacking_country in d_attacks.keys():
+            attacking = attacking or (map.d_continents[attacking_country[0]][attacking_country[1]].owner == player.user_name \
+                        and d_attacks[attacking_country][0] == defending_country)
+      if attacking:
+         numOfAttackers += 1
+         attacking_player = player
 
-   if curr_unit_counts.infantry == 0 and curr_unit_counts.archers == 0 and curr_unit_counts.cannons == 0 and curr_unit_counts.champions == 0 and numOfAttackers == 1:
-      map.d_continents[defending_country[0]][defending_country[1]].owner = attacking_player
+   if curr_unit_counts.infantry == 0 \
+   and curr_unit_counts.archers == 0 \
+   and curr_unit_counts.cannons == 0 \
+   and curr_unit_counts.champions == 0 \
+   and numOfAttackers == 1:
+      map.d_continents[defending_country[0]][defending_country[1]].owner = attacking_player.user_name
       map.d_continents[defending_country[0]][defending_country[1]].unit_production = 1
-      newUnits = attacking_army
-      curr_unit_counts.infantry = newUnits.infantry
-      curr_unit_counts.archers = newUnits.archers
-      curr_unit_counts.cannons = newUnits.cannons
-      curr_unit_counts.champions = newUnits.champions
-      newUnits.infantry = 0
-      newUnits.archers = 0
-      newUnits.cannons = 0
-      newUnits.champions = 0
+      for attack_packet in l_attacks:
+         d_attacks = attack_packet[2]
+         for attacking_country in d_attacks.keys():
+            if map.d_continents[attacking_country[0]][attacking_country[1]].owner == attacking_player.user_name \
+            and d_attacks[attacking_country][0] == defending_country:
+               attacking_army = d_attacks[attacking_country][1]
+               curr_unit_counts.infantry += attacking_army.infantry
+               curr_unit_counts.archers += attacking_army.archers
+               curr_unit_counts.cannons += attacking_army.cannons
+               curr_unit_counts.champions += attacking_army.champions
+               attacking_army.infantry = 0
+               attacking_army.archers = 0
+               attacking_army.cannons = 0
+               attacking_army.champions = 0
          
    l_tempAttacks = copy.deepcopy(l_attacks)
    for player in range(len(l_tempAttacks)):
