@@ -1029,7 +1029,7 @@ def detectGameEnd(DISPLAYSURF, map, player, socket):
             handleGeneral(event, map)
          
          printMap(map, DISPLAYSURF, standardInfo)
-         DISPLAYSURF.fill((255, 20, 20), special_flags=BLEND_MULT)
+         DISPLAYSURF.fill((255, 75, 75), special_flags=BLEND_MULT)
          DISPLAYSURF.blit(LOSER, (0, 0))
          #update the display
          pygame.display.update()
