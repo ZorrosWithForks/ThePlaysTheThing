@@ -230,7 +230,14 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
             l_attacks[player][1].remove(l_tempAttacks[player][1][attack])
             l_attacks[player][2][country] = None
             print("Removed an attacker from the list")
-         
+
+def repairMap(playerMap, map, l_attacks):
+   for attack in l_attacks[1]:
+      currentCountry = playerMap.ll_map[attack[1]][attack[0]]
+      unitCounts = playerMap.d_continents[currentCountry[0]][currentCountry[1]].unit_counts
+      if unitCounts == None:
+         playerMap.d_continents[currentCountry[0]][currentCountry[1]].unit_counts = map.d_continents[currentCountry[0]][currentCountry[1]].unit_counts
+            
 def receiveAttacks(l_players, serversocket, map, address):
    l_attacks = []   # list of tuples (l_attackers, l_defenders, d_attacks), each belonging to a different player
    l_defenders = [] # list of defender_coords
@@ -295,7 +302,9 @@ def receiveAttacks(l_players, serversocket, map, address):
       for i in range(len(l_players)):
          curr_connection = l_players[i].connection
          l_players[i].connection = None
-         packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=l_players[i].user_name), l_attacks[i], True))
+         playerMap = Map(map_to_copy=map, copy_player_name=l_players[i].user_name)
+         repairMap(playerMap, map, l_attacks[i])
+         packet = pickle.dumps((playerMap, l_attacks[i], True))
          curr_connection.sendto(packet, address)
          l_players[i].connection = curr_connection
          print("Sent attacks to: " + l_players[i].user_name)
@@ -331,7 +340,9 @@ def receiveAttacks(l_players, serversocket, map, address):
    for i in range(len(l_players)):
       curr_connection = l_players[i].connection
       l_players[i].connection = None
-      packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=l_players[i].user_name), l_attacks[i], False))
+      playerMap = Map(map_to_copy=map, copy_player_name=l_players[i].user_name)
+      repairMap(playerMap, map, l_attacks[i])
+      packet = pickle.dumps((playerMap, l_attacks[i], False))
       curr_connection.sendto(packet, address)
       l_players[i].connection = curr_connection
       print("Sent final map to: " + l_players[i].user_name)

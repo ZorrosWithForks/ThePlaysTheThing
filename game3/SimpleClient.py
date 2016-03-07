@@ -849,8 +849,10 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address):
                         l_receivers.append([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
                         d_moves[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0)] #[receiver, army]
                      elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_receivers: # if clicking the country your selected country is sending troops to
-                        l_receivers.remove([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
-                        l_senders.remove([selectedCountry[0], selectedCountry[1]])
+                        if [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_receivers:
+                           l_receivers.remove([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
+                        if [selectedCountry[0], selectedCountry[1]] in l_senders:
+                           l_senders.remove([selectedCountry[0], selectedCountry[1]])
                         d_moves[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = None
                      elif [selectedCountry[0], selectedCountry[1]] in l_senders:
                         l_neighbors = []
