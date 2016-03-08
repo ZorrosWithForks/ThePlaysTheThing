@@ -70,18 +70,18 @@ def MakeServer():
       t_connected_client.daemon = True
       t_connected_client.start()
       
-   def display_players(x_panel_position, y_panel_position, player_name):
+   def display_players(x_panel_position, y_panel_position, player_name, y_offset):
       #print("Number of clients: " + str(len(clients)))
       del l_boot_spots[:]
       tempClients = copy.copy(clients)
       for i in tempClients:
          #length of clients is 1, but boot spots countinually grows....
-         DISPLAYSURF.blit(SERVER_BAR, (x_panel_position, y_panel_position))
+         DISPLAYSURF.blit(SERVER_BAR, (x_panel_position, y_panel_position + y_offset))
          #print("blitted bar")
          l_boot_spots.append((x_panel_position + 1200, y_panel_position + 25, str(i[1])))
          # display the name of the client
-         DISPLAYSURF.blit(SERVER_FONT.render(str(i[1]), True, (0,0,0)), (x_panel_position + 25, y_panel_position + 25))
-         DISPLAYSURF.blit(BOOT_BUTTON, (x_panel_position + 1200, y_panel_position + 25))
+         DISPLAYSURF.blit(SERVER_FONT.render(str(i[1]), True, (0,0,0)), (x_panel_position + 25, y_panel_position + 25 + y_offset))
+         DISPLAYSURF.blit(BOOT_BUTTON, (x_panel_position + 1200, y_panel_position + 25 + y_offset))
          y_panel_position += 100
          
    # def append_boot_spots(x_panel_position, y_panel_position)
@@ -139,6 +139,9 @@ def MakeServer():
    # Initialize pygame
    pygame.init()
 
+   # y offset for scrolling
+   y_offset = 0
+   
    # Initilize bad word list
    filter = ProfanitiesFilter(bad_things, replacements="-")
    
@@ -249,7 +252,7 @@ def MakeServer():
    while True:
       DISPLAYSURF.blit(BLACK_BACKGROUND, (100, 100))
       tempPlayers = copy.copy(clients)
-      display_players(x_panel_position, y_panel_position, None)
+      display_players(x_panel_position, y_panel_position, None, y_offset)
       
       for event in pygame.event.get():
          if event.type == QUIT:
@@ -269,6 +272,17 @@ def MakeServer():
                sys.exit()
             if event.key == K_BACKSPACE:
                servername = servername[:-1]
+            if event.key == K_DOWN and y_offset >= 0 and len(clients) > 5:
+               SERVERS_AREA = DISPLAYSURF.get_clip()
+               y_offset -= 100
+               #display_servers(x_panel_position, y_panel_position, y_offset)
+            if event.key == K_UP and y_offset < 0 and len(clients) > 5:
+               SERVERS_AREA = DISPLAYSURF.get_clip()
+               if (SERVERS_AREA.x <= 100 and SERVERS_AREA.y <= 100):#put in server checking too need to find out how to get the position of a surface.
+                  print("Servers area x is: " + str(SERVERS_AREA.x))
+                  print("Servers area y is: " + str(SERVERS_AREA.y))
+                  y_offset += 100
+                  #display_servers(x_panel_position, y_panel_position, y_offset)
             elif event.key == K_LSHIFT or event.key == K_RSHIFT:
                shifted = True
             if not shifted and len(servername) < 25:
