@@ -56,7 +56,7 @@ def LoginClient(username, s):
    
    # Graphics Constants
    IMAGE_FILE_PATH = "ImageFiles\\"
-   LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background.png")
+   LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "waiting_background.png")
    BLACK_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background2.png")
    SERVER_BAR = pygame.image.load(IMAGE_FILE_PATH + "Server.png")
    UP_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "upArrow.png")
