@@ -99,7 +99,7 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
       for attacker in l_attacks:
          for attack in attacker[0]:
             attacking_country = map.ll_map[attack[1]][attack[0]]
-            attacking_user = map.d_continents[attacking_country[0]][attacking_country[1]].owner
+            attacking_user = attacker[2][attacking_country][3]
             if attacker[2][attacking_country][0] == defending_country and attacking_user == player.user_name:
                d_attackers[player.user_name][0].infantry += attacker[2][map.ll_map[attack[1]][attack[0]]][1].infantry
                d_attackers[player.user_name][0].archers += attacker[2][map.ll_map[attack[1]][attack[0]]][1].archers
