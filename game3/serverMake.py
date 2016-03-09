@@ -145,6 +145,12 @@ def MakeServer():
    # Initilize bad word list
    filter = ProfanitiesFilter(bad_things, replacements="-")
    
+   # Position of the arrows
+   arrow_x_pos = 1500
+   up_arrow_y_pos = 550
+   down_arrow_y_pos = 50
+
+   
    # Specify that shift is not pressed
    shifted = False
    
@@ -168,6 +174,8 @@ def MakeServer():
    BACK_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_unpressed.png")
    BACK_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_pressed.png")
    WAITING_PANEL = pygame.image.load(IMAGE_FILE_PATH + "Waiting.png")
+   UP_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "upArrow.png")
+   DOWN_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "downArrow.png")
 
    BLACK = 1
    WHITE = 2
@@ -254,6 +262,18 @@ def MakeServer():
       tempPlayers = copy.copy(clients)
       display_players(x_panel_position, y_panel_position, None, y_offset)
       
+      #stuffs for scrolling
+      players = 0
+      index = 0
+      y_offset_allowed = 0
+      for this_guy in clients:
+         players += 1
+         if players > 5:
+            index += 1
+            y_offset_allowed = (index * 100)
+            print (players)
+            print (y_offset_allowed)
+      
       for event in pygame.event.get():
          if event.type == QUIT:
             #end game
@@ -272,16 +292,13 @@ def MakeServer():
                sys.exit()
             if event.key == K_BACKSPACE:
                servername = servername[:-1]
-            if event.key == K_DOWN and y_offset >= 0 and len(clients) > 5:
+            if event.key == K_DOWN and y_offset > -y_offset_allowed and len(clients) > 5:
                SERVERS_AREA = DISPLAYSURF.get_clip()
                y_offset -= 100
                #display_servers(x_panel_position, y_panel_position, y_offset)
             if event.key == K_UP and y_offset < 0 and len(clients) > 5:
                SERVERS_AREA = DISPLAYSURF.get_clip()
-               if (SERVERS_AREA.x <= 100 and SERVERS_AREA.y <= 100):#put in server checking too need to find out how to get the position of a surface.
-                  print("Servers area x is: " + str(SERVERS_AREA.x))
-                  print("Servers area y is: " + str(SERVERS_AREA.y))
-                  y_offset += 100
+               y_offset += 100
                   #display_servers(x_panel_position, y_panel_position, y_offset)
             elif event.key == K_LSHIFT or event.key == K_RSHIFT:
                shifted = True
@@ -422,7 +439,18 @@ def MakeServer():
                            packet = pickle.dumps((False, l_playerNames, servername))
                            player[0].sendto(packet, player[2])
                         print("\ndeleted: " + boot_spot[2] + client[1])
-  
+                        
+            # clicked up arrow
+            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 50 and y_offset < 0 and len(l_servers) > 5:
+               SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
+               y_offset += 100
+               display_servers(x_panel_position, y_panel_position, y_offset)
+               
+            # clicked down arrow
+            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 50 and y_offset > -y_offset_allowed and len(l_servers) > 5:
+               SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
+               y_offset -= 100
+               display_servers(x_panel_position, y_panel_position, y_offset)
 
          
       # Blit the stuffs onto the screen
@@ -435,6 +463,8 @@ def MakeServer():
       DISPLAYSURF.blit(servername_graphics, (285, y_pos))
       #DISPLAYSURF.blit(PLAY_BUTTON, (1300, 700))
       #DISPLAYSURF.blit(START_SERVER_BUTTON, (x_start_server_button, y_start_server_button))
+      DISPLAYSURF.blit(DOWN_ARROW, (arrow_x_pos, down_arrow_y_pos))
+      DISPLAYSURF.blit(UP_ARROW, (arrow_x_pos, up_arrow_y_pos))
       button("Start",x_start_server_button,y_start_server_button,150,75,START_SERVER_BUTTON_PRESSED,START_SERVER_BUTTON_UNPRESSED)
       button("Play",x_play_button,y_play_button,200,200,PLAY_BUTTON_PRESSED,PLAY_BUTTON_UNPRESSED)
       pushed_back = button("Back",x_back_button,y_back_button,75,50,BACK_BUTTON_PRESSED,BACK_BUTTON_UNPRESSED)
