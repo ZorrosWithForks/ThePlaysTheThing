@@ -56,7 +56,7 @@ def LoginClient(username, s):
    
    # Graphics Constants
    IMAGE_FILE_PATH = "ImageFiles\\"
-   LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background.png")
+   LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "waiting_background.png")
    BLACK_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background2.png")
    SERVER_BAR = pygame.image.load(IMAGE_FILE_PATH + "Server.png")
    UP_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "upArrow.png")
@@ -103,6 +103,18 @@ def LoginClient(username, s):
    while joined:
       curr_x, curr_y = pygame.mouse.get_pos()
       
+      #stuffs for scrolling
+      players = 0
+      index = 0
+      y_offset_allowed = 0
+      for this_guy in l_players:
+         players += 1
+         if players > 5:
+            index += 1
+            y_offset_allowed = (index * 100)
+            print (players)
+            print (y_offset_allowed)
+         
       #get user events
       events = pygame.event.get()
       for event in events:
@@ -121,20 +133,30 @@ def LoginClient(username, s):
                print("something")
                pygame.quit()
                sys.exit()
-            if event.key == K_UP:
+            if event.key == K_DOWN and y_offset > -y_offset_allowed and len(l_players) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
                y_offset -= 100
-            if event.key == K_DOWN:
+            if event.key == K_UP and y_offset < 0 and len(l_players) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
-               if (SERVERS_AREA.x <= 100 and SERVERS_AREA.y <= 100):#put in server checking too need to find out how to get the position of a surface.
-                  print("Servers area x is: " + str(SERVERS_AREA.x))
-                  print("Servers area y is: " + str(SERVERS_AREA.y))
-                  y_offset += 100
+               y_offset += 100
          if event.type == MOUSEBUTTONDOWN:
+            x_mouse_position_main, y_mouse_position_main = pygame.mouse.get_pos()
             # clicked back button
             if x_back_button <= curr_x <= x_back_button + 75 and y_back_button <= curr_y <= y_back_button + 50:
                s.close()
                return(True)
+               
+            # clicked up arrow
+            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 50 and y_offset < 0 and len(l_players) > 5: # only allows me to scroll once...
+               SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
+               y_offset += 100
+               display_servers(x_panel_position, y_panel_position, y_offset)
+               
+            # clicked down arrow
+            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 50 and y_offset > -y_offset_allowed and len(l_players) > 5:
+               SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
+               y_offset -= 100
+               display_servers(x_panel_position, y_panel_position, y_offset)
                         
       # Blit the stuffs onto the screen
       LOGIN_TOP_SURFACE.blit(BLACK_BACKGROUND, (100, 100))

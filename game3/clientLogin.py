@@ -207,6 +207,18 @@ def LoginClient():
    while True:
       mouse = pygame.mouse.get_pos()
       
+      #stuffs for scrolling
+      servers = 0
+      index = 0
+      y_offset_allowed = 0
+      for this_guy in l_servers:
+         servers += 1
+         if servers > 5:
+            index += 1
+            y_offset_allowed = (index * 100)
+            print (servers)
+            print (y_offset_allowed)
+      
       #get user events
       events = pygame.event.get()
       for event in events:
@@ -225,17 +237,14 @@ def LoginClient():
                print("something")
                pygame.quit()
                sys.exit()
-            if event.key == K_UP:
+            if event.key == K_DOWN and y_offset > -y_offset_allowed and len(l_servers) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
                y_offset -= 100
                display_servers(x_panel_position, y_panel_position, y_offset)
-            if event.key == K_DOWN:
+            if event.key == K_UP and y_offset < 0 and len(l_servers) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
-               if (SERVERS_AREA.x <= 100 and SERVERS_AREA.y <= 100):#put in server checking too need to find out how to get the position of a surface.
-                  print("Servers area x is: " + str(SERVERS_AREA.x))
-                  print("Servers area y is: " + str(SERVERS_AREA.y))
-                  y_offset += 100
-                  display_servers(x_panel_position, y_panel_position, y_offset)
+               y_offset += 100
+               display_servers(x_panel_position, y_panel_position, y_offset)
             if event.key == K_BACKSPACE:
                username = username[:-1]
             elif event.key == K_LSHIFT or event.key == K_RSHIFT:
@@ -362,6 +371,18 @@ def LoginClient():
             if x_back_button <= x_mouse_position_main <= x_back_button + 75 and y_back_button <= y_mouse_position_main <= y_back_button + 50:
                client_socket.close()
                return(True)
+               
+            # clicked up arrow
+            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 50 and y_offset < 0 and len(l_servers) > 5:
+               SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
+               y_offset += 100
+               display_servers(x_panel_position, y_panel_position, y_offset)
+               
+            # clicked down arrow
+            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 50 and y_offset > -y_offset_allowed and len(l_servers) > 5:
+               SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
+               y_offset -= 100
+               display_servers(x_panel_position, y_panel_position, y_offset)
                         
       # Blit the stuffs onto the screen
       username = filter.clean(username)
