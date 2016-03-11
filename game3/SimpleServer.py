@@ -101,6 +101,7 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
             attacking_country = map.ll_map[attack[1]][attack[0]]
             attacking_user = attacker[2][attacking_country][3]
             if attacker[2][attacking_country][0] == defending_country and attacking_user == player.user_name:
+               #print("Player " + attacking_user + " is attacking " + str(map.d_continents[defending_country[0]][defending_country[1]]))
                d_attackers[player.user_name][0].infantry += attacker[2][map.ll_map[attack[1]][attack[0]]][1].infantry
                d_attackers[player.user_name][0].archers += attacker[2][map.ll_map[attack[1]][attack[0]]][1].archers
                d_attackers[player.user_name][0].cannons += attacker[2][map.ll_map[attack[1]][attack[0]]][1].cannons
@@ -112,7 +113,7 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
    d_damage_sum = {}
    for player in l_players:
       d_damage_sum[player.user_name] = 0
-      print("damage sum for " + player.user_name + ": " + str(d_damage_sum[player.user_name]))
+      #print("damage sum for " + player.user_name + ": " + str(d_damage_sum[player.user_name]))
       for attacker in l_players:
          if attacker.user_name != player.user_name:
             d_damage_sum[player.user_name] += int((d_attackers[attacker.user_name][0].infantry + \
@@ -120,7 +121,7 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
                                               d_attackers[attacker.user_name][0].cannons + \
                                               d_attackers[attacker.user_name][0].champions * 3) \
                                               * (d_attackers[attacker.user_name][1] / 100 + 1))
-            print("damage sum for " + player.user_name + ": " + str(d_damage_sum[player.user_name]))
+            #print("damage sum for " + player.user_name + ": " + str(d_damage_sum[player.user_name]))
       defending_country_data = map.d_continents[defending_country[0]][defending_country[1]]
       d_damage_sum[player.user_name] += int((defending_country_data.unit_counts.infantry + \
                                         defending_country_data.unit_counts.archers * 2 + \
@@ -203,9 +204,10 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
          d_attacks = attack_packet[2]
          for attacking_country in d_attacks.keys():
             if d_attacks[attacking_country] != None:
-               attacking = attacking or (map.d_continents[attacking_country[0]][attacking_country[1]].owner == player.user_name \
+               attacking = attacking or (d_attacks[attacking_country][3] == player.user_name \
                            and d_attacks[attacking_country][0] == defending_country)
-               attacking_player = d_attacks[attacking_country][3]
+               if d_attacks[attacking_country][0] == defending_country:
+                  attacking_player = d_attacks[attacking_country][3]
       if attacking:
          numOfAttackers += 1
 
@@ -214,6 +216,7 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
    and curr_unit_counts.cannons == 0 \
    and curr_unit_counts.champions == 0 \
    and numOfAttackers == 1:
+      print("Set owner of " + map.d_continents[defending_country[0]][defending_country[1]].name + " to " + attacking_player)
       map.d_continents[defending_country[0]][defending_country[1]].owner = attacking_player
       map.d_continents[defending_country[0]][defending_country[1]].unit_production = 1
       for attack_packet in l_attacks:
