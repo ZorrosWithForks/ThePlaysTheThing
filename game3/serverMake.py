@@ -465,7 +465,8 @@ def MakeServer():
       #DISPLAYSURF.blit(START_SERVER_BUTTON, (x_start_server_button, y_start_server_button))
       DISPLAYSURF.blit(DOWN_ARROW, (arrow_x_pos, down_arrow_y_pos))
       DISPLAYSURF.blit(UP_ARROW, (arrow_x_pos, up_arrow_y_pos))
-      button("Start",x_start_server_button,y_start_server_button,150,75,START_SERVER_BUTTON_PRESSED,START_SERVER_BUTTON_UNPRESSED)
+      if not waiting_for_players:
+         button("Start",x_start_server_button,y_start_server_button,150,75,START_SERVER_BUTTON_PRESSED,START_SERVER_BUTTON_UNPRESSED)
       button("Play",x_play_button,y_play_button,200,200,PLAY_BUTTON_PRESSED,PLAY_BUTTON_UNPRESSED)
       pushed_back = button("Back",x_back_button,y_back_button,75,50,BACK_BUTTON_PRESSED,BACK_BUTTON_UNPRESSED)
       if waiting_for_players == True:
