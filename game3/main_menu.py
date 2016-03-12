@@ -103,14 +103,9 @@ def game_intro():
             pygame.quit()
             quit()
                 
-      gameDisplay.fill(white)
-      largeText = pygame.font.Font('OldNewspaperTypes.ttf',190)
-      TextSurf, TextRect = text_objects("Staged Conflict", largeText, black)
-      TextRect.center = ((display_width/2),(display_height/2) - 150)
-      gameDisplay.blit(TextSurf, TextRect)
         
       mouse = pygame.mouse.get_pos()
-        
+      MENU_SURFACE.blit(MENU_BACKGROUND, (0,0))    
       button("Host Game",100,450,700,100,green,bright_green, serverMake.MakeServer)
       button("Join Game",100,600,700,100,red,bright_red, clientLogin.LoginClient)
       button("Quit",100,750,700,100,black,grey,quitgame)
@@ -122,6 +117,9 @@ in_menu = True
 in_game = False
     
 # Will need to edit the looping logic to allow quitting to return to the main menu
+IMAGE_FILE_PATH = "ImageFiles\\"
+MENU_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "Main_menu.png")
+MENU_SURFACE = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 game_intro()
 pygame.quit()
 quit()
