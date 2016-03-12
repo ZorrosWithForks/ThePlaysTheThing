@@ -99,16 +99,17 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
       for attacker in l_attacks:
          for attack in attacker[0]:
             attacking_country = map.ll_map[attack[1]][attack[0]]
-            attacking_user = attacker[2][attacking_country][3]
-            if attacker[2][attacking_country][0] == defending_country and attacking_user == player.user_name:
-               #print("Player " + attacking_user + " is attacking " + str(map.d_continents[defending_country[0]][defending_country[1]]))
-               d_attackers[player.user_name][0].infantry += attacker[2][map.ll_map[attack[1]][attack[0]]][1].infantry
-               d_attackers[player.user_name][0].archers += attacker[2][map.ll_map[attack[1]][attack[0]]][1].archers
-               d_attackers[player.user_name][0].cannons += attacker[2][map.ll_map[attack[1]][attack[0]]][1].cannons
-               d_attackers[player.user_name][0].champions += attacker[2][map.ll_map[attack[1]][attack[0]]][1].champions
-               
-               d_attackers[player.user_name][1] += map.d_continents[attacking_country[0]][attacking_country[1]].attack_bonus
-               d_attacker_counts[player.user_name] += 1 # Number of countries to divide losses into
+            if attacker[2][attacking_country] != None
+               attacking_user = attacker[2][attacking_country][3]
+               if attacker[2][attacking_country][0] == defending_country and attacking_user == player.user_name:
+                  #print("Player " + attacking_user + " is attacking " + str(map.d_continents[defending_country[0]][defending_country[1]]))
+                  d_attackers[player.user_name][0].infantry += attacker[2][map.ll_map[attack[1]][attack[0]]][1].infantry
+                  d_attackers[player.user_name][0].archers += attacker[2][map.ll_map[attack[1]][attack[0]]][1].archers
+                  d_attackers[player.user_name][0].cannons += attacker[2][map.ll_map[attack[1]][attack[0]]][1].cannons
+                  d_attackers[player.user_name][0].champions += attacker[2][map.ll_map[attack[1]][attack[0]]][1].champions
+                  
+                  d_attackers[player.user_name][1] += map.d_continents[attacking_country[0]][attacking_country[1]].attack_bonus
+                  d_attacker_counts[player.user_name] += 1 # Number of countries to divide losses into
    
    d_damage_sum = {}
    for player in l_players:
@@ -304,7 +305,9 @@ def receiveAttacks(l_players, serversocket, map, address):
                   l_attacks[player][0].remove(l_tempAttacks[player][0][attack])
                   l_attacks[player][1].remove(l_tempAttacks[player][1][attack])
                   l_attacks[player][2][current_attacker] = None
+                  print("Normal retreat")
                else:
+                  print("Thought we were retreating into a conquered country")
                   attackingCountry = map.ll_map[l_tempAttacks[player][1][attack][1]][l_tempAttacks[player][1][attack][0]]
                   l_attacks[player][0].remove(l_tempAttacks[player][0][attack])
                   l_attacks[player][1].remove(l_tempAttacks[player][1][attack])
