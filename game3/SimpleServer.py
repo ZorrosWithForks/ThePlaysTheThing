@@ -320,15 +320,14 @@ def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
       packet = pickle.dumps(playerMap)
       try:
          curr_connection.sendto(packet, address)
+         l_players[i].connection = curr_connection
+         print("Sent final map to: " + l_players[i].user_name)
       except:
          l_players.remove(l_players[i])
          for continent in map.l_continent_names:
             for country in range(len(map.d_continents[continent])):
                if map.d_continents[continent][country].owner == player.user_name:
                   map.d_continents[continent][country].owner = "Unoccupied"
-         
-      l_players[i].connection = curr_connection
-      print("Sent final map to: " + l_players[i].user_name)
       
    tempPlayers = copy.copy(l_dead_players)
    
@@ -338,10 +337,10 @@ def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
       packet = pickle.dumps(map)
       try:
          curr_connection.sendto(packet, address)
+         l_dead_players[i].connection = curr_connection
+         print("Sent final map to spectator: " + l_dead_players[i].user_name)
       except:
          l_dead_players.remove(l_dead_players[i])
-      l_dead_players[i].connection = curr_connection
-      print("Sent final map to spectator: " + l_dead_players[i].user_name)
       
    return l_players
       
@@ -349,7 +348,7 @@ def receiveMoves(l_players, l_dead_players, serversocket, map, address):
    l_moves = [] # list of tuples (l_senders, l_receivers, d_moves)
    
    tempPlayers = copy.copy(l_players)
-   for player in l_players:
+   for player in tempPlayers:
       try:
          response = player.connection.recv(8192)
          packet = pickle.loads(response)

@@ -697,9 +697,9 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
          
        #update the display
        pygame.display.update()
-   return map
+   return map, l_attackers, l_defenders
 
-def moveTroops(DISPLAYSURF, map, player, socket, host_address):
+def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_defenders):
    global moving
    print("Client: inside moveTroops")
    selectedCountry = None
@@ -722,14 +722,18 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address):
    t_updateScreen = threading.Thread(target=refresh)
    t_updateScreen.daemon = True
    t_updateScreen.start()
-   
+   print("Length of l_attackers is: " + str(len(l_attackers)))
    while refreshing:
       for event in pygame.event.get():
          #if the user wants to quit
          handleGeneral(event, map)
-      
+
       printMap(map, DISPLAYSURF, standardInfo)
       DISPLAYSURF.blit(WAITING, (70, map.HEIGHT * TILESIZE + 70))
+      for battle in range(len(l_attackers)):
+         DISPLAYSURF.blit(DEFENDER, (l_defenders[battle][0] * TILESIZE, l_defenders[battle][1] * TILESIZE), special_flags=BLEND_ADD)
+         blitBattle(map, DISPLAYSURF, l_attackers[battle], l_defenders[battle])
+         DISPLAYSURF.blit(ATTACKER, (l_attackers[battle][0] * TILESIZE, l_attackers[battle][1] * TILESIZE), special_flags=BLEND_ADD)
       #update the display
       pygame.display.update()
    print("Exited refreshing")
@@ -753,7 +757,7 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address):
                         l_senders.append([selectedCountry[0], selectedCountry[1]])
                         l_receivers.append([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
                         d_moves[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0)] #[receiver, army]
-                     elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_receivers and \
+                     elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_receivers and [selectedCountry[0], selectedCountry[1]] in l_senders and \
                      l_receivers.index([int(curr_x / TILESIZE), int(curr_y / TILESIZE)]) == l_senders.index([selectedCountry[0], selectedCountry[1]]): # if clicking the country your selected country is sending troops to
                         l_receivers.remove([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
                         if [selectedCountry[0], selectedCountry[1]] in l_senders:
@@ -885,10 +889,10 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address):
       #update the display
       pygame.display.update()
       #fpsClock.tick(50)
-   return map
+   return map, l_senders, l_receivers
 
 newMap = None
-def getMoney(DISPLAYSURF, map, player, socket, host_address):
+def getMoney(DISPLAYSURF, map, player, socket, host_address, l_senders, l_receivers):
    global refreshing
    refreshing = True
    print("Inside getMoney")
@@ -911,16 +915,22 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address):
          handleGeneral(event, map)
       
       printMap(map, DISPLAYSURF, standardInfo)
+      
+      for army in range(len(l_senders)):
+         DISPLAYSURF.blit(DESTINATION, (l_receivers[army][0] * TILESIZE, l_receivers[army][1] * TILESIZE), special_flags=BLEND_ADD)
+         blitMove(map, DISPLAYSURF, l_senders[army], l_receivers[army])
+         DISPLAYSURF.blit(SOURCE, (l_senders[army][0] * TILESIZE, l_senders[army][1] * TILESIZE), special_flags=BLEND_ADD)
       DISPLAYSURF.blit(WAITING, (70, map.HEIGHT * TILESIZE + 70))
       #update the display
       pygame.display.update()
       
    return newMap
 
+deadMap = None
 def detectGameEnd(DISPLAYSURF, map, player, socket):
    Won = True
    Lost = True
-
+   deadMap = map
    for cont_name in map.d_continents.keys():
       for country in map.d_continents[cont_name]:
          if country.owner == player.user_name:
@@ -931,10 +941,12 @@ def detectGameEnd(DISPLAYSURF, map, player, socket):
    if Lost:
       LOSER = pygame.image.load(IMAGE_FILE_PATH + "InfoDefeat.png")
       def refresh():
+         global deadMap
          global map
          while True:
             response = socket.recv(8192)
             map = pickle.loads(response)
+            print("I'm dead and got a new map")
       
       t_updateScreen = threading.Thread(target=refresh)
       t_updateScreen.daemon = True
@@ -944,7 +956,7 @@ def detectGameEnd(DISPLAYSURF, map, player, socket):
          for event in pygame.event.get():
             #if the user wants to quit
             handleGeneral(event, map)
-         
+         map = deadMap
          printMap(map, DISPLAYSURF, standardInfo)
          DISPLAYSURF.fill((255, 75, 75), special_flags=BLEND_MULT)
          DISPLAYSURF.blit(LOSER, (0, 0))
@@ -996,15 +1008,15 @@ def play(host_address, player_name):
       d_playerLogoIndexes[name] = temp_index
    
    print(player_name)
-   DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN) 
+   DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
    while True:
       map.current_player = player_name
       map = placeUnits(DISPLAYSURF, map, player, s, host_address)
-      map = declareAttacks(DISPLAYSURF, map, player, s, host_address)
-      # map = resolveAttacks(DISPLAYSURF, map, player, s, host_address)
-      detectGameEnd(DISPLAYSURF, map, player, socket)
-      map = moveTroops(DISPLAYSURF, map, player, s, host_address)
-      info = getMoney(DISPLAYSURF, map, player, s, host_address)
+      map, l_attackers, l_defenders = declareAttacks(DISPLAYSURF, map, player, s, host_address)
+      print("Length of l_attackers is: " + str(len(l_attackers)))
+      # detectGameEnd(DISPLAYSURF, map, player, socket)
+      map, l_senders, l_receivers = moveTroops(DISPLAYSURF, map, player, s, host_address, l_attackers, l_defenders)
+      info = getMoney(DISPLAYSURF, map, player, s, host_address, l_senders, l_receivers)
       map = info[0]
       player = info[1]
       print("Exited properly")

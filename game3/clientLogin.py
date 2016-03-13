@@ -63,6 +63,7 @@ def LoginClient():
       print("returned from clientJoined")
 
    def display_servers(x_panel_position, y_panel_position, y_offset):
+      del l_join_spots[:]
       for server in l_servers:
          LOGIN_TOP_SURFACE.blit(SERVER_BAR, (x_panel_position, y_panel_position + y_offset))
         

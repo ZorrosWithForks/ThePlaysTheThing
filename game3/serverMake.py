@@ -29,18 +29,25 @@ def MakeServer():
          print(recv_data)
          packet = pickle.dumps((host, servername)) 
          server_socket.sendto(packet, addr)
-
-   def sendToJoinedClient(clients):
-      send_to_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-      send_to_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
-      port = 9997
-      addr = (host, port)
-      send_to_socket.bind(addr)
-      recv_data, client_addr = send_to_socket.recvfrom(4096)
-      host_clients_servername = pickle.dumps((host, clients, servername))
-      send_to_socket.sendto(host_clients_servername, client_addr)
-      #ended seeing if this will connect
-         
+      
+   def stuffAndThings(client):
+      try:
+         data = client[0].recv(2048)
+      except:
+         print("Removing a client")
+         clients.remove(client)
+         tempClients = copy.copy(clients)
+         for player in tempClients:
+            l_playerNames = []
+            for name in clients:
+               l_playerNames.append(name[1])
+            packet = pickle.dumps((False, l_playerNames, servername))
+            try:
+               player[0].sendto(packet, player[2])
+            except:
+               clients.remove(player)
+               print("Removed client: " + player[1])
+      
    def acceptPlayers():
       print("made it to accept players")
       serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -50,9 +57,13 @@ def MakeServer():
       serversocket.listen(5)
       while True:
          client, client_address = serversocket.accept()
+         print("accepted player")
          player_name = client.recv(4096).decode()
          l_temp = (client, player_name, client_address)
          clients.append(l_temp) #Array of clients
+         t_client = threading.Thread(target=stuffAndThings, args=(l_temp,))
+         t_client.daemon = True
+         t_client.start()
          tempClients = copy.copy(clients)
          for player in tempClients:
             l_playerNames = []
