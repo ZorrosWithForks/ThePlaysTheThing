@@ -72,16 +72,18 @@ def LoginClient():
          LOGIN_TOP_SURFACE.blit(JOIN_BUTTON_UNPRESSED, (x_panel_position + 1100, y_panel_position + 25 + y_offset))
          l_join_spots.append((x_panel_position + 1100, y_panel_position + 25, server[0]))
          y_panel_position += 100
-         
+   
    def search(x_panel_position, y_panel_position, y_offset):
       while True:
          packet, addr = client_socket.recvfrom(4096)
          if packet != None:
             try:
+               gotAServer = True
                server_info = pickle.loads(packet)
-               l_servers.append(server_info)
+               if not server_info in l_servers:
+                  l_servers.append(server_info)
                print("added a server: " + server_info[0])
-               print("server length is: " + str(l_servers))
+               print("number of servers: " + str(l_servers))
                display_servers(x_panel_position, y_panel_position, y_offset)
             except:
                print("Client tried connecting to itself")
@@ -93,7 +95,6 @@ def LoginClient():
       print("requesting servers")
       del l_servers[:]
       y_offset = 0
-      print("servers after deleting: ", str(l_servers))
       client_socket.sendto(data.encode('ascii'), address)
 
    # Initialize pygame
