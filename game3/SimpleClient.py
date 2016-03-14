@@ -75,8 +75,6 @@ MOVE_DOWNLEFT_UPRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_UR_BL.png
 
 MOUSE_OVER = pygame.image.load(IMAGE_FILE_PATH + 'MouseOver.png')
 MOUSE_OVER_UNKNOWN = pygame.image.load(IMAGE_FILE_PATH + 'MouseOverUnknown.png')
-ATTACK_COUNTS = pygame.image.load(IMAGE_FILE_PATH + 'BattleCounts.png')
-HIGHLIGHT_ATTACK = pygame.image.load(IMAGE_FILE_PATH + 'BattleCountsHighlight.png')
 INFO_MARQUEE = pygame.image.load(IMAGE_FILE_PATH + "InfoMarque.png")
 INFO_OVERLAY = pygame.image.load(IMAGE_FILE_PATH + "InfoMarqueOverlay.png")
 MAP_FRAME = pygame.image.load(IMAGE_FILE_PATH + "MapFrame.png")
@@ -184,6 +182,17 @@ l_playerLogos = [
                 pygame.image.load(IMAGE_FILE_PATH + 'Player7.png')
               ]
 
+l_playerColors = [
+                (0,0,0), #Black
+                (20,200,45), #Green
+                (220,220,0), #Yellow
+                (255,110,130), #Pink
+                (0,0,25), #Dark Blue
+                (255,255,255), #White
+                (220,110,0), #Orange
+                (110,55,0) #Brown
+              ]
+
 d_playerLogoIndexes = { UNOCCUPIED: 0 }
 
 #useful game dimensions
@@ -218,7 +227,7 @@ def standardInfo(map, DISPLAYSURF, params):
       DISPLAYSURF.blit(COUNTRY_FONT.render("Defense Bonus: " + (str(map.d_continents[current_tile[0]][current_tile[1]].defense_bonus) + "%" if country_known else "?"), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 100, 375))
       
       # Owner
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Owner: " + (str(map.d_continents[current_tile[0]][current_tile[1]].owner) if country_known else "?"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 425))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Owner: " + (str(map.d_continents[current_tile[0]][current_tile[1]].owner) if country_known else "?"), True, l_playerColors[d_playerLogoIndexes[map.d_continents[current_tile[0]][current_tile[1]].owner]] if country_known else (0,0,0)), (map.WIDTH * TILESIZE + 100, 425))
          
       DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonus: " + str(map.d_bonuses[current_tile[0]]), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 500))
     else:
@@ -226,7 +235,7 @@ def standardInfo(map, DISPLAYSURF, params):
       y_offset = 180
       DISPLAYSURF.blit(CONTINENT_FONT.render("Players:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 130))
       for name in map.l_player_names:
-         DISPLAYSURF.blit(COUNTRY_FONT.render(name, True, (0,0,0)), (map.WIDTH * TILESIZE + x_offset, y_offset))
+         DISPLAYSURF.blit(COUNTRY_FONT.render(name, True, l_playerColors[d_playerLogoIndexes[name]]), (map.WIDTH * TILESIZE + x_offset, y_offset))
          y_offset += 25
       y_offset += 25
       DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonuses:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, y_offset))
@@ -252,7 +261,7 @@ def selectedInfo(map, DISPLAYSURF, params):
    DISPLAYSURF.blit(COUNTRY_FONT.render("Defense Bonus: " + str(map.d_continents[current_tile[0]][current_tile[1]].defense_bonus) + "%", True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 100, 375))
     
    # Owner
-   DISPLAYSURF.blit(COUNTRY_FONT.render("Owner: " + str(map.d_continents[current_tile[0]][current_tile[1]].owner if map.d_continents[current_tile[0]][current_tile[1]].owner != None else "Neutral"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 425))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Owner: " + map.d_continents[current_tile[0]][current_tile[1]].owner, True, l_playerColors[d_playerLogoIndexes[map.d_continents[current_tile[0]][current_tile[1]].owner]]), (map.WIDTH * TILESIZE + 100, 425))
     
    DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonus: " + str(map.d_bonuses[current_tile[0]]), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 500))
     

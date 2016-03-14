@@ -211,8 +211,9 @@ def MakeServer():
 
    # Initialize servername
    servername = ""
-   no_servername_message = SERVER_FONT.render("Please type your servername", 1, (255,0,0))
-    
+   NO_USERNAME_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "TypeUsername.png")
+   MESSAGE_COORDS = (220, 620)
+   
    # Address
    addr = ()
     
@@ -237,7 +238,7 @@ def MakeServer():
    
    # No servername positions
    x_no_servername = 350
-   y_no_servername = 800
+   y_no_servername = 400
    
    # Server panels positions
    x_panel_position = 100
@@ -486,7 +487,7 @@ def MakeServer():
          server_socket.close()
          return
       if servername == "":
-         DISPLAYSURF.blit(no_servername_message, (x_no_servername, y_no_servername))
+         DISPLAYSURF.blit(NO_USERNAME_MESSAGE, MESSAGE_COORDS)
          #print(str(x_mouse_position_main) + str(y_mouse_position_main))
         # print("clicked mounce here")
          
