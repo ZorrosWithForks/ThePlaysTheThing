@@ -63,6 +63,7 @@ def LoginClient():
       print("returned from clientJoined")
 
    def display_servers(x_panel_position, y_panel_position, y_offset):
+      del l_join_spots[:]
       for server in l_servers:
          LOGIN_TOP_SURFACE.blit(SERVER_BAR, (x_panel_position, y_panel_position + y_offset))
         
@@ -71,16 +72,18 @@ def LoginClient():
          LOGIN_TOP_SURFACE.blit(JOIN_BUTTON_UNPRESSED, (x_panel_position + 1100, y_panel_position + 25 + y_offset))
          l_join_spots.append((x_panel_position + 1100, y_panel_position + 25, server[0]))
          y_panel_position += 100
-         
+   
    def search(x_panel_position, y_panel_position, y_offset):
       while True:
          packet, addr = client_socket.recvfrom(4096)
          if packet != None:
             try:
+               gotAServer = True
                server_info = pickle.loads(packet)
-               l_servers.append(server_info)
+               if not server_info in l_servers:
+                  l_servers.append(server_info)
                print("added a server: " + server_info[0])
-               print("server length is: " + str(l_servers))
+               print("number of servers: " + str(l_servers))
                display_servers(x_panel_position, y_panel_position, y_offset)
             except:
                print("Client tried connecting to itself")
@@ -92,7 +95,6 @@ def LoginClient():
       print("requesting servers")
       del l_servers[:]
       y_offset = 0
-      print("servers after deleting: ", str(l_servers))
       client_socket.sendto(data.encode('ascii'), address)
 
    # Initialize pygame
@@ -112,6 +114,8 @@ def LoginClient():
    #USERNAME_BOX =  pygame.image.load(IMAGE_FILE_PATH + "username_box.png")
    BACK_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_unpressed.png")
    BACK_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_pressed.png")
+   NO_USERNAME_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "TypeUsername.png")
+   MESSAGE_COORDS = (220, 620)
    #specify that shift is not pressed
    shifted = False
 
@@ -135,7 +139,6 @@ def LoginClient():
 
    # Declare the username
    username = ""
-   no_username_message = SERVER_FONT.render("Please type your username", 1, (255,0,0))
 
    # Position of the text box
    X_POS = 100
@@ -361,7 +364,7 @@ def LoginClient():
             for join_button in l_join_spots:
                if join_button[0] <= x_mouse_position_main <= join_button[0] + 200 and join_button[1] <= y_mouse_position_main <= join_button[1] + 100:
                   if username == "":
-                     LOGIN_TOP_SURFACE.blit(no_username_message, (200, 800))
+                     LOGIN_TOP_SURFACE.blit(NO_USERNAME_MESSAGE, MESSAGE_COORDS)
                   else:
                      joinGame(join_button[2])
                   x_mouse_position_main = 0
@@ -394,14 +397,13 @@ def LoginClient():
       LOGIN_TOP_SURFACE.blit(SERVER_FONT.render(username, 1, (0,0,0)), (285, Y_POS))
       LOGIN_TOP_SURFACE.blit(DOWN_ARROW, (arrow_x_pos, down_arrow_y_pos))
       LOGIN_TOP_SURFACE.blit(UP_ARROW, (arrow_x_pos, up_arrow_y_pos))
-      waiting_on_players = SERVER_FONT.render("Waiting on players:", 1, (0,255,255))
       button("Refresh",refresh_x_pos,refresh_y_pos,200,100,REFRESH_BUTTON_PRESSED,REFRESH_BUTTON_UNPRESSED)
       pushed_back = button("Back",x_back_button,y_back_button,75,50,BACK_BUTTON_PRESSED,BACK_BUTTON_UNPRESSED)
       if pushed_back == True:
          client_socket.close()
          return
       if username == "":
-         LOGIN_TOP_SURFACE.blit(no_username_message, (200, 800))
+         LOGIN_TOP_SURFACE.blit(NO_USERNAME_MESSAGE, MESSAGE_COORDS)
                
       pygame.display.update()
       

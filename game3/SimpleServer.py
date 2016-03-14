@@ -36,7 +36,7 @@ def listener(client, address, l_players):
          #l_players.remove(client)
          client.close()
          
-def receivePlacements(l_players, serversocket, map, address):
+def receivePlacements(l_players, l_dead_players, serversocket, map, address):
    l_placements = []
    
    d_players = {}
@@ -249,7 +249,7 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
                l_attacks[player][2][country] = None
                print("Removed an attacker from the list")
             
-def receiveAttacks(l_players, serversocket, map, address):
+def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
    l_attacks = []   # list of tuples (l_attackers, l_defenders, d_attacks), each belonging to a different player
    l_defenders = [] # list of defender_coords
    
@@ -300,19 +300,19 @@ def receiveAttacks(l_players, serversocket, map, address):
    
    l_temp_players = []
    for player in l_players:
-      for attack in l_attacks:
-         for battle in attack[2].keys():
-            if attack[2][battle] != None and attack[2][battle][3] == player.user_name and player not in l_temp_players:
-               l_temp_players.append(player)          
-   for player in l_players:
       for name, continent in map.d_continents.items():
          for country in continent:
             if country.owner == player.user_name and player not in l_temp_players:
                l_temp_players.append(player)
+               
+   for player in l_players:
+      if player not in l_temp_players:
+         l_dead_players.append(player)
    
    l_players = l_temp_players
          
    tempPlayers = copy.copy(l_players)
+   
    for i in range(len(tempPlayers)):
       curr_connection = l_players[i].connection
       l_players[i].connection = None
@@ -320,23 +320,35 @@ def receiveAttacks(l_players, serversocket, map, address):
       packet = pickle.dumps(playerMap)
       try:
          curr_connection.sendto(packet, address)
+         l_players[i].connection = curr_connection
+         print("Sent final map to: " + l_players[i].user_name)
       except:
          l_players.remove(l_players[i])
          for continent in map.l_continent_names:
             for country in range(len(map.d_continents[continent])):
                if map.d_continents[continent][country].owner == player.user_name:
                   map.d_continents[continent][country].owner = "Unoccupied"
-         
-      l_players[i].connection = curr_connection
-      print("Sent final map to: " + l_players[i].user_name)
+      
+   tempPlayers = copy.copy(l_dead_players)
+   
+   for i in range(len(tempPlayers)):
+      curr_connection = l_dead_players[i].connection
+      l_dead_players[i].connection = None
+      packet = pickle.dumps(map)
+      try:
+         curr_connection.sendto(packet, address)
+         l_dead_players[i].connection = curr_connection
+         print("Sent final map to spectator: " + l_dead_players[i].user_name)
+      except:
+         l_dead_players.remove(l_dead_players[i])
       
    return l_players
       
-def receiveMoves(l_players, serversocket, map, address):
+def receiveMoves(l_players, l_dead_players, serversocket, map, address):
    l_moves = [] # list of tuples (l_senders, l_receivers, d_moves)
    
    tempPlayers = copy.copy(l_players)
-   for player in l_players:
+   for player in tempPlayers:
       try:
          response = player.connection.recv(8192)
          packet = pickle.loads(response)
@@ -415,6 +427,7 @@ def applyContinentBonuses(l_players, map):
 
 def serve(player_count):   
    l_players = []
+   l_dead_players = []
    
    print("Entering server")
 
@@ -457,10 +470,10 @@ def serve(player_count):
       print("Sent to: " + player.user_name)
    
    while True:
-      receivePlacements(l_players, serversocket, map, addr)
-      l_players = receiveAttacks(l_players, serversocket, map, addr)
+      receivePlacements(l_players, l_dead_players, serversocket, map, addr)
+      l_players = receiveAttacks(l_players, l_dead_players, serversocket, map, addr)
       print("Server: exited receiveAttacks")
-      receiveMoves(l_players, serversocket, map, addr)
+      receiveMoves(l_players, l_dead_players, serversocket, map, addr)
       #temp = input("pausing the server")
    
    serversocket.close()
