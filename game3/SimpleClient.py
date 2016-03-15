@@ -494,7 +494,10 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address):
              #Done
              if 980 <= curr_x <= 1080 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 175 and player.unit_counts == 0:
                update_map = pickle.dumps((map, player))
-               socket.sendto(update_map, host_address)
+               try:
+                  socket.sendto(update_map, host_address)
+               except:
+                  return None
                placing = False
        
        if selectedCountry == None:
@@ -527,7 +530,12 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
    def refresh():
       global refreshing
       global oldMap
-      response = socket.recv(8192)
+      try:
+         response = socket.recv(8192)
+      except:
+         oldMap = None
+         refreshing = False
+         return
       oldMap = pickle.loads(response)
       refreshing = False
       print("set refreshing to false")
@@ -547,9 +555,11 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
       #update the display
       pygame.display.update()
    print("Exited refreshing")
-   map = oldMap
+   if oldMap != None:
+      map = oldMap
+   else:
+      return None
    declaring = True
-   refreshing = False
 
    print("I have the map!")
    
@@ -633,7 +643,10 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
              #Done
              if 980 <= curr_x <= 1080 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 175 and player.unit_counts == 0:
                packet = pickle.dumps((l_attackers, l_defenders, d_attacks, player))
-               socket.sendto(packet, host_address)
+               try:
+                  socket.sendto(packet, host_address)
+               except:
+                  return None
                declaring = False
        
        
@@ -722,7 +735,13 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
    def refresh():
       global refreshing
       global oldMap
-      response = socket.recv(8192)
+      try:
+         response = socket.recv(8192)
+      except:
+         refreshing = False
+         oldMap = None
+         return
+         
       oldMap = pickle.loads(response)
       refreshing = False
       print("set refreshing to false")
@@ -746,8 +765,12 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
       #update the display
       pygame.display.update()
    print("Exited refreshing")
-   map = oldMap
-   detectGameEnd(DISPLAYSURF, map, player, socket)
+   if oldMap != None:
+      map = oldMap
+   else:
+      return None, None, None
+   if detectGameEnd(DISPLAYSURF, map, player, socket):
+      return None, None, None
    
    while moving:
       #get all the user events
@@ -827,7 +850,10 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
             #Done
             if 980 <= curr_x <= 1080 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 175 and player.unit_counts == 0:
                packet = pickle.dumps((l_senders, l_receivers, d_moves, player))
-               socket.sendto(packet, host_address)
+               try:
+                  socket.sendto(packet, host_address)
+               except:
+                  return None, None, None # This is kinda funny
                moving = False
                
       if selectedCountry == None:
@@ -937,9 +963,11 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address, l_senders, l_receiv
 
 deadMap = None
 def detectGameEnd(DISPLAYSURF, map, player, socket):
+   global deadMap
    Won = True
    Lost = True
    deadMap = map
+   done = False
    for cont_name in map.d_continents.keys():
       for country in map.d_continents[cont_name]:
          if country.owner == player.user_name:
@@ -954,7 +982,7 @@ def detectGameEnd(DISPLAYSURF, map, player, socket):
          global map
          while True:
             response = socket.recv(8192)
-            map = pickle.loads(response)
+            deadMap = pickle.loads(response)
             print("I'm dead and got a new map")
       
       t_updateScreen = threading.Thread(target=refresh)
@@ -964,11 +992,17 @@ def detectGameEnd(DISPLAYSURF, map, player, socket):
       while True:
          for event in pygame.event.get():
             #if the user wants to quit
-            handleGeneral(event, map)
+            if event.type == KEYDOWN:
+               if event.key == K_ESCAPE:
+                  if done:
+                     return True
+                  else:
+                     done = True
          map = deadMap
          printMap(map, DISPLAYSURF, standardInfo)
-         DISPLAYSURF.fill((255, 75, 75), special_flags=BLEND_MULT)
-         DISPLAYSURF.blit(LOSER, (0, 0))
+         if not done:
+            DISPLAYSURF.fill((255, 75, 75), special_flags=BLEND_MULT)
+            DISPLAYSURF.blit(LOSER, (0, 0))
          #update the display
          pygame.display.update()
    elif Won:
@@ -976,11 +1010,17 @@ def detectGameEnd(DISPLAYSURF, map, player, socket):
       while True:
          for event in pygame.event.get():
             #if the user wants to quit
-            handleGeneral(event, map)
+            if event.type == KEYDOWN:
+               if event.key == K_ESCAPE:
+                  if done:
+                     return True
+                  else:
+                     done = True
          
          printMap(map, DISPLAYSURF, standardInfo)
-         DISPLAYSURF.fill((50, 120, 255), special_flags=BLEND_MULT)
-         DISPLAYSURF.blit(WINNER, (0, 0))
+         if not done:
+            DISPLAYSURF.fill((50, 120, 255), special_flags=BLEND_MULT)
+            DISPLAYSURF.blit(WINNER, (0, 0))
          #update the display
          pygame.display.update()
    
@@ -1021,18 +1061,27 @@ def play(host_address, player_name):
    while True:
       map.current_player = player_name
       map = placeUnits(DISPLAYSURF, map, player, s, host_address)
+      if map == None:
+         break
       map, l_attackers, l_defenders = declareAttacks(DISPLAYSURF, map, player, s, host_address)
+      if map == None:
+         break
       print("Length of l_attackers is: " + str(len(l_attackers)))
       # detectGameEnd(DISPLAYSURF, map, player, socket)
       map, l_senders, l_receivers = moveTroops(DISPLAYSURF, map, player, s, host_address, l_attackers, l_defenders)
+      if map == None:
+         break
       info = getMoney(DISPLAYSURF, map, player, s, host_address, l_senders, l_receivers)
       map = info[0]
+      if map == None:
+         break
       player = info[1]
       print("Exited properly")
       #pygame.quit()
       #sys.exit()
 
    s.close()
+   return
 
 if __name__ == '__main__':
    host_address = sys.argv[1]

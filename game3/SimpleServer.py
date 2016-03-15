@@ -309,7 +309,7 @@ def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
       if player not in l_temp_players:
          l_dead_players.append(player)
    
-   l_players = l_temp_players
+   l_players = copy.copy(l_temp_players)
          
    tempPlayers = copy.copy(l_players)
    
@@ -472,6 +472,8 @@ def serve(player_count):
    while True:
       receivePlacements(l_players, l_dead_players, serversocket, map, addr)
       l_players = receiveAttacks(l_players, l_dead_players, serversocket, map, addr)
+      if len(l_players) <= 0:
+         break
       print("Server: exited receiveAttacks")
       receiveMoves(l_players, l_dead_players, serversocket, map, addr)
       #temp = input("pausing the server")

@@ -15,7 +15,10 @@ import copy
 l_players = []
 play = False
 newServer = None
+joined = True
 def LoginClient(username, s):
+   global joined
+   joined = True
    def displayPlayers(x_panel_position, y_panel_position, y_offset):
       tempPlayers = copy.copy(l_players)
       for player in tempPlayers:
@@ -31,23 +34,28 @@ def LoginClient(username, s):
       global play
       global newServer
       while True:
-         packet = s.recv(4096)
-         info = pickle.loads(packet)
-         if info[0]:
-            newServer = (info[1], 9998)
-            s.close()
-            play = True
-         else:
-            if info[2] == "boot":
+         try:
+            packet = s.recv(4096)
+            info = pickle.loads(packet)
+            if info[0]:
+               newServer = (info[1], 9998)
                s.close()
-               print("Got booted")
-               joined = False
-               return
+               play = True
             else:
-               if len(l_players) > 0:
-                  del l_players[:]
-               l_players = copy.copy(info[1])
-               l_players.insert(0, info[2])
+               if info[2] == "boot":
+                  s.close()
+                  print("Got booted")
+                  joined = False
+                  return
+               else:
+                  if len(l_players) > 0:
+                     del l_players[:]
+                  l_players = copy.copy(info[1])
+                  l_players.insert(0, info[2])
+         except:
+            print("Server died")
+            joined = False
+            return
       
    
    # Initialize pygame
@@ -98,7 +106,6 @@ def LoginClient(username, s):
    t_search = threading.Thread(target=getPlayers)
    t_search.daemon = True
    t_search.start()
-   joined = True
    # Get the username
    while joined:
       curr_x, curr_y = pygame.mouse.get_pos()
