@@ -18,6 +18,8 @@ newServer = None
 joined = True
 def LoginClient(username, s):
    global joined
+   global play
+   play = False
    joined = True
    def displayPlayers(x_panel_position, y_panel_position, y_offset):
       tempPlayers = copy.copy(l_players)

@@ -590,7 +590,8 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address):
                         l_defenders.append([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
                         d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0), False, player.user_name] #[defender, attack force]
                      elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_defenders: # if clicking the country your selected country is attacking
-                        if l_defenders.index([int(curr_x / TILESIZE), int(curr_y / TILESIZE)]) == l_attackers.index(selectedCountry):
+                        index = l_attackers.index(selectedCountry)
+                        if l_defenders[index] == [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] and l_attackers[index] == selectedCountry:
                            l_defenders.remove([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
                            l_attackers.remove([selectedCountry[0], selectedCountry[1]])
                            d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = None
@@ -785,17 +786,19 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
                
                if (curr_country != map.WATER): # if the user did not click water
                   if [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] != selectedCountry and selectedCountry != None: # if not clicking your selected country and there is a selected country
+                     if [selectedCountry[0], selectedCountry[1]] in l_senders:
+                        index = l_senders.index([selectedCountry[0], selectedCountry[1]])
                      if not ([selectedCountry[0], selectedCountry[1]] in l_senders) and [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_neighbors: # if selected country is not sending and clicking neighboring country
                         l_senders.append([selectedCountry[0], selectedCountry[1]])
                         l_receivers.append([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
                         d_moves[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0)] #[receiver, army]
                      elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_receivers and [selectedCountry[0], selectedCountry[1]] in l_senders and \
-                     l_receivers.index([int(curr_x / TILESIZE), int(curr_y / TILESIZE)]) == l_senders.index([selectedCountry[0], selectedCountry[1]]): # if clicking the country your selected country is sending troops to
+                     l_receivers[index] == [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] and l_senders[index] == [selectedCountry[0], selectedCountry[1]]: # if clicking the country your selected country is sending troops to
                         l_receivers.remove([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
                         if [selectedCountry[0], selectedCountry[1]] in l_senders:
                            l_senders.remove([selectedCountry[0], selectedCountry[1]])
                         d_moves[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = None
-                     elif [selectedCountry[0], selectedCountry[1]] in l_senders and map.d_continents[curr_country[0]][curr_country[1]].owner == player.user_name and selectedCountry:
+                     elif map.d_continents[curr_country[0]][curr_country[1]].owner == player.user_name:
                         l_neighbors = []
                         selectedCountry = [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]
                   elif map.d_continents[curr_country[0]][curr_country[1]].owner == player.user_name and selectedCountry != [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]: # if the user clicked his own country and not a selected country
