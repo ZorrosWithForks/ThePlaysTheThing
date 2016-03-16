@@ -966,6 +966,12 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address, l_senders, l_receiv
 
 deadMap = None
 def detectGameEnd(DISPLAYSURF, map, player, socket):
+   OK_COORDS = (450,450)
+   OK_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "OK.png")
+   OK_LIT = pygame.image.load(IMAGE_FILE_PATH + "OKLit.png")
+   EXIT_COORDS = (70, 770)
+   EXIT_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "Exit.png")
+   EXIT_LIT = pygame.image.load(IMAGE_FILE_PATH + "ExitLit.png")
    global deadMap
    Won = True
    Lost = True
@@ -993,39 +999,47 @@ def detectGameEnd(DISPLAYSURF, map, player, socket):
       t_updateScreen.start()
       
       while True:
+         curr_x, curr_y = pygame.mouse.get_pos()
+         over_ok = OK_COORDS[0] <= curr_x <= OK_COORDS[0] + 200 and OK_COORDS[1] <= curr_y <= OK_COORDS[1] + 100
+         over_exit = EXIT_COORDS[0] <= curr_x <= EXIT_COORDS[0] + 200 and EXIT_COORDS[1] <= curr_y <= EXIT_COORDS[1] + 100
          for event in pygame.event.get():
             #if the user wants to quit
-            if event.type == KEYDOWN and event.key == K_ESCAPE:
-               if done:
-                  return True
-               else:
-                  done = True
+            if not done and over_ok and event.type == MOUSEBUTTONDOWN:
+               done = True
+            elif over_exit and event.type == MOUSEBUTTONDOWN:
+               return True
          map = deadMap
          printMap(map, DISPLAYSURF, standardInfo)
          if not done:
             DISPLAYSURF.fill((255, 75, 75), special_flags=BLEND_MULT)
             DISPLAYSURF.blit(LOSER, (0, 0))
+            DISPLAYSURF.blit(OK_LIT if over_ok else OK_UNLIT, OK_COORDS)
          else:
-            DISPLAYSURF.fill((255,220,220), special_flags=BLEND_MULT)
+            DISPLAYSURF.fill((255,200,200), special_flags=BLEND_MULT)
+            DISPLAYSURF.blit(EXIT_LIT if over_exit else EXIT_UNLIT, EXIT_COORDS)
          #update the display
          pygame.display.update()
    elif Won:
       WINNER = pygame.image.load(IMAGE_FILE_PATH + "InfoVictory.png")
       while True:
+         curr_x, curr_y = pygame.mouse.get_pos()
+         over_ok = OK_COORDS[0] <= curr_x <= OK_COORDS[0] + 200 and OK_COORDS[1] <= curr_y <= OK_COORDS[1] + 100
+         over_exit = EXIT_COORDS[0] <= curr_x <= EXIT_COORDS[0] + 200 and EXIT_COORDS[1] <= curr_y <= EXIT_COORDS[1] + 100
          for event in pygame.event.get():
             #if the user wants to quit
-            if event.type == KEYDOWN and event.key == K_ESCAPE:
-               if done:
-                  return True
-               else:
-                  done = True
+            if not done and over_ok and event.type == MOUSEBUTTONDOWN:
+               done = True
+            elif over_exit and event.type == MOUSEBUTTONDOWN:
+               return True
       
          printMap(map, DISPLAYSURF, standardInfo)
          if not done:
             DISPLAYSURF.fill((50, 120, 255), special_flags=BLEND_MULT)
             DISPLAYSURF.blit(WINNER, (0, 0))
+            DISPLAYSURF.blit(OK_LIT if over_ok else OK_UNLIT, OK_COORDS)
          else:
-            DISPLAYSURF.fill((210,230,255), special_flags=BLEND_MULT)
+            DISPLAYSURF.fill((200,230,255), special_flags=BLEND_MULT)
+            DISPLAYSURF.blit(EXIT_LIT if over_exit else EXIT_UNLIT, EXIT_COORDS)
          #update the display
          pygame.display.update()
    
