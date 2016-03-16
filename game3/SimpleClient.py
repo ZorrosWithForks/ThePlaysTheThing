@@ -186,8 +186,8 @@ l_playerColors = [
                 (0,0,0), #Black
                 (20,200,45), #Green
                 (220,220,0), #Yellow
-                (255,110,130), #Pink
-                (0,0,25), #Dark Blue
+                (220,0,0), #Red
+                (0,0,100), #Dark Blue
                 (255,255,255), #White
                 (220,110,0), #Orange
                 (110,55,0) #Brown
@@ -995,17 +995,18 @@ def detectGameEnd(DISPLAYSURF, map, player, socket):
       while True:
          for event in pygame.event.get():
             #if the user wants to quit
-            if event.type == KEYDOWN:
-               if event.key == K_ESCAPE:
-                  if done:
-                     return True
-                  else:
-                     done = True
+            if event.type == KEYDOWN and event.key == K_ESCAPE:
+               if done:
+                  return True
+               else:
+                  done = True
          map = deadMap
          printMap(map, DISPLAYSURF, standardInfo)
          if not done:
             DISPLAYSURF.fill((255, 75, 75), special_flags=BLEND_MULT)
             DISPLAYSURF.blit(LOSER, (0, 0))
+         else:
+            DISPLAYSURF.fill((255,220,220), special_flags=BLEND_MULT)
          #update the display
          pygame.display.update()
    elif Won:
@@ -1013,17 +1014,18 @@ def detectGameEnd(DISPLAYSURF, map, player, socket):
       while True:
          for event in pygame.event.get():
             #if the user wants to quit
-            if event.type == KEYDOWN:
-               if event.key == K_ESCAPE:
-                  if done:
-                     return True
-                  else:
-                     done = True
-         
+            if event.type == KEYDOWN and event.key == K_ESCAPE:
+               if done:
+                  return True
+               else:
+                  done = True
+      
          printMap(map, DISPLAYSURF, standardInfo)
          if not done:
             DISPLAYSURF.fill((50, 120, 255), special_flags=BLEND_MULT)
             DISPLAYSURF.blit(WINNER, (0, 0))
+         else:
+            DISPLAYSURF.fill((210,230,255), special_flags=BLEND_MULT)
          #update the display
          pygame.display.update()
    
