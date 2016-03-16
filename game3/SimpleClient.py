@@ -186,8 +186,8 @@ l_playerColors = [
                 (0,0,0), #Black
                 (20,200,45), #Green
                 (220,220,0), #Yellow
-                (255,110,130), #Pink
-                (0,0,25), #Dark Blue
+                (220,0,0), #Red
+                (0,0,100), #Dark Blue
                 (255,255,255), #White
                 (220,110,0), #Orange
                 (110,55,0) #Brown
