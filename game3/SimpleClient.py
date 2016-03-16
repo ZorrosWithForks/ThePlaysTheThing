@@ -206,9 +206,9 @@ map_Y_offset = 0
 d_continent_tiles = {}
 
 def standardInfo(map, DISPLAYSURF, params):
-    #Highlight country mouse is over and display country info
-    curr_x, curr_y = pygame.mouse.get_pos()
-    if (curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE and map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)] != map.WATER):
+   #Highlight country mouse is over and display country info
+   curr_x, curr_y = pygame.mouse.get_pos()
+   if (curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE and map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)] != map.WATER):
       curr_country = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)]
       DISPLAYSURF.blit(MOUSE_OVER if map.d_continents[curr_country[0]][curr_country[1]].owner != None else MOUSE_OVER_UNKNOWN, (int(curr_x / TILESIZE) * TILESIZE - MARGIN, int(curr_y / TILESIZE) * TILESIZE - MARGIN), special_flags=BLEND_ADD)
       current_tile = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)]
@@ -230,7 +230,7 @@ def standardInfo(map, DISPLAYSURF, params):
       DISPLAYSURF.blit(COUNTRY_FONT.render("Owner: " + (str(map.d_continents[current_tile[0]][current_tile[1]].owner) if country_known else "?"), True, l_playerColors[d_playerLogoIndexes[map.d_continents[current_tile[0]][current_tile[1]].owner]] if country_known else (0,0,0)), (map.WIDTH * TILESIZE + 100, 425))
          
       DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonus: " + str(map.d_bonuses[current_tile[0]]), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 500))
-    else:
+   else:
       x_offset = 120
       y_offset = 180
       DISPLAYSURF.blit(CONTINENT_FONT.render("Players:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 130))
@@ -792,11 +792,9 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
                         l_senders.append([selectedCountry[0], selectedCountry[1]])
                         l_receivers.append([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
                         d_moves[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0)] #[receiver, army]
-                     elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_receivers and [selectedCountry[0], selectedCountry[1]] in l_senders and \
-                     l_receivers[index] == [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] and l_senders[index] == [selectedCountry[0], selectedCountry[1]]: # if clicking the country your selected country is sending troops to
-                        l_receivers.remove([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
-                        if [selectedCountry[0], selectedCountry[1]] in l_senders:
-                           l_senders.remove([selectedCountry[0], selectedCountry[1]])
+                     elif l_receivers[index] == [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]: # if clicking the country your selected country is sending troops to
+                        del l_receivers[index]
+                        l_senders.remove([selectedCountry[0], selectedCountry[1]])
                         d_moves[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = None
                      elif map.d_continents[curr_country[0]][curr_country[1]].owner == player.user_name:
                         l_neighbors = []
