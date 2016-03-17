@@ -18,6 +18,8 @@ import copy
 
 
 def MakeServer():
+   # Booted string
+   booted = "boot"
    def text_objects(text, font, color):
        textSurface = font.render(text, True, color)
        return textSurface, textSurface.get_rect()
@@ -61,21 +63,30 @@ def MakeServer():
          print("accepted player")
          player_name = client.recv(4096).decode()
          l_temp = (client, player_name, client_address)
-         clients.append(l_temp) #Array of clients
-         t_client = threading.Thread(target=stuffAndThings, args=(l_temp,))
-         t_client.daemon = True
-         t_client.start()
-         tempClients = copy.copy(clients)
-         for player in tempClients:
-            l_playerNames = []
-            for name in clients:
-               l_playerNames.append(name[1])
-            packet = pickle.dumps((False, l_playerNames, servername))
-            try:
-               player[0].sendto(packet, player[2])
-            except:
-               clients.remove(player)
-               print("Removed client: " + player[1])
+         clients.append(l_temp)
+         print(str(len(clients)))
+         if len(clients) < 7:
+            #Array of clients
+            t_client = threading.Thread(target=stuffAndThings, args=(l_temp,))
+            t_client.daemon = True
+            t_client.start()
+            tempClients = copy.copy(clients)
+            for player in tempClients:
+               l_playerNames = []
+               for name in clients:
+                  l_playerNames.append(name[1])
+               packet = pickle.dumps((False, l_playerNames, servername))
+               try:
+                  player[0].sendto(packet, player[2])
+               except:
+                  clients.remove(player)
+                  print("Removed client: " + player[1])
+         else:
+            packet = pickle.dumps((False, [], booted))
+            clients[-1][0].sendto(packet, clients[-1][2])
+            clients.remove(clients[-1])
+            print("Denied")
+            
       
    def display_players(x_panel_position, y_panel_position, player_name, y_offset):
       #print("Number of clients: " + str(len(clients)))
@@ -244,8 +255,6 @@ def MakeServer():
    x_start_server_button = 200
    y_start_server_button = 800
        
-   # Booted string
-   booted = "boot"
    # Play string
    play = "play"
    
@@ -286,8 +295,6 @@ def MakeServer():
          if players > 5:
             index += 1
             y_offset_allowed = (index * 100)
-            print (players)
-            print (y_offset_allowed)
       
       for event in pygame.event.get():
          if event.type == QUIT:
