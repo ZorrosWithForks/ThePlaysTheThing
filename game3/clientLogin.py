@@ -61,7 +61,10 @@ def LoginClient():
       # put here? something that will tell if it has been booted. if so, return to the main menu
       clientJoined.LoginClient(username, s)
       print("returned from clientJoined")
-
+      s.close()
+      del l_servers[:]
+      client_socket.sendto(data.encode('ascii'), address)
+      
    def display_servers(x_panel_position, y_panel_position, y_offset):
       del l_join_spots[:]
       for server in l_servers:
@@ -200,11 +203,9 @@ def LoginClient():
    client_socket.bind((host, 8080))
    client_socket.sendto(data.encode('ascii'), address)
 
-   print("Made it")
    t_search = threading.Thread(target=search, args=(x_panel_position, y_panel_position, y_offset))
    t_search.daemon = True
    t_search.start()
-   print("Am I here?")
 
    # Get the username
    while True:
@@ -353,7 +354,6 @@ def LoginClient():
          if event.type == MOUSEBUTTONDOWN:
             x_mouse_position_main, y_mouse_position_main = pygame.mouse.get_pos()
             print(str(x_mouse_position_main) + str(y_mouse_position_main))
-            print("clicked mounce here")
             
             # click refresh
             if refresh_x_pos <= x_mouse_position_main <= refresh_x_pos + 200 and refresh_y_pos <= y_mouse_position_main <= refresh_y_pos + 100:
@@ -399,7 +399,7 @@ def LoginClient():
       LOGIN_TOP_SURFACE.blit(UP_ARROW, (arrow_x_pos, up_arrow_y_pos))
       button("Refresh",refresh_x_pos,refresh_y_pos,200,100,REFRESH_BUTTON_PRESSED,REFRESH_BUTTON_UNPRESSED)
       pushed_back = button("Back",x_back_button,y_back_button,75,50,BACK_BUTTON_PRESSED,BACK_BUTTON_UNPRESSED)
-      if pushed_back == True:
+      if pushed_back:
          client_socket.close()
          return
       if username == "":

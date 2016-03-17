@@ -16,6 +16,7 @@ import os
 from bad_stuff import *
 import copy
 
+
 def MakeServer():
    def text_objects(text, font, color):
        textSurface = font.render(text, True, color)
@@ -24,7 +25,10 @@ def MakeServer():
    def broadcast(servername, server_socket):
       while True:
          print("Listening")
-         recv_data, addr = server_socket.recvfrom(4096)
+         try:
+            recv_data, addr = server_socket.recvfrom(4096)
+         except:
+            return
          
          print(recv_data)
          packet = pickle.dumps((host, servername)) 
@@ -49,14 +53,11 @@ def MakeServer():
                print("Removed client: " + player[1])
       
    def acceptPlayers():
-      print("made it to accept players")
-      serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-      port = 9999
-      addr = (host, port)
-      serversocket.bind((host, port))
-      serversocket.listen(5)
       while True:
-         client, client_address = serversocket.accept()
+         try:
+            client, client_address = serversocket.accept()
+         except:
+            return
          print("accepted player")
          player_name = client.recv(4096).decode()
          l_temp = (client, player_name, client_address)
@@ -75,11 +76,6 @@ def MakeServer():
             except:
                clients.remove(player)
                print("Removed client: " + player[1])
-               
-            
-      t_connected_client = threading.Thread(target=sendToJoinedClient, args=(clients,))
-      t_connected_client.daemon = True
-      t_connected_client.start()
       
    def display_players(x_panel_position, y_panel_position, player_name, y_offset):
       #print("Number of clients: " + str(len(clients)))
@@ -267,6 +263,13 @@ def MakeServer():
    server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
    server_socket.bind(broadcast_address)
+   
+   print("made it to accept players")
+   serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+   port = 9999
+   addr = (host, port)
+   serversocket.bind((host, port))
+   serversocket.listen(5)
 
    # Play the game when the play button is pressed
    while True:
@@ -426,11 +429,19 @@ def MakeServer():
             # clicked play
             if x_play_button <= x_mouse_position_main <= x_play_button + 200 and y_play_button <= y_mouse_position_main <= y_play_button + 200 and servername != "":
                start_game()
+               server_socket.close()
+               serversocket.close()
+               for client in clients:
+                  client[0].close()
+               return
                
             # clicked back
             if x_back_button <= x_mouse_position_main <= x_back_button + 75 and y_back_button <= y_mouse_position_main <= y_back_button + 50:
                server_socket.close()
-               return(True)
+               serversocket.close()
+               for client in clients:
+                  client[0].close()
+               return
                
             # clicked boot
             for boot_spot in l_boot_spots:
