@@ -62,6 +62,19 @@ def MakeServer():
             return
          print("accepted player")
          player_name = client.recv(4096).decode()
+         goodName = False
+         index = 0
+         if player_name == servername:
+            index += 1
+         while not goodName:
+            goodName = True
+            for player in clients:
+               if player[1] == player_name + ("(" + str(index) + ")" if index >= 1 else ""):
+                  goodName = False
+                  index += 1
+                  
+         player_name = player_name + ("(" + str(index) + ")" if index >= 1 else "")
+         print(player_name)
          l_temp = (client, player_name, client_address)
          clients.append(l_temp)
          print(str(len(clients)))
