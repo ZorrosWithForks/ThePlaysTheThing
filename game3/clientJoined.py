@@ -121,8 +121,6 @@ def LoginClient(username, s):
          if players > 5:
             index += 1
             y_offset_allowed = (index * 100)
-            print (players)
-            print (y_offset_allowed)
          
       #get user events
       events = pygame.event.get()
