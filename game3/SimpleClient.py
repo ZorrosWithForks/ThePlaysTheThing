@@ -429,7 +429,6 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address):
        curr_x, curr_y = pygame.mouse.get_pos()
        for event in pygame.event.get():
            #if the user wants to quit
-           #if selectedCountry == None:
            handleGeneral(event, map, temp_map, selectedCountry)
            
            if event.type == MOUSEBUTTONDOWN:
