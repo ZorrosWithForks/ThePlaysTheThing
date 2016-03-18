@@ -15,6 +15,38 @@ from bad_stuff import *
 import clientJoined
 
 def LoginClient():
+   def displayMessage(image):
+      OK_COORDS = (450,450)
+      OK_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "OK.png")
+      OK_LIT = pygame.image.load(IMAGE_FILE_PATH + "OKLit.png")
+      clickedOK = False
+      while not clickedOK:
+         print("looping")
+         curr_x, curr_y = pygame.mouse.get_pos()
+         over_ok = OK_COORDS[0] <= curr_x <= OK_COORDS[0] + 200 and OK_COORDS[1] <= curr_y <= OK_COORDS[1] + 100
+         for event in pygame.event.get():
+            if over_ok and event.type == MOUSEBUTTONDOWN:
+               clickedOK = True
+               print("Clicked OK")
+              
+         # Blit the stuffs onto the screen
+         LOGIN_TOP_SURFACE.blit(BLACK_BACKGROUND, (100, 100))
+         display_servers(x_panel_position, y_panel_position, y_offset)
+         LOGIN_TOP_SURFACE.blit(LOGIN_BACKGROUND, (0,0))
+         #LOGIN_TOP_SURFACE.blit(USERNAME_BOX, (280, Y_POS))
+         #LOGIN_TOP_SURFACE.blit(SERVER_FONT.render("Username: ", 1, (0,0,0)), (X_POS, Y_POS))
+         LOGIN_TOP_SURFACE.blit(SERVER_FONT.render(username, 1, (0,0,0)), (285, Y_POS))
+         LOGIN_TOP_SURFACE.blit(DOWN_ARROW, (arrow_x_pos, down_arrow_y_pos))
+         LOGIN_TOP_SURFACE.blit(UP_ARROW, (arrow_x_pos, up_arrow_y_pos))
+         #button("Refresh",refresh_x_pos,refresh_y_pos,200,100,REFRESH_BUTTON_PRESSED,REFRESH_BUTTON_UNPRESSED)
+         #pushed_back = button("Back",x_back_button,y_back_button,75,50,BACK_BUTTON_PRESSED,BACK_BUTTON_UNPRESSED)
+         LOGIN_TOP_SURFACE.blit(image, (0, 0))
+         LOGIN_TOP_SURFACE.blit(OK_LIT if over_ok else OK_UNLIT, OK_COORDS)
+         print("blitted stuffs")
+         
+         pygame.display.update()
+
+
    def button(msg, x, y, w, h, button_pressed,button_unpressed):
       ''' x: The x location of the top left coordinate of the button box.
 
@@ -54,16 +86,25 @@ def LoginClient():
       print("attempting to join " + ip)
       s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       addr = (ip, 9999)
-      
-      s.connect(addr)
-      s.sendto(username.encode('ascii'), addr)
-      print("joined")
-      # put here? something that will tell if it has been booted. if so, return to the main menu
-      clientJoined.LoginClient(username, s)
-      print("returned from clientJoined")
-      s.close()
-      del l_servers[:]
-      client_socket.sendto(data.encode('ascii'), address)
+      s.settimeout(1)
+      try:
+         s.connect(addr)
+         s.settimeout(None)
+         s.sendto(username.encode('ascii'), addr)
+         print("joined")
+         # put here? something that will tell if it has been booted. if so, return to the main menu
+         full = clientJoined.LoginClient(username, s)
+         if full:
+            print("Returned true")
+            displayMessage(MESSAGE)
+         print("returned from clientJoined")
+         s.close()
+         del l_servers[:]
+         client_socket.sendto(data.encode('ascii'), address)
+      except:
+         s.close()
+         del l_servers[:]
+         client_socket.sendto(data.encode('ascii'), address)
       
    def display_servers(x_panel_position, y_panel_position, y_offset):
       del l_join_spots[:]
@@ -104,6 +145,8 @@ def LoginClient():
    pygame.init()
 
    # Graphics Constants
+   IMAGE_FILE_PATH = "ImageFiles\\"
+   MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoVictory.png")
    IMAGE_FILE_PATH = "ImageFiles\\"
    LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background.png")
    BLACK_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background2.png")

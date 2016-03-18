@@ -95,7 +95,7 @@ def MakeServer():
                   clients.remove(player)
                   print("Removed client: " + player[1])
          else:
-            packet = pickle.dumps((False, [], booted))
+            packet = pickle.dumps((False, [], "full"))
             clients[-1][0].sendto(packet, clients[-1][2])
             clients.remove(clients[-1])
             print("Denied")
@@ -129,6 +129,7 @@ def MakeServer():
       t_become_server.daemon = True
       t_become_server.start()
       server_socket.close()
+      serversocket.close()
       SimpleClient.play(addr, servername)
 
    def begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients):
