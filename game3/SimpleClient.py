@@ -772,9 +772,9 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
    if oldMap != None:
       map = oldMap[0]
    else:
-      return None, None, None
-   if detectGameEnd(DISPLAYSURF, map, player, socket):
-      return None, None, None
+      return None, None, None, None
+   if detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames):
+      return None, None, None, None
    
    while moving:
       #get all the user events
@@ -858,7 +858,7 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
                try:
                   socket.sendto(packet, host_address)
                except:
-                  return None, None, None # This is kinda funny
+                  return None, None, None, None # This is kinda funny
                moving = False
                
       if selectedCountry == None:
@@ -967,7 +967,7 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address, l_senders, l_receiv
    return newMap
 
 deadMap = None
-def detectGameEnd(DISPLAYSURF, map, player, socket):
+def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames):
    OK_COORDS = (450,450)
    OK_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "OK.png")
    OK_LIT = pygame.image.load(IMAGE_FILE_PATH + "OKLit.png")
@@ -1011,7 +1011,7 @@ def detectGameEnd(DISPLAYSURF, map, player, socket):
             elif over_exit and event.type == MOUSEBUTTONDOWN:
                return True
          map = deadMap
-         printMap(map, DISPLAYSURF, standardInfo)
+         printMap(map, DISPLAYSURF, standardInfo, l_playerNames)
          if not done:
             DISPLAYSURF.fill((255, 75, 75), special_flags=BLEND_MULT)
             DISPLAYSURF.blit(LOSER, (0, 0))
@@ -1034,7 +1034,7 @@ def detectGameEnd(DISPLAYSURF, map, player, socket):
             elif over_exit and event.type == MOUSEBUTTONDOWN:
                return True
       
-         printMap(map, DISPLAYSURF, standardInfo)
+         printMap(map, DISPLAYSURF, standardInfo, l_playerNames)
          if not done:
             DISPLAYSURF.fill((50, 120, 255), special_flags=BLEND_MULT)
             DISPLAYSURF.blit(WINNER, (0, 0))

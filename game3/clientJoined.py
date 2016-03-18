@@ -13,14 +13,49 @@ import SimpleClient
 import copy
 
 l_players = []
-play = False
+play = None
 newServer = None
 joined = True
+IMAGE_FILE_PATH = "ImageFiles\\"
+MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoVictory.png")
+# Position of the arrows
+arrow_x_pos = 1500
+up_arrow_y_pos = 550
+down_arrow_y_pos = 50
+
 def LoginClient(username, s):
    global joined
    global play
-   play = False
+   play = None
    joined = True
+   
+   def displayMessage(image):
+      OK_COORDS = (450,450)
+      OK_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "OK.png")
+      OK_LIT = pygame.image.load(IMAGE_FILE_PATH + "OKLit.png")
+      clickedOK = False
+      while not clickedOK:
+         curr_x, curr_y = pygame.mouse.get_pos()
+         over_ok = OK_COORDS[0] <= curr_x <= OK_COORDS[0] + 200 and OK_COORDS[1] <= curr_y <= OK_COORDS[1] + 100
+         for event in pygame.event.get():
+            if over_ok and event.type == MOUSEBUTTONDOWN:
+               clickedOK = True
+              
+         # Blit the stuffs onto the screen
+         LOGIN_TOP_SURFACE.blit(BLACK_BACKGROUND, (100, 100))
+         LOGIN_TOP_SURFACE.blit(LOGIN_BACKGROUND, (0,0))
+         LOGIN_TOP_SURFACE.blit(SERVER_FONT.render(username, 1, (0,0,0)), (285, Y_POS))
+         LOGIN_TOP_SURFACE.blit(DOWN_ARROW, (arrow_x_pos, down_arrow_y_pos))
+         LOGIN_TOP_SURFACE.blit(UP_ARROW, (arrow_x_pos, up_arrow_y_pos))
+         if x_back_button <= curr_x <= x_back_button + 75 and y_back_button <= curr_y <= y_back_button + 50:
+            LOGIN_TOP_SURFACE.blit(BACK_BUTTON_PRESSED, (x_back_button,y_back_button))
+         else:
+            LOGIN_TOP_SURFACE.blit(BACK_BUTTON_UNPRESSED, (x_back_button,y_back_button))
+         LOGIN_TOP_SURFACE.blit(image, (0, 0))
+         LOGIN_TOP_SURFACE.blit(OK_LIT if over_ok else OK_UNLIT, OK_COORDS)
+         
+         pygame.display.update()
+            
    def displayPlayers(x_panel_position, y_panel_position, y_offset):
       tempPlayers = copy.copy(l_players)
       for player in tempPlayers:
@@ -42,12 +77,14 @@ def LoginClient(username, s):
             if info[0]:
                newServer = (info[1], 9998)
                s.close()
-               play = True
+               play = "play"
             else:
-               if info[2] == "boot":
+               if info[2] == "boot" or info[2] == "full":
                   s.close()
                   print("Got booted")
-                  joined = False
+                  if info[2] == "boot":
+                     joined = False
+                  play = info[2]
                   return
                else:
                   if len(l_players) > 0:
@@ -57,6 +94,7 @@ def LoginClient(username, s):
          except:
             print("Server died")
             joined = False
+            play = "crash"
             return
       
    
@@ -85,11 +123,6 @@ def LoginClient(username, s):
    # Position of back button
    x_back_button = 5
    y_back_button = 5
-
-   # Position of the arrows
-   arrow_x_pos = 1500
-   up_arrow_y_pos = 550
-   down_arrow_y_pos = 50
 
    # Position of refresh button
    refresh_x_pos = 1300
@@ -176,11 +209,16 @@ def LoginClient(username, s):
          LOGIN_TOP_SURFACE.blit(BACK_BUTTON_PRESSED, (x_back_button,y_back_button))
       else:
          LOGIN_TOP_SURFACE.blit(BACK_BUTTON_UNPRESSED, (x_back_button,y_back_button))
-      waiting_on_players = SERVER_FONT.render("Waiting on players:", 1, (0,255,255))
       
-      if play:
+      if play == "play":
          SimpleClient.play(newServer, username)
+      elif play == "boot":
+         displayMessage(MESSAGE)
+      elif play == "full":
+         return True
+      elif play == "crashed":
+         displayMessage(MESSAGE)
       else:
          pygame.display.update()
       
-   return
+   return False

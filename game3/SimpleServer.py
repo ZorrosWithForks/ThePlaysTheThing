@@ -101,7 +101,7 @@ def receivePlacements(l_players, l_dead_players, serversocket, map, address):
       
 def resolveAttacks(defender_coords, l_attacks, map, l_players):
    numOfAttackers = 2
-   while numOfAttackers > 1:
+   while numOfAttackers > 0:
       print("Number of attackers: " + str(numOfAttackers))
       defending_country = map.ll_map[defender_coords[1]][defender_coords[0]]
       d_attackers = {}
@@ -187,7 +187,7 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
                print("d_damage_sum: " + str(d_damage_sum[attacker_name]))
                player[2][attacking_country][1].infantry -= int(random.randrange(int(d_damage_sum[attacker_name]  * .5), int(d_damage_sum[attacker_name]) + 1) * player[2][attacking_country][1].infantry / max(total_unit_count, 1) / max(d_attacker_counts[player[2][attacking_country][3]], 1))
                player[2][attacking_country][1].archers -= int(random.randrange(int(d_damage_sum[attacker_name]   * .4), int(d_damage_sum[attacker_name]) + 1) * player[2][attacking_country][1].archers / max(total_unit_count, 1) / max(d_attacker_counts[player[2][attacking_country][3]], 1))
-               player[2][attacking_country][1].cannons -= int(random.randrange(int(d_damage_sum[attacker_name]   * .2), int(d_damage_sum[attacker_name] * .4) + 1) * player[2][attacking_country][1].cannons / max(total_unit_count, 1) / max(d_attacker_counts[player[2][attacking_country][3]], 1))
+               player[2][attacking_country][1].cannons -= int(random.randrange(int(d_damage_sum[attacker_name]   * .2), int(d_damage_sum[attacker_name] * .35) + 2) * player[2][attacking_country][1].cannons / max(total_unit_count, 1) / max(d_attacker_counts[player[2][attacking_country][3]], 1))
                player[2][attacking_country][1].champions -= int(random.randrange(int(d_damage_sum[attacker_name] * .2), int(d_damage_sum[attacker_name] * .35) + 1) * player[2][attacking_country][1].champions / max(total_unit_count, 1) / max(d_attacker_counts[player[2][attacking_country][3]], 1))
                
               
@@ -248,6 +248,7 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
                   attacking_army.archers = 0
                   attacking_army.cannons = 0
                   attacking_army.champions = 0
+                  numOfAttackers = 0
             
       l_tempAttacks = copy.deepcopy(l_attacks)
       for player in range(len(l_tempAttacks)):
