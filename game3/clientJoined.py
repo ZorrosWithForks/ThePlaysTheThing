@@ -17,7 +17,8 @@ play = None
 newServer = None
 joined = True
 IMAGE_FILE_PATH = "ImageFiles\\"
-MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoVictory.png")
+BOOT_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoBooted.png")
+CRASH_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoServerLost.png")
 # Position of the arrows
 arrow_x_pos = 1500
 up_arrow_y_pos = 550
@@ -213,11 +214,11 @@ def LoginClient(username, s):
       if play == "play":
          SimpleClient.play(newServer, username)
       elif play == "boot":
-         displayMessage(MESSAGE)
+         displayMessage(BOOT_MESSAGE)
       elif play == "full":
          return True
       elif play == "crashed":
-         displayMessage(MESSAGE)
+         displayMessage(CRASH_MESSAGE)
       else:
          pygame.display.update()
       

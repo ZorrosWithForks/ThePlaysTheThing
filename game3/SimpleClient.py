@@ -44,6 +44,21 @@ OVERLAY = 9
 HELP_COORDS = [1135, 820]
 
 # Graphics Constants
+WATER_OUTLINE = pygame.image.load(IMAGE_FILE_PATH + 'water.png')
+t_WATER_OUTLINES = (
+                     WATER_OUTLINE,
+                     pygame.transform.rotate(WATER_OUTLINE, 90),
+                     pygame.transform.rotate(WATER_OUTLINE, 180),
+                     pygame.transform.rotate(WATER_OUTLINE, 270)
+                   )
+WATER_TEXTURE = pygame.image.load(IMAGE_FILE_PATH + 'deep_water.png')
+t_WATER_TEXTURES = (
+                     WATER_TEXTURE,
+                     pygame.transform.rotate(WATER_TEXTURE, 90),
+                     pygame.transform.rotate(WATER_TEXTURE, 180),
+                     pygame.transform.rotate(WATER_TEXTURE, 270)
+                   )
+
 INFO_BUY_UNITS = pygame.image.load(IMAGE_FILE_PATH + "InfoBuyUnits.png")
 INFO_ATTACK = pygame.image.load(IMAGE_FILE_PATH + "InfoAttack.png")
 INFO_RESOLVE = pygame.image.load(IMAGE_FILE_PATH + "InfoBattle.png")
@@ -158,8 +173,6 @@ def blitMove(map, DISPLAYSURF, source_coords, dest_coords):
 
 #a dictionary linking resources to textures
 textures =   {
-                WATER  : pygame.image.load(IMAGE_FILE_PATH + 'water.png'),
-                DEEP_WATER : pygame.image.load(IMAGE_FILE_PATH + 'deep_water.png'),
                 OVERLAY : pygame.image.load(IMAGE_FILE_PATH + 'overlay.png'),
                 CONTINENT_1 : pygame.image.load(IMAGE_FILE_PATH + 'continent_1.png'),
                 CONTINENT_2 : pygame.image.load(IMAGE_FILE_PATH + 'continent_2.png'),
@@ -367,7 +380,7 @@ def printMap(map, DISPLAYSURF, infoDisplay, params=None):
         for column in range(map.WIDTH):
             #draw the resource at that position in the tilemap, using the correct colour
             if (map.ll_map[row][column] == WATER):
-               DISPLAYSURF.blit(textures[WATER], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
+               DISPLAYSURF.blit(t_WATER_OUTLINES[map.ll_water_mask[row][column]], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
           
     #loop through each row
     for row in range(map.HEIGHT):
@@ -375,7 +388,7 @@ def printMap(map, DISPLAYSURF, infoDisplay, params=None):
         for column in range(map.WIDTH):
             #draw the resource at that position in the tilemap, using the correct colour
             if (map.ll_map[row][column] == WATER):
-               DISPLAYSURF.blit(textures[DEEP_WATER], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
+               DISPLAYSURF.blit(t_WATER_TEXTURES[map.ll_water_mask[row][column]], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
 
     DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
     DISPLAYSURF.blit(MAP_FRAME, dest=(0,0))
