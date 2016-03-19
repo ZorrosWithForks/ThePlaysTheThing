@@ -79,6 +79,7 @@ def LoginClient(username, s):
                newServer = (info[1], 9998)
                s.close()
                play = "play"
+               return
             else:
                if info[2] == "boot" or info[2] == "full":
                   s.close()
@@ -212,6 +213,7 @@ def LoginClient(username, s):
          LOGIN_TOP_SURFACE.blit(BACK_BUTTON_UNPRESSED, (x_back_button,y_back_button))
       
       if play == "play":
+         print("About to call SimpleClient.play")
          SimpleClient.play(newServer, username)
       elif play == "boot":
          displayMessage(BOOT_MESSAGE)
