@@ -426,7 +426,7 @@ def LoginClient():
                
                
             # clicked down arrow
-            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 100 and y_offset > -y_offset_allowed and len(l_servers) > 5:
+            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 50 and y_offset > -y_offset_allowed and len(l_servers) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
                y_offset -= 100
                #display_servers(x_panel_position, y_panel_position, y_offset)

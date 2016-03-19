@@ -335,7 +335,7 @@ def MakeServer():
             if event.key == K_UP and y_offset < 0 and len(clients) > 5:
                SERVERS_AREA = DISPLAYSURF.get_clip()
                y_offset += 100
-                  #display_servers(x_panel_position, y_panel_position, y_offset)
+               #display_servers(x_panel_position, y_panel_position, y_offset)
             elif event.key == K_LSHIFT or event.key == K_RSHIFT:
                shifted = True
             if not shifted and len(servername) < 25:
@@ -488,11 +488,13 @@ def MakeServer():
             if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 50 and y_offset < 0 and len(l_servers) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
                y_offset += 100
+               #display_servers(x_panel_position, y_panel_position, y_offset)
                
             # clicked down arrow
             if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 100 and y_offset > -y_offset_allowed and len(l_servers) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
                y_offset -= 100
+               #display_servers(x_panel_position, y_panel_position, y_offset)
 
          
       # Blit the stuffs onto the screen
