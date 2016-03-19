@@ -20,6 +20,7 @@ fpsClock = pygame.time.Clock()
    
 #constants representing the different resources
 IMAGE_FILE_PATH = "ImageFiles\\"
+GAME_STAGE_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 55)
 CONTINENT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 40)
 COUNTRY_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 25)
 UNIT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 35)
@@ -44,6 +45,21 @@ OVERLAY = 9
 HELP_COORDS = [1135, 820]
 
 # Graphics Constants
+WATER_OUTLINE = pygame.image.load(IMAGE_FILE_PATH + 'water.png')
+t_WATER_OUTLINES = (
+                     WATER_OUTLINE,
+                     pygame.transform.rotate(WATER_OUTLINE, 90),
+                     pygame.transform.rotate(WATER_OUTLINE, 180),
+                     pygame.transform.rotate(WATER_OUTLINE, 270)
+                   )
+WATER_TEXTURE = pygame.image.load(IMAGE_FILE_PATH + 'deep_water.png')
+t_WATER_TEXTURES = (
+                     WATER_TEXTURE,
+                     pygame.transform.rotate(WATER_TEXTURE, 90),
+                     pygame.transform.rotate(WATER_TEXTURE, 180),
+                     pygame.transform.rotate(WATER_TEXTURE, 270)
+                   )
+
 INFO_BUY_UNITS = pygame.image.load(IMAGE_FILE_PATH + "InfoBuyUnits.png")
 INFO_ATTACK = pygame.image.load(IMAGE_FILE_PATH + "InfoAttack.png")
 INFO_RESOLVE = pygame.image.load(IMAGE_FILE_PATH + "InfoBattle.png")
@@ -75,6 +91,7 @@ MOVE_DOWNLEFT_UPRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_UR_BL.png
 
 MOUSE_OVER = pygame.image.load(IMAGE_FILE_PATH + 'MouseOver.png')
 MOUSE_OVER_UNKNOWN = pygame.image.load(IMAGE_FILE_PATH + 'MouseOverUnknown.png')
+BASE_BOARD = pygame.image.load(IMAGE_FILE_PATH + "BaseBoard.png")
 INFO_MARQUEE = pygame.image.load(IMAGE_FILE_PATH + "InfoMarque.png")
 INFO_OVERLAY = pygame.image.load(IMAGE_FILE_PATH + "InfoMarqueOverlay.png")
 MAP_FRAME = pygame.image.load(IMAGE_FILE_PATH + "MapFrame.png")
@@ -158,8 +175,6 @@ def blitMove(map, DISPLAYSURF, source_coords, dest_coords):
 
 #a dictionary linking resources to textures
 textures =   {
-                WATER  : pygame.image.load(IMAGE_FILE_PATH + 'water.png'),
-                DEEP_WATER : pygame.image.load(IMAGE_FILE_PATH + 'deep_water.png'),
                 OVERLAY : pygame.image.load(IMAGE_FILE_PATH + 'overlay.png'),
                 CONTINENT_1 : pygame.image.load(IMAGE_FILE_PATH + 'continent_1.png'),
                 CONTINENT_2 : pygame.image.load(IMAGE_FILE_PATH + 'continent_2.png'),
@@ -352,7 +367,7 @@ def battleInfo(map, DISPLAYSURF, params):
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.cannons), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 425))
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.champions), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 475))
     
-def printMap(map, DISPLAYSURF, infoDisplay, params=None):
+def printMap(map, DISPLAYSURF, gameStage, infoDisplay, params=None):
     #loop through each row
     for row in range(map.HEIGHT):
         #loop through each column in the row
@@ -367,7 +382,7 @@ def printMap(map, DISPLAYSURF, infoDisplay, params=None):
         for column in range(map.WIDTH):
             #draw the resource at that position in the tilemap, using the correct colour
             if (map.ll_map[row][column] == WATER):
-               DISPLAYSURF.blit(textures[WATER], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
+               DISPLAYSURF.blit(t_WATER_OUTLINES[map.ll_water_mask[row][column]], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
           
     #loop through each row
     for row in range(map.HEIGHT):
@@ -375,7 +390,7 @@ def printMap(map, DISPLAYSURF, infoDisplay, params=None):
         for column in range(map.WIDTH):
             #draw the resource at that position in the tilemap, using the correct colour
             if (map.ll_map[row][column] == WATER):
-               DISPLAYSURF.blit(textures[DEEP_WATER], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
+               DISPLAYSURF.blit(t_WATER_TEXTURES[map.ll_water_mask[row][column]], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
 
     DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
     DISPLAYSURF.blit(MAP_FRAME, dest=(0,0))
@@ -394,7 +409,9 @@ def printMap(map, DISPLAYSURF, infoDisplay, params=None):
                   DISPLAYSURF.blit(UNIT_FONT.render(count, True, (0,0,0)), (((column) % map.WIDTH) * TILESIZE + 45 - len(count) * 7, ((row) % map.HEIGHT) * TILESIZE + 25))
 
     DISPLAYSURF.blit(source=INFO_MARQUEE, dest=(map.WIDTH * TILESIZE, 0))
-    DISPLAYSURF.blit(source=pygame.image.load(IMAGE_FILE_PATH + "BaseBoard.png"), dest=(0, map.HEIGHT * TILESIZE))
+    DISPLAYSURF.blit(source=GAME_STAGE_FONT.render(gameStage, True, (0,0,0)), dest=(map.WIDTH * TILESIZE + 100, 50))
+    pygame.draw.line(DISPLAYSURF, (0,0,0), (map.WIDTH * TILESIZE + 28, 112), (map.WIDTH * TILESIZE + 700, 112), 3)
+    DISPLAYSURF.blit(source=BASE_BOARD, dest=(0, map.HEIGHT * TILESIZE))
     
     infoDisplay(map, DISPLAYSURF, params)
 
@@ -504,9 +521,9 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address, l_playerNames):
                placing = False
        
        if selectedCountry == None:
-         printMap(map, DISPLAYSURF, standardInfo, l_playerNames)
+         printMap(map, DISPLAYSURF, "Place Troops", standardInfo, l_playerNames)
        else:
-         printMap(map, DISPLAYSURF, selectedInfo, selectedCountry)
+         printMap(map, DISPLAYSURF, "Place Troops", selectedInfo, selectedCountry)
        
        if selectedCountry != None:
          DISPLAYSURF.blit(SELECTED_TILE, (selectedCountry[0] * TILESIZE, selectedCountry[1] * TILESIZE), special_flags=BLEND_ADD)
@@ -553,7 +570,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
          #if the user wants to quit
          handleGeneral(event, map)
       
-      printMap(map, DISPLAYSURF, standardInfo, l_playerNames)
+      printMap(map, DISPLAYSURF, "Declare Attacks", standardInfo, l_playerNames)
       DISPLAYSURF.blit(WAITING, (70, map.HEIGHT * TILESIZE + 70))
       #update the display
       pygame.display.update()
@@ -656,12 +673,12 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
        
        
        if selectedCountry == None:
-         printMap(map, DISPLAYSURF, standardInfo, oldMap[1])
+         printMap(map, DISPLAYSURF, "Declare Attacks", standardInfo, oldMap[1])
        else:
          if [selectedCountry[0], selectedCountry[1]] in l_attackers:
-            printMap(map,  DISPLAYSURF, attackInfo, (selectedCountry, d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]]))
+            printMap(map,  DISPLAYSURF, "Declare Attacks", attackInfo, (selectedCountry, d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]]))
          else:
-            printMap(map, DISPLAYSURF, selectedInfo, selectedCountry)
+            printMap(map, DISPLAYSURF, "Declare Attacks", selectedInfo, selectedCountry)
        
        if selectedCountry != None:
          DISPLAYSURF.blit(SELECTED_TILE, (selectedCountry[0] * TILESIZE, selectedCountry[1] * TILESIZE), special_flags=BLEND_ADD)
@@ -760,7 +777,7 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
          #if the user wants to quit
          handleGeneral(event, map)
 
-      printMap(map, DISPLAYSURF, standardInfo, l_playerNames)
+      printMap(map, DISPLAYSURF, "Move Troops", standardInfo, l_playerNames)
       DISPLAYSURF.blit(WAITING, (70, map.HEIGHT * TILESIZE + 70))
       for battle in range(len(l_attackers)):
          DISPLAYSURF.blit(DEFENDER, (l_defenders[battle][0] * TILESIZE, l_defenders[battle][1] * TILESIZE), special_flags=BLEND_ADD)
@@ -862,12 +879,12 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
                moving = False
                
       if selectedCountry == None:
-         printMap(map, DISPLAYSURF, standardInfo, oldMap[1])
+         printMap(map, DISPLAYSURF, "Move Troops", standardInfo, oldMap[1])
       else:
          if [selectedCountry[0], selectedCountry[1]] in l_senders:
-            printMap(map,  DISPLAYSURF, moveInfo, (selectedCountry, d_moves[map.ll_map[selectedCountry[1]][selectedCountry[0]]]))
+            printMap(map,  DISPLAYSURF, "Move Troops", moveInfo, (selectedCountry, d_moves[map.ll_map[selectedCountry[1]][selectedCountry[0]]]))
          else:
-            printMap(map, DISPLAYSURF, selectedInfo, selectedCountry)
+            printMap(map, DISPLAYSURF, "Move Troops", selectedInfo, selectedCountry)
 
       if selectedCountry != None:
          DISPLAYSURF.blit(SELECTED_TILE, (selectedCountry[0] * TILESIZE, selectedCountry[1] * TILESIZE), special_flags=BLEND_ADD)
@@ -954,7 +971,7 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address, l_senders, l_receiv
          #if the user wants to quit
          handleGeneral(event, map)
       
-      printMap(map, DISPLAYSURF, standardInfo, l_playerNames)
+      printMap(map, DISPLAYSURF, "Move Troops", standardInfo, l_playerNames)
       
       for army in range(len(l_senders)):
          DISPLAYSURF.blit(DESTINATION, (l_receivers[army][0] * TILESIZE, l_receivers[army][1] * TILESIZE), special_flags=BLEND_ADD)
@@ -1011,7 +1028,7 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames):
             elif over_exit and event.type == MOUSEBUTTONDOWN:
                return True
          map = deadMap
-         printMap(map, DISPLAYSURF, standardInfo, l_playerNames)
+         printMap(map, DISPLAYSURF, "Spectating", standardInfo, l_playerNames)
          if not done:
             DISPLAYSURF.fill((255, 75, 75), special_flags=BLEND_MULT)
             DISPLAYSURF.blit(LOSER, (0, 0))
@@ -1034,7 +1051,7 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames):
             elif over_exit and event.type == MOUSEBUTTONDOWN:
                return True
       
-         printMap(map, DISPLAYSURF, standardInfo, l_playerNames)
+         printMap(map, DISPLAYSURF, "Spectating", standardInfo, l_playerNames)
          if not done:
             DISPLAYSURF.fill((50, 120, 255), special_flags=BLEND_MULT)
             DISPLAYSURF.blit(WINNER, (0, 0))

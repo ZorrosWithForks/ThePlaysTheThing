@@ -24,6 +24,7 @@ class Map:
          self.WATER = (0, 0) #Constant representing water in map, If a particular tile is not water, it's a country
          
          self.ll_map = [[self.WATER for x in range(self.WIDTH)] for y in range(self.HEIGHT)]
+         self.ll_water_mask = [[int(random.getrandbits(2)) for x in range(self.WIDTH)] for y in range(self.HEIGHT)]
          print("In map: # of players: " + str(self.PLAYER_COUNT))
          # Generate list of countries
          l_countries = []
@@ -133,6 +134,12 @@ class Map:
             self.ll_map.append([])
             for x in range(len(map_to_copy.ll_map[y])):
                self.ll_map[y].append((map_to_copy.ll_map[y][x][0], map_to_copy.ll_map[y][x][1]))
+         
+         self.ll_water_mask = []
+         for y in range(len(map_to_copy.ll_water_mask)):
+            self.ll_water_mask.append([])
+            for x in range(len(map_to_copy.ll_water_mask[y])):
+               self.ll_water_mask[y].append(map_to_copy.ll_water_mask[y][x])
                
          for x in range(self.WIDTH):
             for y in range(self.HEIGHT):
