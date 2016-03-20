@@ -29,6 +29,7 @@ def LoginClient(username, s):
    global play
    play = None
    joined = True
+   print("In clientJoined")
    
    def displayMessage(image):
       OK_COORDS = (450,450)
@@ -140,7 +141,11 @@ def LoginClient(username, s):
    # Declare the Surface
    LOGIN_TOP_SURFACE = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
    
-   username = s.recv(2048).decode()
+   # try:
+      # temp = s.recvfrom(2048)
+      # username = pickle.loads(temp)
+   # except:
+      # print(str(temp))
 
    t_search = threading.Thread(target=getPlayers)
    t_search.daemon = True
@@ -188,7 +193,8 @@ def LoginClient(username, s):
             # clicked back button
             if x_back_button <= curr_x <= x_back_button + 75 and y_back_button <= curr_y <= y_back_button + 50:
                s.close()
-               return(True)
+               print("Clicked back button")
+               return False
                
             # clicked up arrow
             if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 50 and y_offset < 0 and len(l_players) > 5: # only allows me to scroll once...
@@ -225,5 +231,5 @@ def LoginClient(username, s):
          displayMessage(CRASH_MESSAGE)
       else:
          pygame.display.update()
-      
+   print("Leaving clientJoined")   
    return False
