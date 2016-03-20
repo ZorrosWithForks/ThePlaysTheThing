@@ -96,7 +96,7 @@ def LoginClient(username, s):
          except:
             print("Server died")
             joined = False
-            play = "crash"
+            play = "crashed"
             return
       
    
@@ -139,6 +139,8 @@ def LoginClient(username, s):
    
    # Declare the Surface
    LOGIN_TOP_SURFACE = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+   
+   username = s.recv(2048).decode()
 
    t_search = threading.Thread(target=getPlayers)
    t_search.daemon = True
@@ -211,13 +213,15 @@ def LoginClient(username, s):
          LOGIN_TOP_SURFACE.blit(BACK_BUTTON_UNPRESSED, (x_back_button,y_back_button))
       
       if play == "play":
-         print("About to call SimpleClient.play")
+         print("play")
          SimpleClient.play(newServer, username)
       elif play == "boot":
+         print("boot")
          displayMessage(BOOT_MESSAGE)
       elif play == "full":
          return True
       elif play == "crashed":
+         print("crashed")
          displayMessage(CRASH_MESSAGE)
       else:
          pygame.display.update()

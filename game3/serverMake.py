@@ -74,6 +74,7 @@ def MakeServer():
                   index += 1
                   
          player_name = player_name + ("(" + str(index) + ")" if index >= 1 else "")
+         client.sendto(player_name.encode('ascii'), client_address)
          print(player_name)
          l_temp = (client, player_name, client_address)
          clients.append(l_temp)
