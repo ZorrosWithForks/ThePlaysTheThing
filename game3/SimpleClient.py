@@ -232,10 +232,15 @@ def standardInfo(map, DISPLAYSURF, params):
       
       country_known = map.d_continents[current_tile[0]][current_tile[1]].owner != None 
       # Unit counts by type
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Pistoleers: " + (str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.infantry) if country_known else "?"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 225))
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Musketeers: " + (str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.archers) if country_known else "?"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 250))
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Cannons: " + (str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.cannons) if country_known else "?"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 275))
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Airships: " + (str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.champions) if country_known else "?"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 300))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Pistoleers:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 225))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Musketeers:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 250))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Cannons:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 275))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Airships:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 300))
+      
+      DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.infantry) if country_known else "?", True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 225))
+      DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.archers) if country_known else "?", True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 250))
+      DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.cannons) if country_known else "?", True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 275))
+      DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.champions) if country_known else "?", True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 300))
       
       # Country bonuses
       DISPLAYSURF.blit(COUNTRY_FONT.render("Attack Bonus: " + (str(map.d_continents[current_tile[0]][current_tile[1]].attack_bonus) + "%" if country_known else "?"), True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 100, 350))
@@ -244,15 +249,14 @@ def standardInfo(map, DISPLAYSURF, params):
       # Owner
       DISPLAYSURF.blit(COUNTRY_FONT.render("Owner: " + (str(map.d_continents[current_tile[0]][current_tile[1]].owner) if country_known else "?"), True, l_playerColors[d_playerLogoIndexes[map.d_continents[current_tile[0]][current_tile[1]].owner]] if country_known else (0,0,0)), (map.WIDTH * TILESIZE + 100, 425))
          
-      DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonus: " + str(map.d_bonuses[current_tile[0]]), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 500))
+      DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonus: $" + str(map.d_bonuses[current_tile[0]]), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 500))
    else:
       x_offset = 120
       y_offset = 180
       DISPLAYSURF.blit(CONTINENT_FONT.render("Players:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 130))
       for name in map.l_player_names:
          DISPLAYSURF.blit(COUNTRY_FONT.render(name, True, l_playerColors[d_playerLogoIndexes[name]]), (map.WIDTH * TILESIZE + x_offset, y_offset))
-         if params != None:
-            if name not in params:
+         if params != None and name not in params:
                playerName = COUNTRY_FONT.render(name, True, l_playerColors[d_playerLogoIndexes[name]])
                pygame.draw.line(DISPLAYSURF, l_playerColors[d_playerLogoIndexes[name]], (map.WIDTH * TILESIZE + x_offset, y_offset + 17), (map.WIDTH * TILESIZE + x_offset + playerName.get_width(), y_offset + 17), 2)
          y_offset += 25
@@ -261,7 +265,7 @@ def standardInfo(map, DISPLAYSURF, params):
       y_offset += 20
       for continent_name in map.l_continent_names:
          y_offset += 25
-         DISPLAYSURF.blit(COUNTRY_FONT.render(continent_name + ": " + str(map.d_bonuses[continent_name]), True, (0,0,0)), (map.WIDTH * TILESIZE + x_offset, y_offset))
+         DISPLAYSURF.blit(COUNTRY_FONT.render(continent_name + ": $" + str(map.d_bonuses[continent_name]), True, (0,0,0)), (map.WIDTH * TILESIZE + x_offset, y_offset))
 
 def selectedInfo(map, DISPLAYSURF, params):
    current_tile = map.ll_map[params[1]][params[0]]
@@ -270,10 +274,15 @@ def selectedInfo(map, DISPLAYSURF, params):
    DISPLAYSURF.blit(COUNTRY_FONT.render("Country: " + map.d_continents[current_tile[0]][current_tile[1]].name, True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 170))
 
    # Unit counts by type
-   DISPLAYSURF.blit(COUNTRY_FONT.render("Pistoleers: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.infantry), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 225))
-   DISPLAYSURF.blit(COUNTRY_FONT.render("Musketeers: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.archers), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 250))
-   DISPLAYSURF.blit(COUNTRY_FONT.render("Cannons: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.cannons), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 275))
-   DISPLAYSURF.blit(COUNTRY_FONT.render("Airships: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.champions), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 300))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Pistoleers:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 225))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Musketeers:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 250))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Cannons:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 275))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Airships:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 300))
+   
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.infantry), True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 225))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.archers), True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 250))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.cannons), True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 275))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.champions), True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 300))
     
    # Country bonuses
    DISPLAYSURF.blit(COUNTRY_FONT.render("Attack Bonus: " + str(map.d_continents[current_tile[0]][current_tile[1]].attack_bonus) + "%" , True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 100, 350))
@@ -282,7 +291,7 @@ def selectedInfo(map, DISPLAYSURF, params):
    # Owner
    DISPLAYSURF.blit(COUNTRY_FONT.render("Owner: " + map.d_continents[current_tile[0]][current_tile[1]].owner, True, l_playerColors[d_playerLogoIndexes[map.d_continents[current_tile[0]][current_tile[1]].owner]]), (map.WIDTH * TILESIZE + 100, 425))
     
-   DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonus: " + str(map.d_bonuses[current_tile[0]]), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 500))
+   DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonus: $" + str(map.d_bonuses[current_tile[0]]), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 500))
     
 def attackInfo(map, DISPLAYSURF, params):
    attacker = map.ll_map[params[0][1]][params[0][0]]
