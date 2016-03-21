@@ -87,24 +87,25 @@ def LoginClient():
       s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       addr = (ip, 9999)
       s.settimeout(1)
-      try:
-         s.connect(addr)
-         s.settimeout(None)
-         s.sendto(username.encode('ascii'), addr)
-         print("joined")
-         # put here? something that will tell if it has been booted. if so, return to the main menu
-         full = clientJoined.LoginClient(username, s)
-         if full:
-            print("Returned true")
-            displayMessage(MESSAGE)
-         print("returned from clientJoined")
-         s.close()
-         del l_servers[:]
-         client_socket.sendto(data.encode('ascii'), address)
-      except:
-         s.close()
-         del l_servers[:]
-         client_socket.sendto(data.encode('ascii'), address)
+      #try:
+      s.connect(addr)
+      s.settimeout(None)
+      s.sendto(username.encode('ascii'), addr)
+      print("joined")
+      # put here? something that will tell if it has been booted. if so, return to the main menu
+      full = clientJoined.LoginClient(username, s)
+      if full:
+         print("Returned true")
+         displayMessage(MESSAGE)
+      print("returned from clientJoined")
+      s.close()
+      del l_servers[:]
+      client_socket.sendto(data.encode('ascii'), address)
+      # except:
+         # print("Failed somewhere")
+         # s.close()
+         # del l_servers[:]
+         # client_socket.sendto(data.encode('ascii'), address)
       
    def display_servers(x_panel_position, y_panel_position, y_offset):
       del l_join_spots[:]

@@ -62,6 +62,7 @@ def MakeServer():
             return
          print("accepted player")
          player_name = client.recv(4096).decode()
+         print("Player name after receiving: " + player_name)
          goodName = False
          index = 0
          if player_name == servername:
@@ -72,8 +73,12 @@ def MakeServer():
                if player[1] == player_name + ("(" + str(index) + ")" if index >= 1 else ""):
                   goodName = False
                   index += 1
-                  
-         player_name = player_name + ("(" + str(index) + ")" if index >= 1 else "")
+         if index >= 1:
+            player_name = player_name + "(" + str(index) + ")"
+         print("Player name right before sending: " + player_name + str(len(player_name)))
+         #print(str(player_name.encode('utf-8')))
+         # namePacket = pickle.dumps((player_name,))
+         # client.sendto(namePacket, client_address)
          print(player_name)
          l_temp = (client, player_name, client_address)
          clients.append(l_temp)
