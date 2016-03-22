@@ -23,10 +23,13 @@ CRASH_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoServerLost.png")
 arrow_x_pos = 1500
 up_arrow_y_pos = 550
 down_arrow_y_pos = 50
+name = None
 
 def LoginClient(username, s):
    global joined
    global play
+   global name
+   name = username
    play = None
    joined = True
    print("In clientJoined")
@@ -46,7 +49,7 @@ def LoginClient(username, s):
          # Blit the stuffs onto the screen
          LOGIN_TOP_SURFACE.blit(BLACK_BACKGROUND, (100, 100))
          LOGIN_TOP_SURFACE.blit(LOGIN_BACKGROUND, (0,0))
-         LOGIN_TOP_SURFACE.blit(SERVER_FONT.render(username, 1, (0,0,0)), (285, Y_POS))
+         LOGIN_TOP_SURFACE.blit(SERVER_FONT.render(name, 1, (0,0,0)), (285, Y_POS))
          LOGIN_TOP_SURFACE.blit(DOWN_ARROW, (arrow_x_pos, down_arrow_y_pos))
          LOGIN_TOP_SURFACE.blit(UP_ARROW, (arrow_x_pos, up_arrow_y_pos))
          if x_back_button <= curr_x <= x_back_button + 75 and y_back_button <= curr_y <= y_back_button + 50:
@@ -68,6 +71,7 @@ def LoginClient(username, s):
          y_panel_position += 100
    
    def getPlayers():
+      global name
       global joined
       global l_players
       global play
@@ -94,6 +98,9 @@ def LoginClient(username, s):
                      del l_players[:]
                   l_players = copy.copy(info[1])
                   l_players.insert(0, info[2])
+                  if len(info) == 4:
+                     name = info[3]
+                     
          except:
             print("Server died")
             joined = False
@@ -178,7 +185,7 @@ def LoginClient(username, s):
          if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                #end the game and close the window
-               print(username)
+               print(name)
                print("something")
                pygame.quit()
                sys.exit()
@@ -210,7 +217,7 @@ def LoginClient(username, s):
       LOGIN_TOP_SURFACE.blit(BLACK_BACKGROUND, (100, 100))
       displayPlayers(x_panel_position, y_panel_position, y_offset)
       LOGIN_TOP_SURFACE.blit(LOGIN_BACKGROUND, (0,0))
-      LOGIN_TOP_SURFACE.blit(SERVER_FONT.render(username, 1, (0,0,0)), (285, Y_POS))
+      LOGIN_TOP_SURFACE.blit(SERVER_FONT.render(name, 1, (0,0,0)), (285, Y_POS))
       LOGIN_TOP_SURFACE.blit(DOWN_ARROW, (arrow_x_pos, down_arrow_y_pos))
       LOGIN_TOP_SURFACE.blit(UP_ARROW, (arrow_x_pos, up_arrow_y_pos))
       if x_back_button <= curr_x <= x_back_button + 75 and y_back_button <= curr_y <= y_back_button + 50:
@@ -220,7 +227,8 @@ def LoginClient(username, s):
       
       if play == "play":
          print("play")
-         SimpleClient.play(newServer, username)
+         SimpleClient.play(newServer, name)
+         return False
       elif play == "boot":
          print("boot")
          displayMessage(BOOT_MESSAGE)

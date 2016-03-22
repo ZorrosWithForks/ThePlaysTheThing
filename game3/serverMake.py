@@ -93,7 +93,11 @@ def MakeServer():
                l_playerNames = []
                for name in clients:
                   l_playerNames.append(name[1])
-               packet = pickle.dumps((False, l_playerNames, servername))
+               if player_name == player[1]:
+                  packet = pickle.dumps((False, l_playerNames, servername, player_name))
+               else:
+                  packet = pickle.dumps((False, l_playerNames, servername))
+                  
                try:
                   player[0].sendto(packet, player[2])
                except:

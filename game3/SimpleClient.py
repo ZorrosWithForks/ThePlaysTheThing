@@ -587,7 +587,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
    if oldMap != None:
       map = oldMap[0]
    else:
-      return None
+      return None, None, None, None
    declaring = True
 
    print("I have the map!")
@@ -676,7 +676,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
                try:
                   socket.sendto(packet, host_address)
                except:
-                  return None
+                  return None, None, None, None
                declaring = False
        
        
@@ -767,12 +767,10 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
       global oldMap
       try:
          response = socket.recv(8192)
+         oldMap = pickle.loads(response)
       except:
-         refreshing = False
          oldMap = None
-         return
-         
-      oldMap = pickle.loads(response)
+      
       refreshing = False
       print("set refreshing to false")
       return
@@ -965,8 +963,12 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address, l_senders, l_receiv
    def refresh():
       global refreshing
       global newMap
-      response = socket.recv(8192)
-      newMap = pickle.loads(response)
+      try:
+         response = socket.recv(8192)
+         newMap = pickle.loads(response)
+      except:
+         newMap = None
+         
       refreshing = False
       print("set refreshing to false")
       return
