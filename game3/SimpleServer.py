@@ -264,6 +264,7 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
 def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
    l_attacks = []   # list of tuples (l_attackers, l_defenders, d_attacks), each belonging to a different player
    l_defenders = [] # list of defender_coords
+   d_attackResults = {} # dictionary of the results of the attacks in the form (countries conquered, countries lost, failed attacks)
    
    d_players = {}
    for player in l_players:
