@@ -71,23 +71,23 @@ INFO_AIRSHIPS = pygame.image.load(IMAGE_FILE_PATH + "InfoAirships.png")
 INFO_BUTTON_OFF = pygame.image.load(IMAGE_FILE_PATH + "HelpButton.png")
 INFO_BUTTON_ON = pygame.image.load(IMAGE_FILE_PATH + "HelpButtonActive.png")
 
-ATK_LEFT_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Left.png')
-ATK_RIGHT_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Right.png')
-ATK_TOP_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Top.png')
-ATK_BOTTOM_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Bottom.png')
-ATK_LEFT_RIGHT = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_L_R.png')
-ATK_TOP_BOTTOM = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_T_B.png')
-ATK_UPLEFT_DOWNRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_UL_BR.png')
-ATK_DOWNLEFT_UPRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_UR_BL.png')
+ATK_UP = pygame.image.load(IMAGE_FILE_PATH + "AttackUp.png")
+ATK_DO = pygame.image.load(IMAGE_FILE_PATH + "AttackDown.png")
+ATK_LE = pygame.image.load(IMAGE_FILE_PATH + "AttackLeft.png")
+ATK_RI = pygame.image.load(IMAGE_FILE_PATH + "AttackRight.png")
+ATK_UR = pygame.image.load(IMAGE_FILE_PATH + "AttackUpRight.png")
+ATK_DL = pygame.image.load(IMAGE_FILE_PATH + "AttackLowLeft.png")
+ATK_UL = pygame.image.load(IMAGE_FILE_PATH + "AttackUpLeft.png")
+ATK_DR = pygame.image.load(IMAGE_FILE_PATH + "AttackLowRight.png")
 
-MOVE_LEFT_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Left.png')
-MOVE_RIGHT_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_Edge_Right.png')
-MOVE_TOP_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Top.png')
-MOVE_BOTTOM_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_Edge_Bottom.png')
-MOVE_LEFT_RIGHT = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_L_R.png')
-MOVE_TOP_BOTTOM = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_T_B.png')
-MOVE_UPLEFT_DOWNRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_UL_BR.png')
-MOVE_DOWNLEFT_UPRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_UR_BL.png')
+MOVE_UP = pygame.image.load(IMAGE_FILE_PATH + "MoveUp.png")
+MOVE_DO = pygame.image.load(IMAGE_FILE_PATH + "MoveDown.png")
+MOVE_LE = pygame.image.load(IMAGE_FILE_PATH + "MoveLeft.png")
+MOVE_RI = pygame.image.load(IMAGE_FILE_PATH + "MoveRight.png")
+MOVE_UR = pygame.image.load(IMAGE_FILE_PATH + "MoveUpRight.png")
+MOVE_DL = pygame.image.load(IMAGE_FILE_PATH + "MoveDownLeft.png")
+MOVE_UL = pygame.image.load(IMAGE_FILE_PATH + "MoveUpLeft.png")
+MOVE_DR = pygame.image.load(IMAGE_FILE_PATH + "MoveDownRight.png")
 
 MOUSE_OVER = pygame.image.load(IMAGE_FILE_PATH + 'MouseOver.png')
 MOUSE_OVER_UNKNOWN = pygame.image.load(IMAGE_FILE_PATH + 'MouseOverUnknown.png')
@@ -138,40 +138,125 @@ def blitInfo(DISPLAYSURF, map, phase_info, displayUnitThings=True):
       DISPLAYSURF.blit(INFO_BUTTON_OFF, (1085, map.HEIGHT * TILESIZE + 70))
 
 def blitBattle(map, DISPLAYSURF, attack_coords, defend_coords):
-   if min(attack_coords[0], defend_coords[0]) == 0 and max(attack_coords[0], defend_coords[0]) == map.WIDTH - 1:
-      DISPLAYSURF.blit(ATK_LEFT_EDGE, (0, (attack_coords[1] if attack_coords[0] == 0 else defend_coords[1]) * TILESIZE))
-      DISPLAYSURF.blit(ATK_RIGHT_EDGE, ((map.WIDTH - 1) * TILESIZE, (attack_coords[1] if defend_coords[0] == 0 else defend_coords[1]) * TILESIZE))
-   elif min(attack_coords[1], defend_coords[1]) == 0 and max(attack_coords[1], defend_coords[1]) == map.HEIGHT - 1:
-      DISPLAYSURF.blit(ATK_TOP_EDGE, ((attack_coords[0] if attack_coords[1] == 0 else defend_coords[0]) * TILESIZE, 0))
-      DISPLAYSURF.blit(ATK_BOTTOM_EDGE, ((attack_coords[0] if defend_coords[1] == 0 else defend_coords[0]) * TILESIZE, (map.HEIGHT - 1) * TILESIZE))
+   blitCoords = (attack_coords[0] * TILESIZE - 50, attack_coords[1] * TILESIZE - 50)
+
+   if attack_coords[0] == 0 and defend_coords[0] == map.WIDTH - 1:
+      if attack_coords[1] == 0 and attack_coords[1] == map.HEIGHT - 1:
+         DISPLAYSURF.blit(ATK_UL, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[1] == map.HEIGHT - 1 and attack_coords[1] == 0:
+         DISPLAYSURF.blit(ATK_DR, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[1] < defend_coords[1]:
+         DISPLAYSURF.blit(ATK_UL, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[1] > defend_coords[1]:
+         DISPLAYSURF.blit(ATK_DL, blitCoords, special_flags=BLEND_ADD)
+      else:# attack_coords[1] == defend_coords[1]:
+         DISPLAYSURF.blit(ATK_LE, blitCoords, special_flags=BLEND_ADD)
+   elif attack_coords[0] == map.WIDTH - 1 and defend_coords[0] == 0:
+      if attack_coords[1] == 0 and attack_coords[1] == map.HEIGHT - 1:
+         DISPLAYSURF.blit(ATK_UR, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[1] == map.HEIGHT - 1 and attack_coords[1] == 0:
+         DISPLAYSURF.blit(ATK_DL, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[1] < defend_coords[1]:
+         DISPLAYSURF.blit(ATK_UR, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[1] > defend_coords[1]:
+         DISPLAYSURF.blit(ATK_DR, blitCoords, special_flags=BLEND_ADD)
+      else:# attack_coords[1] == defend_coords[1]:
+         DISPLAYSURF.blit(ATK_RI, blitCoords, special_flags=BLEND_ADD)
+   elif attack_coords[1] == 0 and defend_coords[1] == map.HEIGHT - 1:
+      if attack_coords[0] < defend_coords[0]:
+         DISPLAYSURF.blit(ATK_UR, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[0] > defend_coords[0]:
+         DISPLAYSURF.blit(ATK_UL, blitCoords, special_flags=BLEND_ADD)
+      else:# attack_coords[0] == defend_coords[0]:
+         DISPLAYSURF.blit(ATK_UP, blitCoords, special_flags=BLEND_ADD)
+   elif attack_coords[1] == map.HEIGHT - 1 and defend_coords[1] == 0:
+      if attack_coords[0] < defend_coords[0]:
+         DISPLAYSURF.blit(ATK_DR, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[0] > defend_coords[0]:
+         DISPLAYSURF.blit(ATK_DL, blitCoords, special_flags=BLEND_ADD)
+      else:# attack_coords[0] == defend_coords[0]:
+         DISPLAYSURF.blit(ATK_DO, blitCoords, special_flags=BLEND_ADD)
    elif attack_coords[0] == defend_coords[0]:
-      DISPLAYSURF.blit(ATK_TOP_BOTTOM, (attack_coords[0] * TILESIZE, min(attack_coords[1], defend_coords[1]) * TILESIZE))
+      if attack_coords[1] < defend_coords[1]:
+         DISPLAYSURF.blit(ATK_DO, blitCoords, special_flags=BLEND_ADD)
+      else: # attack_coords[1] > defend_coords[1]:
+         DISPLAYSURF.blit(ATK_UP, blitCoords, special_flags=BLEND_ADD)
    elif attack_coords[1] == defend_coords[1]:
-      DISPLAYSURF.blit(ATK_LEFT_RIGHT, (min(attack_coords[0], defend_coords[0]) * TILESIZE, attack_coords[1] * TILESIZE))
-   elif attack_coords[0] < defend_coords[0] and attack_coords[1] < defend_coords[1]:
-      DISPLAYSURF.blit(ATK_UPLEFT_DOWNRIGHT, (attack_coords[0] * TILESIZE, attack_coords[1] * TILESIZE))
-   elif attack_coords[0] > defend_coords[0] and attack_coords[1] > defend_coords[1]:
-      DISPLAYSURF.blit(ATK_UPLEFT_DOWNRIGHT, (defend_coords[0] * TILESIZE, defend_coords[1] * TILESIZE))
-   else:
-      DISPLAYSURF.blit(ATK_DOWNLEFT_UPRIGHT, (min(attack_coords[0], defend_coords[0]) * TILESIZE, min(attack_coords[1], defend_coords[1]) * TILESIZE))
+      if attack_coords[0] < defend_coords[0]:
+         DISPLAYSURF.blit(ATK_RI, blitCoords, special_flags=BLEND_ADD)
+      else: # attack_coords[0] > defend_coords[0]:
+         DISPLAYSURF.blit(ATK_LE, blitCoords, special_flags=BLEND_ADD)
+   elif attack_coords[0] < defend_coords[0]:
+      if attack_coords[1] < defend_coords[1]:
+         DISPLAYSURF.blit(ATK_DR, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[1] > defend_coords[1]:
+         DISPLAYSURF.blit(ATK_UR, blitCoords, special_flags=BLEND_ADD)
+   elif attack_coords[0] > defend_coords[0]:
+      if attack_coords[1] < defend_coords[1]:
+         DISPLAYSURF.blit(ATK_DL, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[1] > defend_coords[1]:
+         DISPLAYSURF.blit(ATK_UL, blitCoords, special_flags=BLEND_ADD)
+      
 
 def blitMove(map, DISPLAYSURF, source_coords, dest_coords):
-   if min(source_coords[0], dest_coords[0]) == 0 and max(source_coords[0], dest_coords[0]) == map.WIDTH - 1:
-      DISPLAYSURF.blit(MOVE_LEFT_EDGE, (0, (source_coords[1] if source_coords[0] == 0 else dest_coords[1]) * TILESIZE))
-      DISPLAYSURF.blit(MOVE_RIGHT_EDGE, ((map.WIDTH - 1) * TILESIZE, (source_coords[1] if dest_coords[0] == 0 else dest_coords[1]) * TILESIZE))
-   elif min(source_coords[1], dest_coords[1]) == 0 and max(source_coords[1], dest_coords[1]) == map.HEIGHT - 1:
-      DISPLAYSURF.blit(MOVE_TOP_EDGE, ((source_coords[0] if source_coords[1] == 0 else dest_coords[0]) * TILESIZE, 0))
-      DISPLAYSURF.blit(MOVE_BOTTOM_EDGE, ((source_coords[0] if dest_coords[1] == 0 else dest_coords[0]) * TILESIZE, (map.HEIGHT - 1) * TILESIZE))
+   blitCoords = (source_coords[0] * TILESIZE - 50, source_coords[1] * TILESIZE - 50)
+
+   if source_coords[0] == 0 and dest_coords[0] == map.WIDTH - 1:
+      if source_coords[1] == 0 and source_coords[1] == map.HEIGHT - 1:
+         DISPLAYSURF.blit(MOVE_UL, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[1] == map.HEIGHT - 1 and source_coords[1] == 0:
+         DISPLAYSURF.blit(MOVE_DR, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[1] < dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_UL, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[1] > dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_DL, blitCoords, special_flags=BLEND_ADD)
+      else:# source_coords[1] == dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_LE, blitCoords, special_flags=BLEND_ADD)
+   elif source_coords[0] == map.WIDTH - 1 and dest_coords[0] == 0:
+      if source_coords[1] == 0 and source_coords[1] == map.HEIGHT - 1:
+         DISPLAYSURF.blit(MOVE_UR, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[1] == map.HEIGHT - 1 and source_coords[1] == 0:
+         DISPLAYSURF.blit(MOVE_DL, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[1] < dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_UR, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[1] > dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_DR, blitCoords, special_flags=BLEND_ADD)
+      else:# source_coords[1] == dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_RI, blitCoords, special_flags=BLEND_ADD)
+   elif source_coords[1] == 0 and dest_coords[1] == map.HEIGHT - 1:
+      if source_coords[0] < dest_coords[0]:
+         DISPLAYSURF.blit(MOVE_UR, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[0] > dest_coords[0]:
+         DISPLAYSURF.blit(MOVE_UL, blitCoords, special_flags=BLEND_ADD)
+      else:# source_coords[0] == dest_coords[0]:
+         DISPLAYSURF.blit(MOVE_UP, blitCoords, special_flags=BLEND_ADD)
+   elif source_coords[1] == map.HEIGHT - 1 and dest_coords[1] == 0:
+      if source_coords[0] < dest_coords[0]:
+         DISPLAYSURF.blit(MOVE_DR, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[0] > dest_coords[0]:
+         DISPLAYSURF.blit(MOVE_DL, blitCoords, special_flags=BLEND_ADD)
+      else:# source_coords[0] == dest_coords[0]:
+         DISPLAYSURF.blit(MOVE_DO, blitCoords, special_flags=BLEND_ADD)
    elif source_coords[0] == dest_coords[0]:
-      DISPLAYSURF.blit(MOVE_TOP_BOTTOM, (source_coords[0] * TILESIZE, min(source_coords[1], dest_coords[1]) * TILESIZE))
+      if source_coords[1] < dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_DO, blitCoords, special_flags=BLEND_ADD)
+      else: # source_coords[1] > dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_UP, blitCoords, special_flags=BLEND_ADD)
    elif source_coords[1] == dest_coords[1]:
-      DISPLAYSURF.blit(MOVE_LEFT_RIGHT, (min(source_coords[0], dest_coords[0]) * TILESIZE, source_coords[1] * TILESIZE))
-   elif source_coords[0] < dest_coords[0] and source_coords[1] < dest_coords[1]:
-      DISPLAYSURF.blit(MOVE_UPLEFT_DOWNRIGHT, (source_coords[0] * TILESIZE, source_coords[1] * TILESIZE))
-   elif source_coords[0] > dest_coords[0] and source_coords[1] > dest_coords[1]:
-      DISPLAYSURF.blit(MOVE_UPLEFT_DOWNRIGHT, (dest_coords[0] * TILESIZE, dest_coords[1] * TILESIZE))
-   else:
-      DISPLAYSURF.blit(MOVE_DOWNLEFT_UPRIGHT, (min(source_coords[0], dest_coords[0]) * TILESIZE, min(source_coords[1], dest_coords[1]) * TILESIZE))
+      if source_coords[0] < dest_coords[0]:
+         DISPLAYSURF.blit(MOVE_RI, blitCoords, special_flags=BLEND_ADD)
+      else: # source_coords[0] > dest_coords[0]:
+         DISPLAYSURF.blit(MOVE_LE, blitCoords, special_flags=BLEND_ADD)
+   elif source_coords[0] < dest_coords[0]:
+      if source_coords[1] < dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_DR, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[1] > dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_UR, blitCoords, special_flags=BLEND_ADD)
+   elif source_coords[0] > dest_coords[0]:
+      if source_coords[1] < dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_DL, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[1] > dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_UL, blitCoords, special_flags=BLEND_ADD)
 
 #a dictionary linking resources to textures
 textures =   {
@@ -232,10 +317,15 @@ def standardInfo(map, DISPLAYSURF, params):
       
       country_known = map.d_continents[current_tile[0]][current_tile[1]].owner != None 
       # Unit counts by type
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Pistoleers: " + (str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.infantry) if country_known else "?"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 225))
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Musketeers: " + (str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.archers) if country_known else "?"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 250))
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Cannons: " + (str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.cannons) if country_known else "?"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 275))
-      DISPLAYSURF.blit(COUNTRY_FONT.render("Airships: " + (str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.champions) if country_known else "?"), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 300))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Pistoleers:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 225))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Musketeers:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 250))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Cannons:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 275))
+      DISPLAYSURF.blit(COUNTRY_FONT.render("Airships:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 300))
+      
+      DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.infantry) if country_known else "?", True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 225))
+      DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.archers) if country_known else "?", True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 250))
+      DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.cannons) if country_known else "?", True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 275))
+      DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.champions) if country_known else "?", True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 300))
       
       # Country bonuses
       DISPLAYSURF.blit(COUNTRY_FONT.render("Attack Bonus: " + (str(map.d_continents[current_tile[0]][current_tile[1]].attack_bonus) + "%" if country_known else "?"), True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 100, 350))
@@ -244,15 +334,14 @@ def standardInfo(map, DISPLAYSURF, params):
       # Owner
       DISPLAYSURF.blit(COUNTRY_FONT.render("Owner: " + (str(map.d_continents[current_tile[0]][current_tile[1]].owner) if country_known else "?"), True, l_playerColors[d_playerLogoIndexes[map.d_continents[current_tile[0]][current_tile[1]].owner]] if country_known else (0,0,0)), (map.WIDTH * TILESIZE + 100, 425))
          
-      DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonus: " + str(map.d_bonuses[current_tile[0]]), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 500))
+      DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonus: $" + str(map.d_bonuses[current_tile[0]]), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 500))
    else:
       x_offset = 120
       y_offset = 180
       DISPLAYSURF.blit(CONTINENT_FONT.render("Players:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 130))
       for name in map.l_player_names:
          DISPLAYSURF.blit(COUNTRY_FONT.render(name, True, l_playerColors[d_playerLogoIndexes[name]]), (map.WIDTH * TILESIZE + x_offset, y_offset))
-         if params != None:
-            if name not in params:
+         if params != None and name not in params:
                playerName = COUNTRY_FONT.render(name, True, l_playerColors[d_playerLogoIndexes[name]])
                pygame.draw.line(DISPLAYSURF, l_playerColors[d_playerLogoIndexes[name]], (map.WIDTH * TILESIZE + x_offset, y_offset + 17), (map.WIDTH * TILESIZE + x_offset + playerName.get_width(), y_offset + 17), 2)
          y_offset += 25
@@ -261,7 +350,7 @@ def standardInfo(map, DISPLAYSURF, params):
       y_offset += 20
       for continent_name in map.l_continent_names:
          y_offset += 25
-         DISPLAYSURF.blit(COUNTRY_FONT.render(continent_name + ": " + str(map.d_bonuses[continent_name]), True, (0,0,0)), (map.WIDTH * TILESIZE + x_offset, y_offset))
+         DISPLAYSURF.blit(COUNTRY_FONT.render(continent_name + ": $" + str(map.d_bonuses[continent_name]), True, (0,0,0)), (map.WIDTH * TILESIZE + x_offset, y_offset))
 
 def selectedInfo(map, DISPLAYSURF, params):
    current_tile = map.ll_map[params[1]][params[0]]
@@ -270,10 +359,15 @@ def selectedInfo(map, DISPLAYSURF, params):
    DISPLAYSURF.blit(COUNTRY_FONT.render("Country: " + map.d_continents[current_tile[0]][current_tile[1]].name, True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 170))
 
    # Unit counts by type
-   DISPLAYSURF.blit(COUNTRY_FONT.render("Pistoleers: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.infantry), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 225))
-   DISPLAYSURF.blit(COUNTRY_FONT.render("Musketeers: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.archers), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 250))
-   DISPLAYSURF.blit(COUNTRY_FONT.render("Cannons: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.cannons), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 275))
-   DISPLAYSURF.blit(COUNTRY_FONT.render("Airships: " + str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.champions), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 300))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Pistoleers:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 225))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Musketeers:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 250))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Cannons:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 275))
+   DISPLAYSURF.blit(COUNTRY_FONT.render("Airships:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 300))
+   
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.infantry), True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 225))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.archers), True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 250))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.cannons), True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 275))
+   DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[current_tile[0]][current_tile[1]].unit_counts.champions), True, (0,0,0)), (map.WIDTH * TILESIZE + 250, 300))
     
    # Country bonuses
    DISPLAYSURF.blit(COUNTRY_FONT.render("Attack Bonus: " + str(map.d_continents[current_tile[0]][current_tile[1]].attack_bonus) + "%" , True, ATTACK_COLOR), (map.WIDTH * TILESIZE + 100, 350))
@@ -282,7 +376,7 @@ def selectedInfo(map, DISPLAYSURF, params):
    # Owner
    DISPLAYSURF.blit(COUNTRY_FONT.render("Owner: " + map.d_continents[current_tile[0]][current_tile[1]].owner, True, l_playerColors[d_playerLogoIndexes[map.d_continents[current_tile[0]][current_tile[1]].owner]]), (map.WIDTH * TILESIZE + 100, 425))
     
-   DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonus: " + str(map.d_bonuses[current_tile[0]]), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 500))
+   DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonus: $" + str(map.d_bonuses[current_tile[0]]), True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 500))
     
 def attackInfo(map, DISPLAYSURF, params):
    attacker = map.ll_map[params[0][1]][params[0][0]]
@@ -578,7 +672,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
    if oldMap != None:
       map = oldMap[0]
    else:
-      return None
+      return None, None, None, None
    declaring = True
 
    print("I have the map!")
@@ -667,7 +761,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
                try:
                   socket.sendto(packet, host_address)
                except:
-                  return None
+                  return None, None, None, None
                declaring = False
        
        
@@ -758,12 +852,10 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
       global oldMap
       try:
          response = socket.recv(8192)
+         oldMap = pickle.loads(response)
       except:
-         refreshing = False
          oldMap = None
-         return
-         
-      oldMap = pickle.loads(response)
+      
       refreshing = False
       print("set refreshing to false")
       return
@@ -956,8 +1048,12 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address, l_senders, l_receiv
    def refresh():
       global refreshing
       global newMap
-      response = socket.recv(8192)
-      newMap = pickle.loads(response)
+      try:
+         response = socket.recv(8192)
+         newMap = pickle.loads(response)
+      except:
+         newMap = None
+         
       refreshing = False
       print("set refreshing to false")
       return
