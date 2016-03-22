@@ -71,23 +71,23 @@ INFO_AIRSHIPS = pygame.image.load(IMAGE_FILE_PATH + "InfoAirships.png")
 INFO_BUTTON_OFF = pygame.image.load(IMAGE_FILE_PATH + "HelpButton.png")
 INFO_BUTTON_ON = pygame.image.load(IMAGE_FILE_PATH + "HelpButtonActive.png")
 
-ATK_LEFT_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Left.png')
-ATK_RIGHT_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Right.png')
-ATK_TOP_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Top.png')
-ATK_BOTTOM_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Bottom.png')
-ATK_LEFT_RIGHT = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_L_R.png')
-ATK_TOP_BOTTOM = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_T_B.png')
-ATK_UPLEFT_DOWNRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_UL_BR.png')
-ATK_DOWNLEFT_UPRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_UR_BL.png')
+ATK_UP = pygame.image.load(IMAGE_FILE_PATH + "AttackUp.png")
+ATK_DO = pygame.image.load(IMAGE_FILE_PATH + "AttackDown.png")
+ATK_LE = pygame.image.load(IMAGE_FILE_PATH + "AttackLeft.png")
+ATK_RI = pygame.image.load(IMAGE_FILE_PATH + "AttackRight.png")
+ATK_UR = pygame.image.load(IMAGE_FILE_PATH + "AttackUpRight.png")
+ATK_DL = pygame.image.load(IMAGE_FILE_PATH + "AttackLowLeft.png")
+ATK_UL = pygame.image.load(IMAGE_FILE_PATH + "AttackUpLeft.png")
+ATK_DR = pygame.image.load(IMAGE_FILE_PATH + "AttackLowRight.png")
 
-MOVE_LEFT_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Left.png')
-MOVE_RIGHT_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_Edge_Right.png')
-MOVE_TOP_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'BattleGears_Edge_Top.png')
-MOVE_BOTTOM_EDGE = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_Edge_Bottom.png')
-MOVE_LEFT_RIGHT = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_L_R.png')
-MOVE_TOP_BOTTOM = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_T_B.png')
-MOVE_UPLEFT_DOWNRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_UL_BR.png')
-MOVE_DOWNLEFT_UPRIGHT = pygame.image.load(IMAGE_FILE_PATH + 'MoveGears_UR_BL.png')
+MOVE_UP = pygame.image.load(IMAGE_FILE_PATH + "MoveUp.png")
+MOVE_DO = pygame.image.load(IMAGE_FILE_PATH + "MoveDown.png")
+MOVE_LE = pygame.image.load(IMAGE_FILE_PATH + "MoveLeft.png")
+MOVE_RI = pygame.image.load(IMAGE_FILE_PATH + "MoveRight.png")
+MOVE_UR = pygame.image.load(IMAGE_FILE_PATH + "MoveUpRight.png")
+MOVE_DL = pygame.image.load(IMAGE_FILE_PATH + "MoveDownLeft.png")
+MOVE_UL = pygame.image.load(IMAGE_FILE_PATH + "MoveUpLeft.png")
+MOVE_DR = pygame.image.load(IMAGE_FILE_PATH + "MoveDownRight.png")
 
 MOUSE_OVER = pygame.image.load(IMAGE_FILE_PATH + 'MouseOver.png')
 MOUSE_OVER_UNKNOWN = pygame.image.load(IMAGE_FILE_PATH + 'MouseOverUnknown.png')
@@ -138,40 +138,125 @@ def blitInfo(DISPLAYSURF, map, phase_info, displayUnitThings=True):
       DISPLAYSURF.blit(INFO_BUTTON_OFF, (1085, map.HEIGHT * TILESIZE + 70))
 
 def blitBattle(map, DISPLAYSURF, attack_coords, defend_coords):
-   if min(attack_coords[0], defend_coords[0]) == 0 and max(attack_coords[0], defend_coords[0]) == map.WIDTH - 1:
-      DISPLAYSURF.blit(ATK_LEFT_EDGE, (0, (attack_coords[1] if attack_coords[0] == 0 else defend_coords[1]) * TILESIZE))
-      DISPLAYSURF.blit(ATK_RIGHT_EDGE, ((map.WIDTH - 1) * TILESIZE, (attack_coords[1] if defend_coords[0] == 0 else defend_coords[1]) * TILESIZE))
-   elif min(attack_coords[1], defend_coords[1]) == 0 and max(attack_coords[1], defend_coords[1]) == map.HEIGHT - 1:
-      DISPLAYSURF.blit(ATK_TOP_EDGE, ((attack_coords[0] if attack_coords[1] == 0 else defend_coords[0]) * TILESIZE, 0))
-      DISPLAYSURF.blit(ATK_BOTTOM_EDGE, ((attack_coords[0] if defend_coords[1] == 0 else defend_coords[0]) * TILESIZE, (map.HEIGHT - 1) * TILESIZE))
+   blitCoords = (attack_coords[0] * TILESIZE - 50, attack_coords[1] * TILESIZE - 50)
+
+   if attack_coords[0] == 0 and defend_coords[0] == map.WIDTH - 1:
+      if attack_coords[1] == 0 and attack_coords[1] == map.HEIGHT - 1:
+         DISPLAYSURF.blit(ATK_UL, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[1] == map.HEIGHT - 1 and attack_coords[1] == 0:
+         DISPLAYSURF.blit(ATK_DR, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[1] < defend_coords[1]:
+         DISPLAYSURF.blit(ATK_UL, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[1] > defend_coords[1]:
+         DISPLAYSURF.blit(ATK_DL, blitCoords, special_flags=BLEND_ADD)
+      else:# attack_coords[1] == defend_coords[1]:
+         DISPLAYSURF.blit(ATK_LE, blitCoords, special_flags=BLEND_ADD)
+   elif attack_coords[0] == map.WIDTH - 1 and defend_coords[0] == 0:
+      if attack_coords[1] == 0 and attack_coords[1] == map.HEIGHT - 1:
+         DISPLAYSURF.blit(ATK_UR, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[1] == map.HEIGHT - 1 and attack_coords[1] == 0:
+         DISPLAYSURF.blit(ATK_DL, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[1] < defend_coords[1]:
+         DISPLAYSURF.blit(ATK_UR, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[1] > defend_coords[1]:
+         DISPLAYSURF.blit(ATK_DR, blitCoords, special_flags=BLEND_ADD)
+      else:# attack_coords[1] == defend_coords[1]:
+         DISPLAYSURF.blit(ATK_RI, blitCoords, special_flags=BLEND_ADD)
+   elif attack_coords[1] == 0 and defend_coords[1] == map.HEIGHT - 1:
+      if attack_coords[0] < defend_coords[0]:
+         DISPLAYSURF.blit(ATK_UR, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[0] > defend_coords[0]:
+         DISPLAYSURF.blit(ATK_UL, blitCoords, special_flags=BLEND_ADD)
+      else:# attack_coords[0] == defend_coords[0]:
+         DISPLAYSURF.blit(ATK_UP, blitCoords, special_flags=BLEND_ADD)
+   elif attack_coords[1] == map.HEIGHT - 1 and defend_coords[1] == 0:
+      if attack_coords[0] < defend_coords[0]:
+         DISPLAYSURF.blit(ATK_DR, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[0] > defend_coords[0]:
+         DISPLAYSURF.blit(ATK_DL, blitCoords, special_flags=BLEND_ADD)
+      else:# attack_coords[0] == defend_coords[0]:
+         DISPLAYSURF.blit(ATK_DO, blitCoords, special_flags=BLEND_ADD)
    elif attack_coords[0] == defend_coords[0]:
-      DISPLAYSURF.blit(ATK_TOP_BOTTOM, (attack_coords[0] * TILESIZE, min(attack_coords[1], defend_coords[1]) * TILESIZE))
+      if attack_coords[1] < defend_coords[1]:
+         DISPLAYSURF.blit(ATK_DO, blitCoords, special_flags=BLEND_ADD)
+      else: # attack_coords[1] > defend_coords[1]:
+         DISPLAYSURF.blit(ATK_UP, blitCoords, special_flags=BLEND_ADD)
    elif attack_coords[1] == defend_coords[1]:
-      DISPLAYSURF.blit(ATK_LEFT_RIGHT, (min(attack_coords[0], defend_coords[0]) * TILESIZE, attack_coords[1] * TILESIZE))
-   elif attack_coords[0] < defend_coords[0] and attack_coords[1] < defend_coords[1]:
-      DISPLAYSURF.blit(ATK_UPLEFT_DOWNRIGHT, (attack_coords[0] * TILESIZE, attack_coords[1] * TILESIZE))
-   elif attack_coords[0] > defend_coords[0] and attack_coords[1] > defend_coords[1]:
-      DISPLAYSURF.blit(ATK_UPLEFT_DOWNRIGHT, (defend_coords[0] * TILESIZE, defend_coords[1] * TILESIZE))
-   else:
-      DISPLAYSURF.blit(ATK_DOWNLEFT_UPRIGHT, (min(attack_coords[0], defend_coords[0]) * TILESIZE, min(attack_coords[1], defend_coords[1]) * TILESIZE))
+      if attack_coords[0] < defend_coords[0]:
+         DISPLAYSURF.blit(ATK_RI, blitCoords, special_flags=BLEND_ADD)
+      else: # attack_coords[0] > defend_coords[0]:
+         DISPLAYSURF.blit(ATK_LE, blitCoords, special_flags=BLEND_ADD)
+   elif attack_coords[0] < defend_coords[0]:
+      if attack_coords[1] < defend_coords[1]:
+         DISPLAYSURF.blit(ATK_DR, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[1] > defend_coords[1]:
+         DISPLAYSURF.blit(ATK_UR, blitCoords, special_flags=BLEND_ADD)
+   elif attack_coords[0] > defend_coords[0]:
+      if attack_coords[1] < defend_coords[1]:
+         DISPLAYSURF.blit(ATK_DL, blitCoords, special_flags=BLEND_ADD)
+      elif attack_coords[1] > defend_coords[1]:
+         DISPLAYSURF.blit(ATK_UL, blitCoords, special_flags=BLEND_ADD)
+      
 
 def blitMove(map, DISPLAYSURF, source_coords, dest_coords):
-   if min(source_coords[0], dest_coords[0]) == 0 and max(source_coords[0], dest_coords[0]) == map.WIDTH - 1:
-      DISPLAYSURF.blit(MOVE_LEFT_EDGE, (0, (source_coords[1] if source_coords[0] == 0 else dest_coords[1]) * TILESIZE))
-      DISPLAYSURF.blit(MOVE_RIGHT_EDGE, ((map.WIDTH - 1) * TILESIZE, (source_coords[1] if dest_coords[0] == 0 else dest_coords[1]) * TILESIZE))
-   elif min(source_coords[1], dest_coords[1]) == 0 and max(source_coords[1], dest_coords[1]) == map.HEIGHT - 1:
-      DISPLAYSURF.blit(MOVE_TOP_EDGE, ((source_coords[0] if source_coords[1] == 0 else dest_coords[0]) * TILESIZE, 0))
-      DISPLAYSURF.blit(MOVE_BOTTOM_EDGE, ((source_coords[0] if dest_coords[1] == 0 else dest_coords[0]) * TILESIZE, (map.HEIGHT - 1) * TILESIZE))
+   blitCoords = (source_coords[0] * TILESIZE - 50, source_coords[1] * TILESIZE - 50)
+
+   if source_coords[0] == 0 and dest_coords[0] == map.WIDTH - 1:
+      if source_coords[1] == 0 and source_coords[1] == map.HEIGHT - 1:
+         DISPLAYSURF.blit(MOVE_UL, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[1] == map.HEIGHT - 1 and source_coords[1] == 0:
+         DISPLAYSURF.blit(MOVE_DR, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[1] < dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_UL, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[1] > dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_DL, blitCoords, special_flags=BLEND_ADD)
+      else:# source_coords[1] == dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_LE, blitCoords, special_flags=BLEND_ADD)
+   elif source_coords[0] == map.WIDTH - 1 and dest_coords[0] == 0:
+      if source_coords[1] == 0 and source_coords[1] == map.HEIGHT - 1:
+         DISPLAYSURF.blit(MOVE_UR, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[1] == map.HEIGHT - 1 and source_coords[1] == 0:
+         DISPLAYSURF.blit(MOVE_DL, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[1] < dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_UR, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[1] > dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_DR, blitCoords, special_flags=BLEND_ADD)
+      else:# source_coords[1] == dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_RI, blitCoords, special_flags=BLEND_ADD)
+   elif source_coords[1] == 0 and dest_coords[1] == map.HEIGHT - 1:
+      if source_coords[0] < dest_coords[0]:
+         DISPLAYSURF.blit(MOVE_UR, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[0] > dest_coords[0]:
+         DISPLAYSURF.blit(MOVE_UL, blitCoords, special_flags=BLEND_ADD)
+      else:# source_coords[0] == dest_coords[0]:
+         DISPLAYSURF.blit(MOVE_UP, blitCoords, special_flags=BLEND_ADD)
+   elif source_coords[1] == map.HEIGHT - 1 and dest_coords[1] == 0:
+      if source_coords[0] < dest_coords[0]:
+         DISPLAYSURF.blit(MOVE_DR, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[0] > dest_coords[0]:
+         DISPLAYSURF.blit(MOVE_DL, blitCoords, special_flags=BLEND_ADD)
+      else:# source_coords[0] == dest_coords[0]:
+         DISPLAYSURF.blit(MOVE_DO, blitCoords, special_flags=BLEND_ADD)
    elif source_coords[0] == dest_coords[0]:
-      DISPLAYSURF.blit(MOVE_TOP_BOTTOM, (source_coords[0] * TILESIZE, min(source_coords[1], dest_coords[1]) * TILESIZE))
+      if source_coords[1] < dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_DO, blitCoords, special_flags=BLEND_ADD)
+      else: # source_coords[1] > dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_UP, blitCoords, special_flags=BLEND_ADD)
    elif source_coords[1] == dest_coords[1]:
-      DISPLAYSURF.blit(MOVE_LEFT_RIGHT, (min(source_coords[0], dest_coords[0]) * TILESIZE, source_coords[1] * TILESIZE))
-   elif source_coords[0] < dest_coords[0] and source_coords[1] < dest_coords[1]:
-      DISPLAYSURF.blit(MOVE_UPLEFT_DOWNRIGHT, (source_coords[0] * TILESIZE, source_coords[1] * TILESIZE))
-   elif source_coords[0] > dest_coords[0] and source_coords[1] > dest_coords[1]:
-      DISPLAYSURF.blit(MOVE_UPLEFT_DOWNRIGHT, (dest_coords[0] * TILESIZE, dest_coords[1] * TILESIZE))
-   else:
-      DISPLAYSURF.blit(MOVE_DOWNLEFT_UPRIGHT, (min(source_coords[0], dest_coords[0]) * TILESIZE, min(source_coords[1], dest_coords[1]) * TILESIZE))
+      if source_coords[0] < dest_coords[0]:
+         DISPLAYSURF.blit(MOVE_RI, blitCoords, special_flags=BLEND_ADD)
+      else: # source_coords[0] > dest_coords[0]:
+         DISPLAYSURF.blit(MOVE_LE, blitCoords, special_flags=BLEND_ADD)
+   elif source_coords[0] < dest_coords[0]:
+      if source_coords[1] < dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_DR, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[1] > dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_UR, blitCoords, special_flags=BLEND_ADD)
+   elif source_coords[0] > dest_coords[0]:
+      if source_coords[1] < dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_DL, blitCoords, special_flags=BLEND_ADD)
+      elif source_coords[1] > dest_coords[1]:
+         DISPLAYSURF.blit(MOVE_UL, blitCoords, special_flags=BLEND_ADD)
 
 #a dictionary linking resources to textures
 textures =   {
