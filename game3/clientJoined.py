@@ -9,7 +9,7 @@ from pygame.locals import *
 from pygame import font
 from Maps import *
 import Player
-import SimpleClient
+from SimpleClient import *
 import copy
 
 l_players = []
@@ -17,8 +17,8 @@ play = None
 newServer = None
 joined = True
 IMAGE_FILE_PATH = "ImageFiles\\"
-BOOT_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoBooted.png")
-CRASH_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoServerLost.png")
+BOOT_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoBooted.png").convert_alpha()
+CRASH_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoServerLost.png").convert_alpha()
 # Position of the arrows
 arrow_x_pos = 1500
 up_arrow_y_pos = 550
@@ -36,8 +36,6 @@ def LoginClient(username, s):
    
    def displayMessage(image):
       OK_COORDS = (450,450)
-      OK_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "OK.png")
-      OK_LIT = pygame.image.load(IMAGE_FILE_PATH + "OKLit.png")
       clickedOK = False
       while not clickedOK:
          curr_x, curr_y = pygame.mouse.get_pos()
@@ -114,13 +112,15 @@ def LoginClient(username, s):
    
    # Graphics Constants
    IMAGE_FILE_PATH = "ImageFiles\\"
-   LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "waiting_background.png")
-   BLACK_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background2.png")
-   SERVER_BAR = pygame.image.load(IMAGE_FILE_PATH + "Server.png")
-   UP_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "upArrow.png")
-   DOWN_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "downArrow.png")
-   BACK_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_unpressed.png")
-   BACK_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_pressed.png")
+   OK_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "OK.png")
+   OK_LIT = pygame.image.load(IMAGE_FILE_PATH + "OKLit.png")
+   LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "waiting_background.png").convert_alpha()
+   BLACK_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background2.png").convert_alpha()
+   SERVER_BAR = pygame.image.load(IMAGE_FILE_PATH + "Server.png").convert_alpha()
+   UP_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "upArrow.png").convert_alpha()
+   DOWN_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "downArrow.png").convert_alpha()
+   BACK_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_unpressed.png").convert_alpha()
+   BACK_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_pressed.png").convert_alpha()
 
    # Declare Server Font
    SERVER_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 35)

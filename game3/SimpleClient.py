@@ -16,7 +16,7 @@ pygame.font.init()
 
 pygame.init()
 
-fpsClock = pygame.time.Clock()
+DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
    
 #constants representing the different resources
 IMAGE_FILE_PATH = "ImageFiles\\"
@@ -45,14 +45,14 @@ OVERLAY = 9
 HELP_COORDS = [1135, 820]
 
 # Graphics Constants
-WATER_OUTLINE = pygame.image.load(IMAGE_FILE_PATH + 'water.png')
+WATER_OUTLINE = pygame.image.load(IMAGE_FILE_PATH + 'water.png').convert_alpha()
 t_WATER_OUTLINES = (
                      WATER_OUTLINE,
                      pygame.transform.rotate(WATER_OUTLINE, 90),
                      pygame.transform.rotate(WATER_OUTLINE, 180),
                      pygame.transform.rotate(WATER_OUTLINE, 270)
                    )
-WATER_TEXTURE = pygame.image.load(IMAGE_FILE_PATH + 'deep_water.png')
+WATER_TEXTURE = pygame.image.load(IMAGE_FILE_PATH + 'deep_water.png').convert_alpha()
 t_WATER_TEXTURES = (
                      WATER_TEXTURE,
                      pygame.transform.rotate(WATER_TEXTURE, 90),
@@ -60,65 +60,65 @@ t_WATER_TEXTURES = (
                      pygame.transform.rotate(WATER_TEXTURE, 270)
                    )
 
-INFO_BUY_UNITS = pygame.image.load(IMAGE_FILE_PATH + "InfoBuyUnits.png")
-INFO_ATTACK = pygame.image.load(IMAGE_FILE_PATH + "InfoAttack.png")
-INFO_RESOLVE = pygame.image.load(IMAGE_FILE_PATH + "InfoBattle.png")
-INFO_MOVE = pygame.image.load(IMAGE_FILE_PATH + "InfoMove.png")
-INFO_PISTOLEERS = pygame.image.load(IMAGE_FILE_PATH + "InfoPistoleers.png")
-INFO_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "InfoMusketeers.png")
-INFO_CANNONS = pygame.image.load(IMAGE_FILE_PATH + "InfoCannons.png")
-INFO_AIRSHIPS = pygame.image.load(IMAGE_FILE_PATH + "InfoAirships.png")
-INFO_BUTTON_OFF = pygame.image.load(IMAGE_FILE_PATH + "HelpButton.png")
-INFO_BUTTON_ON = pygame.image.load(IMAGE_FILE_PATH + "HelpButtonActive.png")
+INFO_BUY_UNITS = pygame.image.load(IMAGE_FILE_PATH + "InfoBuyUnits.png").convert_alpha()
+INFO_ATTACK = pygame.image.load(IMAGE_FILE_PATH + "InfoAttack.png").convert_alpha()
+INFO_RESOLVE = pygame.image.load(IMAGE_FILE_PATH + "InfoBattle.png").convert_alpha()
+INFO_MOVE = pygame.image.load(IMAGE_FILE_PATH + "InfoMove.png").convert_alpha()
+INFO_PISTOLEERS = pygame.image.load(IMAGE_FILE_PATH + "InfoPistoleers.png").convert_alpha()
+INFO_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "InfoMusketeers.png").convert_alpha()
+INFO_CANNONS = pygame.image.load(IMAGE_FILE_PATH + "InfoCannons.png").convert_alpha()
+INFO_AIRSHIPS = pygame.image.load(IMAGE_FILE_PATH + "InfoAirships.png").convert_alpha()
+INFO_BUTTON_OFF = pygame.image.load(IMAGE_FILE_PATH + "HelpButton.png").convert_alpha()
+INFO_BUTTON_ON = pygame.image.load(IMAGE_FILE_PATH + "HelpButtonActive.png").convert_alpha()
 
-ATK_UP = pygame.image.load(IMAGE_FILE_PATH + "AttackUp.png")
-ATK_DO = pygame.image.load(IMAGE_FILE_PATH + "AttackDown.png")
-ATK_LE = pygame.image.load(IMAGE_FILE_PATH + "AttackLeft.png")
-ATK_RI = pygame.image.load(IMAGE_FILE_PATH + "AttackRight.png")
-ATK_UR = pygame.image.load(IMAGE_FILE_PATH + "AttackUpRight.png")
-ATK_DL = pygame.image.load(IMAGE_FILE_PATH + "AttackLowLeft.png")
-ATK_UL = pygame.image.load(IMAGE_FILE_PATH + "AttackUpLeft.png")
-ATK_DR = pygame.image.load(IMAGE_FILE_PATH + "AttackLowRight.png")
+ATK_UP = pygame.image.load(IMAGE_FILE_PATH + "AttackUp.png").convert_alpha()
+ATK_DO = pygame.image.load(IMAGE_FILE_PATH + "AttackDown.png").convert_alpha()
+ATK_LE = pygame.image.load(IMAGE_FILE_PATH + "AttackLeft.png").convert_alpha()
+ATK_RI = pygame.image.load(IMAGE_FILE_PATH + "AttackRight.png").convert_alpha()
+ATK_UR = pygame.image.load(IMAGE_FILE_PATH + "AttackUpRight.png").convert_alpha()
+ATK_DL = pygame.image.load(IMAGE_FILE_PATH + "AttackLowLeft.png").convert_alpha()
+ATK_UL = pygame.image.load(IMAGE_FILE_PATH + "AttackUpLeft.png").convert_alpha()
+ATK_DR = pygame.image.load(IMAGE_FILE_PATH + "AttackLowRight.png").convert_alpha()
 
-MOVE_UP = pygame.image.load(IMAGE_FILE_PATH + "MoveUp.png")
-MOVE_DO = pygame.image.load(IMAGE_FILE_PATH + "MoveDown.png")
-MOVE_LE = pygame.image.load(IMAGE_FILE_PATH + "MoveLeft.png")
-MOVE_RI = pygame.image.load(IMAGE_FILE_PATH + "MoveRight.png")
-MOVE_UR = pygame.image.load(IMAGE_FILE_PATH + "MoveUpRight.png")
-MOVE_DL = pygame.image.load(IMAGE_FILE_PATH + "MoveDownLeft.png")
-MOVE_UL = pygame.image.load(IMAGE_FILE_PATH + "MoveUpLeft.png")
-MOVE_DR = pygame.image.load(IMAGE_FILE_PATH + "MoveDownRight.png")
+MOVE_UP = pygame.image.load(IMAGE_FILE_PATH + "MoveUp.png").convert_alpha()
+MOVE_DO = pygame.image.load(IMAGE_FILE_PATH + "MoveDown.png").convert_alpha()
+MOVE_LE = pygame.image.load(IMAGE_FILE_PATH + "MoveLeft.png").convert_alpha()
+MOVE_RI = pygame.image.load(IMAGE_FILE_PATH + "MoveRight.png").convert_alpha()
+MOVE_UR = pygame.image.load(IMAGE_FILE_PATH + "MoveUpRight.png").convert_alpha()
+MOVE_DL = pygame.image.load(IMAGE_FILE_PATH + "MoveDownLeft.png").convert_alpha()
+MOVE_UL = pygame.image.load(IMAGE_FILE_PATH + "MoveUpLeft.png").convert_alpha()
+MOVE_DR = pygame.image.load(IMAGE_FILE_PATH + "MoveDownRight.png").convert_alpha()
 
-MOUSE_OVER = pygame.image.load(IMAGE_FILE_PATH + 'MouseOver.png')
-MOUSE_OVER_UNKNOWN = pygame.image.load(IMAGE_FILE_PATH + 'MouseOverUnknown.png')
-BASE_BOARD = pygame.image.load(IMAGE_FILE_PATH + "BaseBoard.png")
-INFO_MARQUEE = pygame.image.load(IMAGE_FILE_PATH + "InfoMarque.png")
-INFO_OVERLAY = pygame.image.load(IMAGE_FILE_PATH + "InfoMarqueOverlay.png")
-MAP_FRAME = pygame.image.load(IMAGE_FILE_PATH + "MapFrame.png")
-MAP_LIGHT = pygame.image.load(IMAGE_FILE_PATH + "MapLighting.png")
-SELECTED_TILE = pygame.image.load(IMAGE_FILE_PATH + "Selected.png")
-ATTACK_OPTION = pygame.image.load(IMAGE_FILE_PATH + "AttackOption.png")
-MOVE_OPTION = pygame.image.load(IMAGE_FILE_PATH + "MoveOption.png")
-ATTACKER = pygame.image.load(IMAGE_FILE_PATH + "Attacker.png")
-DEFENDER = pygame.image.load(IMAGE_FILE_PATH + "Defender.png")
-SOURCE = pygame.image.load(IMAGE_FILE_PATH + "MoveSource.png")
-DESTINATION = pygame.image.load(IMAGE_FILE_PATH + "MoveDestination.png")
-WAITING = pygame.image.load(IMAGE_FILE_PATH + "Waiting.png")
+MOUSE_OVER = pygame.image.load(IMAGE_FILE_PATH + 'MouseOver.png').convert_alpha()
+MOUSE_OVER_UNKNOWN = pygame.image.load(IMAGE_FILE_PATH + 'MouseOverUnknown.png').convert_alpha()
+BASE_BOARD = pygame.image.load(IMAGE_FILE_PATH + "BaseBoard.png").convert_alpha()
+INFO_MARQUEE = pygame.image.load(IMAGE_FILE_PATH + "InfoMarque.png").convert_alpha()
+INFO_OVERLAY = pygame.image.load(IMAGE_FILE_PATH + "InfoMarqueOverlay.png").convert_alpha()
+MAP_FRAME = pygame.image.load(IMAGE_FILE_PATH + "MapFrame.png").convert_alpha()
+MAP_LIGHT = pygame.image.load(IMAGE_FILE_PATH + "MapLighting.png").convert_alpha()
+SELECTED_TILE = pygame.image.load(IMAGE_FILE_PATH + "Selected.png").convert_alpha()
+ATTACK_OPTION = pygame.image.load(IMAGE_FILE_PATH + "AttackOption.png").convert_alpha()
+MOVE_OPTION = pygame.image.load(IMAGE_FILE_PATH + "MoveOption.png").convert_alpha()
+ATTACKER = pygame.image.load(IMAGE_FILE_PATH + "Attacker.png").convert_alpha()
+DEFENDER = pygame.image.load(IMAGE_FILE_PATH + "Defender.png").convert_alpha()
+SOURCE = pygame.image.load(IMAGE_FILE_PATH + "MoveSource.png").convert_alpha()
+DESTINATION = pygame.image.load(IMAGE_FILE_PATH + "MoveDestination.png").convert_alpha()
+WAITING = pygame.image.load(IMAGE_FILE_PATH + "Waiting.png").convert_alpha()
 
-SEND_PISTOLEERS = pygame.image.load(IMAGE_FILE_PATH + "SendPistoleers.png")
-SEND_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "SendMusketeers.png")
-SEND_CANNONS = pygame.image.load(IMAGE_FILE_PATH + "SendCannons.png")
-SEND_AIRSHIPS = pygame.image.load(IMAGE_FILE_PATH + "SendAirships.png")
-DONE_BUTTON = pygame.image.load(IMAGE_FILE_PATH + "DoneButton.png")
-DONE_BUTTON_ACTIVE = pygame.image.load(IMAGE_FILE_PATH + "DoneButtonActive.png")
+SEND_PISTOLEERS = pygame.image.load(IMAGE_FILE_PATH + "SendPistoleers.png").convert_alpha()
+SEND_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "SendMusketeers.png").convert_alpha()
+SEND_CANNONS = pygame.image.load(IMAGE_FILE_PATH + "SendCannons.png").convert_alpha()
+SEND_AIRSHIPS = pygame.image.load(IMAGE_FILE_PATH + "SendAirships.png").convert_alpha()
+DONE_BUTTON = pygame.image.load(IMAGE_FILE_PATH + "DoneButton.png").convert_alpha()
+DONE_BUTTON_ACTIVE = pygame.image.load(IMAGE_FILE_PATH + "DoneButtonActive.png").convert_alpha()
 
-MOVE_PISTOLEERS = pygame.image.load(IMAGE_FILE_PATH + "MovePistoleers.png")
-MOVE_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "MoveMusketeers.png")
-MOVE_CANNONS    = pygame.image.load(IMAGE_FILE_PATH + "MoveCannons.png")
-MOVE_AIRSHIPS   = pygame.image.load(IMAGE_FILE_PATH + "MoveAirships.png")
+MOVE_PISTOLEERS = pygame.image.load(IMAGE_FILE_PATH + "MovePistoleers.png").convert_alpha()
+MOVE_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "MoveMusketeers.png").convert_alpha()
+MOVE_CANNONS    = pygame.image.load(IMAGE_FILE_PATH + "MoveCannons.png").convert_alpha()
+MOVE_AIRSHIPS   = pygame.image.load(IMAGE_FILE_PATH + "MoveAirships.png").convert_alpha()
 
-CRASH_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoServerLost.png")
-ATTACK_RESULTS = pygame.image.load(IMAGE_FILE_PATH + "AttackResults.png")
+CRASH_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoServerLost.png").convert_alpha()
+ATTACK_RESULTS = pygame.image.load(IMAGE_FILE_PATH + "AttackResults.png").convert_alpha()
 
 def blitInfo(DISPLAYSURF, map, phase_info, displayUnitThings=True):
    curr_x, curr_y = pygame.mouse.get_pos()
@@ -1233,7 +1233,6 @@ def play(host_address, player_name):
       d_playerLogoIndexes[name] = temp_index
    
    print(player_name)
-   DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
    while True:
       map.current_player = player_name
       map = placeUnits(DISPLAYSURF, map, player, s, host_address, l_playerNames)
