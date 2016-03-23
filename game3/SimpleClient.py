@@ -120,6 +120,9 @@ MOVE_AIRSHIPS   = pygame.image.load(IMAGE_FILE_PATH + "MoveAirships.png").conver
 CRASH_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoServerLost.png").convert_alpha()
 ATTACK_RESULTS = pygame.image.load(IMAGE_FILE_PATH + "AttackResults.png").convert_alpha()
 
+MOUSE_LIT = pygame.image.load(IMAGE_FILE_PATH + "MouseLit.png").convert_alpha()
+MOUSE_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "MouseUnlit.png").convert_alpha()
+
 def blitInfo(DISPLAYSURF, map, phase_info, displayUnitThings=True):
    curr_x, curr_y = pygame.mouse.get_pos()
    
@@ -306,6 +309,10 @@ map_X_offset = 0
 map_Y_offset = 0
 
 d_continent_tiles = {}
+
+def isOverButton(map, curr_x, curr_y):
+    return ((175 + 245 <= curr_x <= 175 + 395 or 580 + 245 <= curr_x <= 580 + 395) and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120) or \
+    ((175 + 245 <= curr_x <= 175 + 395 or 580 + 245 <= curr_x <= 580 + 395) and map.HEIGHT * TILESIZE + 125 < curr_y <= map.HEIGHT * TILESIZE + 175)
 
 def standardInfo(map, DISPLAYSURF, params):
    #Highlight country mouse is over and display country info
@@ -520,7 +527,6 @@ def handleGeneral(event, map, temp_map=None, selectedCountry=None):
       #and the game and close the window
       pygame.quit()
       sys.exit()
-  pygame.mouse.set_visible(True)
   # if a key is pressed
   if event.type == KEYDOWN:
       if event.key == K_ESCAPE:
@@ -559,6 +565,7 @@ def displayMessage(image, map, DISPLAYSURF, turnState, l_playerNames, battles = 
             DISPLAYSURF.blit(COUNTRY_FONT.render(attackLost, True, (0,0,0)),(650,140 + y_offset))
             y_offset += 25
       DISPLAYSURF.blit(OK_LIT if over_ok else OK_UNLIT, OK_COORDS)
+      DISPLAYSURF.blit(MOUSE_LIT if over_ok else MOUSE_UNLIT, (curr_x, curr_y))
       
       pygame.display.update()
 
@@ -666,6 +673,7 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address, l_playerNames):
        DISPLAYSURF.blit(DONE_BUTTON if player.unit_counts > 0 else DONE_BUTTON_ACTIVE, (980, map.HEIGHT * TILESIZE + 70))
        
        blitInfo(DISPLAYSURF, map, INFO_BUY_UNITS)
+       DISPLAYSURF.blit(MOUSE_LIT if isOverButton(map, curr_x, curr_y) and selectedCountry != None else MOUSE_UNLIT, (curr_x, curr_y))
        
        #update the display
        pygame.display.update()
@@ -701,6 +709,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
       
       printMap(map, DISPLAYSURF, "Declare Attacks", standardInfo, l_playerNames)
       DISPLAYSURF.blit(WAITING, (70, map.HEIGHT * TILESIZE + 70))
+      DISPLAYSURF.blit(MOUSE_UNLIT, pygame.mouse.get_pos())
       #update the display
       pygame.display.update()
    print("Exited refreshing")
@@ -801,8 +810,6 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
                   return None, None, None, None
                declaring = False
        
-       
-       
        if selectedCountry == None:
          printMap(map, DISPLAYSURF, "Declare Attacks", standardInfo, oldMap[1])
        else:
@@ -868,6 +875,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
        DISPLAYSURF.blit(DONE_BUTTON if player.unit_counts > 0 else DONE_BUTTON_ACTIVE, (980, map.HEIGHT * TILESIZE + 70))
        
        blitInfo(DISPLAYSURF, map, INFO_ATTACK)
+       DISPLAYSURF.blit(MOUSE_LIT if isOverButton(map, curr_x, curr_y) and selectedCountry != None and selectedCountry in l_attackers else MOUSE_UNLIT, (curr_x, curr_y))
          
        #update the display
        pygame.display.update()
@@ -912,6 +920,8 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
          DISPLAYSURF.blit(DEFENDER, (l_defenders[battle][0] * TILESIZE, l_defenders[battle][1] * TILESIZE), special_flags=BLEND_ADD)
          blitBattle(map, DISPLAYSURF, l_attackers[battle], l_defenders[battle])
          DISPLAYSURF.blit(ATTACKER, (l_attackers[battle][0] * TILESIZE, l_attackers[battle][1] * TILESIZE), special_flags=BLEND_ADD)
+      
+      DISPLAYSURF.blit(MOUSE_UNLIT, pygame.mouse.get_pos())
       #update the display
       pygame.display.update()
    print("Exited refreshing")
@@ -1075,6 +1085,7 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
       DISPLAYSURF.blit(DONE_BUTTON if player.unit_counts > 0 else DONE_BUTTON_ACTIVE, (980, map.HEIGHT * TILESIZE + 70))
     
       blitInfo(DISPLAYSURF, map, INFO_MOVE)
+      DISPLAYSURF.blit(MOUSE_LIT if isOverButton(map, curr_x, curr_y) and selectedCountry != None and selectedCountry in l_senders else MOUSE_UNLIT, (curr_x, curr_y))
     
       #update the display
       pygame.display.update()
@@ -1115,6 +1126,7 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address, l_senders, l_receiv
          blitMove(map, DISPLAYSURF, l_senders[army], l_receivers[army])
          DISPLAYSURF.blit(SOURCE, (l_senders[army][0] * TILESIZE, l_senders[army][1] * TILESIZE), special_flags=BLEND_ADD)
       DISPLAYSURF.blit(WAITING, (70, map.HEIGHT * TILESIZE + 70))
+      DISPLAYSURF.blit(MOUSE_UNLIT, pygame.mouse.get_pos())
       #update the display
       pygame.display.update()
    if newMap == None:
@@ -1174,6 +1186,8 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames):
          else:
             DISPLAYSURF.fill((255,200,200), special_flags=BLEND_MULT)
             DISPLAYSURF.blit(EXIT_LIT if over_exit else EXIT_UNLIT, EXIT_COORDS)
+         
+         DISPLAYSURF.blit(MOUSE_UNLIT, (curr_x, curr_y))
          #update the display
          pygame.display.update()
    elif Won:
@@ -1197,10 +1211,13 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames):
          else:
             DISPLAYSURF.fill((200,230,255), special_flags=BLEND_MULT)
             DISPLAYSURF.blit(EXIT_LIT if over_exit else EXIT_UNLIT, EXIT_COORDS)
+         
+         DISPLAYSURF.blit(MOUSE_UNLIT, (curr_x, curr_y))
          #update the display
          pygame.display.update()
    
 def play(host_address, player_name):
+   pygame.mouse.set_visible(False)
    #set up the display
    print("Enter play")
 
@@ -1257,6 +1274,8 @@ def play(host_address, player_name):
       #sys.exit()
 
    s.close()
+   
+   pygame.mouse.set_visible(True)
    return
 
 if __name__ == '__main__':

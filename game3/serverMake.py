@@ -7,7 +7,7 @@ import time
 import select
 import SimpleServer
 import clientLogin
-from SimpleClient import *
+import SimpleClient
 import pygame, sys
 from pygame.locals import *
 import random

@@ -9,7 +9,7 @@ from pygame.locals import *
 from pygame import font
 from Maps import *
 import Player
-from SimpleClient import *
+import SimpleClient
 import copy
 
 l_players = []
