@@ -15,7 +15,7 @@ import clientJoined
 
 def LoginClient():
    def displayMessage(image):
-      OK_COORDS = (450,450)
+      OK_COORDS = (450,650)
       clickedOK = False
       while not clickedOK:
          print("looping")
