@@ -119,6 +119,12 @@ MOVE_AIRSHIPS   = pygame.image.load(IMAGE_FILE_PATH + "MoveAirships.png").conver
 
 CRASH_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoServerLost.png").convert_alpha()
 ATTACK_RESULTS = pygame.image.load(IMAGE_FILE_PATH + "AttackResults.png").convert_alpha()
+OK_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "OK.png").convert_alpha()
+OK_LIT = pygame.image.load(IMAGE_FILE_PATH + "OKLit.png").convert_alpha()
+EXIT_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "Exit.png").convert_alpha()
+EXIT_LIT = pygame.image.load(IMAGE_FILE_PATH + "ExitLit.png").convert_alpha()
+WINNER = pygame.image.load(IMAGE_FILE_PATH + "InfoVictory.png").convert_alpha()
+LOSER = pygame.image.load(IMAGE_FILE_PATH + "InfoDefeat.png").convert_alpha()
 
 def blitInfo(DISPLAYSURF, map, phase_info, displayUnitThings=True):
    curr_x, curr_y = pygame.mouse.get_pos()
@@ -529,9 +535,7 @@ def handleGeneral(event, map, temp_map=None, selectedCountry=None):
          sys.exit()
 
 def displayMessage(image, map, DISPLAYSURF, turnState, l_playerNames, battles = None):
-   OK_COORDS = (450,450)
-   OK_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "OK.png")
-   OK_LIT = pygame.image.load(IMAGE_FILE_PATH + "OKLit.png")
+   OK_COORDS = (450,650)
    clickedOK = False
    
    while not clickedOK:
@@ -1124,11 +1128,7 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address, l_senders, l_receiv
 deadMap = None
 def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames):
    OK_COORDS = (450,450)
-   OK_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "OK.png")
-   OK_LIT = pygame.image.load(IMAGE_FILE_PATH + "OKLit.png")
    EXIT_COORDS = (70, 770)
-   EXIT_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "Exit.png")
-   EXIT_LIT = pygame.image.load(IMAGE_FILE_PATH + "ExitLit.png")
    global deadMap
    Won = True
    Lost = True
@@ -1142,7 +1142,6 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames):
             Won = False
    
    if Lost:
-      LOSER = pygame.image.load(IMAGE_FILE_PATH + "InfoDefeat.png")
       def refresh():
          global deadMap
          global map
@@ -1177,7 +1176,7 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames):
          #update the display
          pygame.display.update()
    elif Won:
-      WINNER = pygame.image.load(IMAGE_FILE_PATH + "InfoVictory.png")
+      OK_COORDS = (450,650)
       while True:
          curr_x, curr_y = pygame.mouse.get_pos()
          over_ok = OK_COORDS[0] <= curr_x <= OK_COORDS[0] + 200 and OK_COORDS[1] <= curr_y <= OK_COORDS[1] + 100

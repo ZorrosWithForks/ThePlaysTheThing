@@ -35,7 +35,7 @@ def LoginClient(username, s):
    print("In clientJoined")
    
    def displayMessage(image):
-      OK_COORDS = (450,450)
+      OK_COORDS = (450,650)
       clickedOK = False
       while not clickedOK:
          curr_x, curr_y = pygame.mouse.get_pos()
