@@ -117,6 +117,8 @@ MOVE_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "MoveMusketeers.png")
 MOVE_CANNONS    = pygame.image.load(IMAGE_FILE_PATH + "MoveCannons.png")
 MOVE_AIRSHIPS   = pygame.image.load(IMAGE_FILE_PATH + "MoveAirships.png")
 
+CRASH_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoServerLost.png")
+ATTACK_RESULTS = pygame.image.load(IMAGE_FILE_PATH + "AttackResults.png")
 
 def blitInfo(DISPLAYSURF, map, phase_info, displayUnitThings=True):
    curr_x, curr_y = pygame.mouse.get_pos()
@@ -526,7 +528,39 @@ def handleGeneral(event, map, temp_map=None, selectedCountry=None):
          pygame.quit()
          sys.exit()
 
-         
+def displayMessage(image, map, DISPLAYSURF, turnState, l_playerNames, battles = None):
+   OK_COORDS = (450,450)
+   OK_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "OK.png")
+   OK_LIT = pygame.image.load(IMAGE_FILE_PATH + "OKLit.png")
+   clickedOK = False
+   
+   while not clickedOK:
+      curr_x, curr_y = pygame.mouse.get_pos()
+      over_ok = OK_COORDS[0] <= curr_x <= OK_COORDS[0] + 200 and OK_COORDS[1] <= curr_y <= OK_COORDS[1] + 100
+      for event in pygame.event.get():
+         if over_ok and event.type == MOUSEBUTTONDOWN:
+            clickedOK = True
+      printMap(map, DISPLAYSURF, turnState, standardInfo, l_playerNames)
+      DISPLAYSURF.blit(image, (0, 0))
+      if battles != None:
+         DISPLAYSURF.blit(COUNTRY_FONT.render("Countries Conquered", True, (0,0,0)),(150,140))
+         DISPLAYSURF.blit(COUNTRY_FONT.render("Countries Lost", True, (0,0,0)),(435,140))
+         DISPLAYSURF.blit(COUNTRY_FONT.render("Attacks Failed", True, (0,0,0)),(650,140))
+         y_offset = 25
+         for countryConquered in battles[0]:
+            DISPLAYSURF.blit(COUNTRY_FONT.render(countryConquered, True, (0,0,0)),(150,140 + y_offset))
+            y_offset += 25
+         y_offset = 25
+         for countryLost in battles[1]:
+            DISPLAYSURF.blit(COUNTRY_FONT.render(countryLost, True, (0,0,0)),(435,140 + y_offset))
+            y_offset += 25
+         y_offset = 25
+         for attackLost in battles[2]:
+            DISPLAYSURF.blit(COUNTRY_FONT.render(attackLost, True, (0,0,0)),(650,140 + y_offset))
+            y_offset += 25
+      DISPLAYSURF.blit(OK_LIT if over_ok else OK_UNLIT, OK_COORDS)
+      
+      pygame.display.update()
 
 def placeUnits(DISPLAYSURF, map, player, socket, host_address, l_playerNames):
    BUY_PISTOLEERS = pygame.image.load(IMAGE_FILE_PATH + "PistoleersBuy.png")
@@ -611,6 +645,7 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address, l_playerNames):
                try:
                   socket.sendto(update_map, host_address)
                except:
+                  displayMessage(CRASH_MESSAGE, map, DISPLAYSURF, "Place Troops", l_playerNames)
                   return None
                placing = False
        
@@ -672,6 +707,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
    if oldMap != None:
       map = oldMap[0]
    else:
+      displayMessage(CRASH_MESSAGE, map, DISPLAYSURF, "Declare Attacks", l_playerNames)
       return None, None, None, None
    declaring = True
 
@@ -761,6 +797,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
                try:
                   socket.sendto(packet, host_address)
                except:
+                  displayMessage(CRASH_MESSAGE, map, DISPLAYSURF, "Declare Attacks", l_playerNames)
                   return None, None, None, None
                declaring = False
        
@@ -880,7 +917,10 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
    print("Exited refreshing")
    if oldMap != None:
       map = oldMap[0]
+      if len(oldMap) > 2:
+         displayMessage(ATTACK_RESULTS, map, DISPLAYSURF, "Move Troops", l_playerNames, oldMap[2])
    else:
+      displayMessage(CRASH_MESSAGE, map, DISPLAYSURF, "Move Troops", l_playerNames)
       return None, None, None, None
    if detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames):
       return None, None, None, None
@@ -967,6 +1007,7 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
                try:
                   socket.sendto(packet, host_address)
                except:
+                  displayMessage(CRASH_MESSAGE, map, DISPLAYSURF, "Move Troops", l_playerNames)
                   return None, None, None, None # This is kinda funny
                moving = False
                
@@ -1076,7 +1117,8 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address, l_senders, l_receiv
       DISPLAYSURF.blit(WAITING, (70, map.HEIGHT * TILESIZE + 70))
       #update the display
       pygame.display.update()
-      
+   if newMap == None:
+      displayMessage(CRASH_MESSAGE, map, DISPLAYSURF, "Move Troops", l_playerNames)
    return newMap
 
 deadMap = None
@@ -1206,9 +1248,9 @@ def play(host_address, player_name):
       if map == None:
          break
       info = getMoney(DISPLAYSURF, map, player, s, host_address, l_senders, l_receivers, l_playerNames)
-      map = info[0]
-      if map == None:
+      if info == None:
          break
+      map = info[0]
       player = info[1]
       l_playerNames = info[2]
       print("Exited properly")

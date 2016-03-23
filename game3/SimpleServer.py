@@ -99,7 +99,7 @@ def receivePlacements(l_players, l_dead_players, serversocket, map, address):
       print("Sent placements to: " + player.user_name)
 
       
-def resolveAttacks(defender_coords, l_attacks, map, l_players):
+def resolveAttacks(defender_coords, l_attacks, map, l_players, d_attackResults):
    numOfAttackers = 2
    while numOfAttackers > 0:
       print("Number of attackers: " + str(numOfAttackers))
@@ -206,6 +206,16 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
             country = map.ll_map[l_tempAttacks[player][0][attack][1]][l_tempAttacks[player][0][attack][0]]
             units = l_tempAttacks[player][2][country][1]
             if units.infantry == 0 and units.archers == 0 and units.cannons == 0 and units.champions == 0:
+               if l_attacks[player][2][country][3] != map.d_continents[defending_country[0]][defending_country[1]].owner and \
+                  map.d_continents[defending_country[0]][defending_country[1]].name not in d_attackResults[l_attacks[player][2][country][3]][2]:
+                  defenderCount = 0
+                  for defender in l_attacks[player][1]:
+                     if defender == defender_coords:
+                        defenderCount += 1
+                  print("Defender count: " + str(defenderCount))
+                  if defenderCount == 1:
+                     d_attackResults[l_attacks[player][2][country][3]][2].append(map.d_continents[defending_country[0]][defending_country[1]].name) 
+                     print("added fail to player: " + l_attacks[player][2][country][3])
                l_attacks[player][0].remove(l_tempAttacks[player][0][attack])
                l_attacks[player][1].remove(l_tempAttacks[player][1][attack])
                l_attacks[player][2][country] = None
@@ -231,7 +241,9 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
       and curr_unit_counts.cannons == 0 \
       and curr_unit_counts.champions == 0 \
       and numOfAttackers == 1:
+         d_attackResults[map.d_continents[defending_country[0]][defending_country[1]].owner][1].append(map.d_continents[defending_country[0]][defending_country[1]].name)
          print("Set owner of " + map.d_continents[defending_country[0]][defending_country[1]].name + " to " + attacking_player)
+         d_attackResults[attacking_player][0].append(map.d_continents[defending_country[0]][defending_country[1]].name)
          map.d_continents[defending_country[0]][defending_country[1]].owner = attacking_player
          map.d_continents[defending_country[0]][defending_country[1]].unit_production = 1
          for attack_packet in l_attacks:
@@ -264,7 +276,11 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players):
 def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
    l_attacks = []   # list of tuples (l_attackers, l_defenders, d_attacks), each belonging to a different player
    l_defenders = [] # list of defender_coords
+   d_attackResults = {} # dictionary of the results of the attacks in the form (countries conquered, countries lost, failed attacks)
    
+   d_attackResults["Unoccupied"] = [[],[],[]]
+   for player in l_players:
+      d_attackResults[player.user_name] = [[],[],[]]
    d_players = {}
    for player in l_players:
       d_players[player.user_name] = player
@@ -309,7 +325,7 @@ def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
             print(defender)
    
    for defender in l_defenders: # defender is a set of coords
-      resolveAttacks(defender, l_attacks, map, l_players)
+      resolveAttacks(defender, l_attacks, map, l_players, d_attackResults)
    
    l_temp_players = []
    for player in l_players:
@@ -330,7 +346,7 @@ def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
       curr_connection = l_players[i].connection
       l_players[i].connection = None
       playerMap = Map(map_to_copy=map, copy_player_name=l_players[i].user_name)
-      packet = pickle.dumps((playerMap, l_playerNames))
+      packet = pickle.dumps((playerMap, l_playerNames, d_attackResults[l_players[i].user_name]))
       try:
          curr_connection.sendto(packet, address)
          l_players[i].connection = curr_connection
