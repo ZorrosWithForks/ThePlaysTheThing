@@ -3,7 +3,6 @@ import threading
 from threading import Thread
 import _thread
 import time
-import SimpleClient
 import pickle
 import string
 import pygame, sys
@@ -17,8 +16,6 @@ import clientJoined
 def LoginClient():
    def displayMessage(image):
       OK_COORDS = (450,450)
-      OK_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "OK.png")
-      OK_LIT = pygame.image.load(IMAGE_FILE_PATH + "OKLit.png")
       clickedOK = False
       while not clickedOK:
          print("looping")
@@ -147,21 +144,22 @@ def LoginClient():
 
    # Graphics Constants
    IMAGE_FILE_PATH = "ImageFiles\\"
-   MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoVictory.png")
-   IMAGE_FILE_PATH = "ImageFiles\\"
-   LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background.png")
-   BLACK_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background2.png")
-   SERVER_BAR = pygame.image.load(IMAGE_FILE_PATH + "Server.png")
-   JOIN_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "JoinButton_pressed.png")
-   JOIN_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "JoinButton_unpressed.png")
-   REFRESH_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "RefreshButton_unpressed.png")
-   REFRESH_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "RefreshButton_pressed.png")
-   UP_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "upArrow.png")
-   DOWN_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "downArrow.png")
+   MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoVictory.png").convert_alpha()
+   OK_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "OK.png").convert_alpha()
+   OK_LIT = pygame.image.load(IMAGE_FILE_PATH + "OKLit.png").convert_alpha()
+   LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background.png").convert_alpha()
+   BLACK_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background2.png").convert_alpha()
+   SERVER_BAR = pygame.image.load(IMAGE_FILE_PATH + "Server.png").convert_alpha()
+   JOIN_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "JoinButton_pressed.png").convert_alpha()
+   JOIN_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "JoinButton_unpressed.png").convert_alpha()
+   REFRESH_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "RefreshButton_unpressed.png").convert_alpha()
+   REFRESH_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "RefreshButton_pressed.png").convert_alpha()
+   UP_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "upArrow.png").convert_alpha()
+   DOWN_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "downArrow.png").convert_alpha()
    #USERNAME_BOX =  pygame.image.load(IMAGE_FILE_PATH + "username_box.png")
-   BACK_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_unpressed.png")
-   BACK_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_pressed.png")
-   NO_USERNAME_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "TypeUsername.png")
+   BACK_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_unpressed.png").convert_alpha()
+   BACK_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_pressed.png").convert_alpha()
+   NO_USERNAME_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "TypeUsername.png").convert_alpha()
    MESSAGE_COORDS = (220, 620)
    #specify that shift is not pressed
    shifted = False

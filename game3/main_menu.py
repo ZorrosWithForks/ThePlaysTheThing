@@ -15,13 +15,17 @@ pygame.init()
 MENU_SURFACE = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 
 IMAGE_FILE_PATH = "ImageFiles\\"
-MENU_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "Main_menu.png")
-JOIN_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "JoinGame.png")
-JOIN_LIT = pygame.image.load(IMAGE_FILE_PATH + "JoinGameLit.png")
-NEW_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "NewGame.png")
-NEW_LIT = pygame.image.load(IMAGE_FILE_PATH + "NewGameLit.png")
-EXIT_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "Exit.png")
-EXIT_LIT = pygame.image.load(IMAGE_FILE_PATH + "ExitLit.png")
+MENU_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "Main_menu.png").convert_alpha()
+JOIN_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "JoinGame.png").convert_alpha()
+JOIN_LIT = pygame.image.load(IMAGE_FILE_PATH + "JoinGameLit.png").convert_alpha()
+NEW_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "NewGame.png").convert_alpha()
+NEW_LIT = pygame.image.load(IMAGE_FILE_PATH + "NewGameLit.png").convert_alpha()
+EXIT_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "Exit.png").convert_alpha()
+EXIT_LIT = pygame.image.load(IMAGE_FILE_PATH + "ExitLit.png").convert_alpha()
+
+SOUND_FILE_PATH = "Sounds\\"
+pygame.mixer.music.load(SOUND_FILE_PATH + "The Pyre.mp3")
+pygame.mixer.music.play(-1)
  
 #gameDisplay = pygame.display.set_mode((display_width,display_height))
 gameDisplay = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
