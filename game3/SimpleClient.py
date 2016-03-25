@@ -25,7 +25,8 @@ CONTINENT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 40)
 COUNTRY_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 25)
 UNIT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 35)
 MONEY_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 22)
-COUNT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 20)
+TURN_READOUT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 18)
+VICTOR_COLOR = (0, 50, 100)
 ATTACK_COLOR = (100, 0, 0)
 DEFEND_COLOR = (50, 50, 0)
 ATTACK_COUNT_COLOR = (255, 0, 0)
@@ -553,21 +554,22 @@ def displayMessage(image, map, DISPLAYSURF, turnState, l_playerNames, battles = 
       printMap(map, DISPLAYSURF, turnState, standardInfo, l_playerNames)
       DISPLAYSURF.blit(image, (0, 0))
       if battles != None:
-         DISPLAYSURF.blit(COUNTRY_FONT.render("Countries Conquered", True, (0,0,0)),(150,140))
-         DISPLAYSURF.blit(COUNTRY_FONT.render("Countries Lost", True, (0,0,0)),(435,140))
-         DISPLAYSURF.blit(COUNTRY_FONT.render("Attacks Failed", True, (0,0,0)),(650,140))
-         y_offset = 25
+         DISPLAYSURF.blit(COUNTRY_FONT.render("Countries Conquered", True, VICTOR_COLOR),(150,140))
+         DISPLAYSURF.blit(COUNTRY_FONT.render("Countries Lost", True, DEFEND_COLOR),(435,140))
+         DISPLAYSURF.blit(COUNTRY_FONT.render("Attacks Failed", True, ATTACK_COLOR),(650,140))
+         pygame.draw.line(DISPLAYSURF, (0,0,0), (150, 170), (850, 170), 3)
+         y_offset = 30
          for countryConquered in battles[0]:
-            DISPLAYSURF.blit(COUNTRY_FONT.render(countryConquered, True, (0,0,0)),(150,140 + y_offset))
+            DISPLAYSURF.blit(TURN_READOUT_FONT.render(countryConquered, True, VICTOR_COLOR),(150,140 + y_offset))
             y_offset += 25
          y_offset = 25
          for countryLost in battles[1]:
-            DISPLAYSURF.blit(COUNTRY_FONT.render(countryLost, True, (0,0,0)),(435,140 + y_offset))
+            DISPLAYSURF.blit(TURN_READOUT_FONT.render(countryLost, True, DEFEND_COLOR),(435,140 + y_offset))
             y_offset += 25
-         y_offset = 25
+         y_offset = 30
          for attackLost in battles[2]:
-            DISPLAYSURF.blit(COUNTRY_FONT.render(attackLost, True, (0,0,0)),(650,140 + y_offset))
-            y_offset += 25
+            DISPLAYSURF.blit(TURN_READOUT_FONT.render(attackLost, True, ATTACK_COLOR),(650,140 + y_offset))
+            y_offset += 30
       DISPLAYSURF.blit(OK_LIT if over_ok else OK_UNLIT, OK_COORDS)
       DISPLAYSURF.blit(MOUSE_LIT if over_ok else MOUSE_UNLIT, (curr_x, curr_y))
       
