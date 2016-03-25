@@ -20,6 +20,8 @@ def LoginClient():
       while not clickedOK:
          print("looping")
          curr_x, curr_y = pygame.mouse.get_pos()
+         curr_x *= xScale
+         curr_y *= yScale
          over_ok = OK_COORDS[0] <= curr_x <= OK_COORDS[0] + 200 and OK_COORDS[1] <= curr_y <= OK_COORDS[1] + 100
          for event in pygame.event.get():
             if over_ok and event.type == MOUSEBUTTONDOWN:
@@ -40,7 +42,7 @@ def LoginClient():
          LOGIN_TOP_SURFACE.blit(image, (0, 0))
          LOGIN_TOP_SURFACE.blit(OK_LIT if over_ok else OK_UNLIT, OK_COORDS)
          print("blitted stuffs")
-         
+         newSurface = pygame.transform.scale(LOGIN_TOP_SURFACE,(screenInfo.current_w, screenInfo.current_h), window)
          pygame.display.update()
 
 
@@ -57,19 +59,14 @@ def LoginClient():
 
           ac: Active color (when a mouse is hovering).
       '''
-      mouse = pygame.mouse.get_pos()
+      curr_x, curr_y = pygame.mouse.get_pos()
       click = pygame.mouse.get_pressed()
-      
-      if x+w > mouse[0] > x and y+h > mouse[1] > y:
+      curr_x *= xScale
+      curr_y *= yScale
+      if x+w > curr_x > x and y+h > curr_y > y:
          LOGIN_TOP_SURFACE.blit(button_pressed, (x, y))
       else:
          LOGIN_TOP_SURFACE.blit(button_unpressed, (x, y))
-         
-      smallText = pygame.font.Font("freesansbold.ttf",20)
-      textSurf, textRect = text_objects(msg, smallText, l_colors[WHITE])
-      textRect.center = ( (x+(w/2)), (y+(h/2)) )
-
-
 
    def text_objects(text, font, color):
        textSurface = font.render(text, True, color)
@@ -231,8 +228,11 @@ def LoginClient():
    pushed_back=False
    
    # Declare the Surface
-   LOGIN_TOP_SURFACE = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
-
+   screenInfo = pygame.display.Info()
+   LOGIN_TOP_SURFACE = pygame.Surface((1600,900))
+   window = pygame.display.set_mode((screenInfo.current_w,screenInfo.current_h), pygame.FULLSCREEN)
+   xScale = 1600.0 / float(screenInfo.current_w)
+   yScale = 900.0 / float(screenInfo.current_h)
    # Client network stuff
    l_servers = []
    address = ('255.255.255.255', 8080)
@@ -251,7 +251,6 @@ def LoginClient():
 
    # Get the username
    while True:
-      mouse = pygame.mouse.get_pos()
       
       #stuffs for scrolling
       servers = 0
@@ -395,6 +394,8 @@ def LoginClient():
                elif event.key == K_SLASH: username += "?" 
          if event.type == MOUSEBUTTONDOWN:
             x_mouse_position_main, y_mouse_position_main = pygame.mouse.get_pos()
+            x_mouse_position_main *= xScale
+            y_mouse_position_main *= yScale
             print(str(x_mouse_position_main) + str(y_mouse_position_main))
             
             # click refresh
@@ -447,7 +448,7 @@ def LoginClient():
          return
       if username == "":
          LOGIN_TOP_SURFACE.blit(NO_USERNAME_MESSAGE, MESSAGE_COORDS)
-               
+      newSurface = pygame.transform.scale(LOGIN_TOP_SURFACE,(screenInfo.current_w, screenInfo.current_h), window)
       pygame.display.update()
       
 if __name__ == '__main__':

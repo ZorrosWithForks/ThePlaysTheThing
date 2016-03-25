@@ -165,17 +165,15 @@ def MakeServer():
 
           ac: Active color (when a mouse is hovering).
       '''
-      mouse = pygame.mouse.get_pos()
+      curr_x, curr_y = pygame.mouse.get_pos()
       click = pygame.mouse.get_pressed()
+      curr_x *= xScale
+      curr_y *= yScale
       
-      if x+w > mouse[0] > x and y+h > mouse[1] > y:
+      if x+w > curr_x > x and y+h > curr_y > y:
          DISPLAYSURF.blit(button_pressed, (x, y))
       else:
          DISPLAYSURF.blit(button_unpressed, (x, y))
-         
-      smallText = pygame.font.Font("freesansbold.ttf",20)
-      textSurf, textRect = text_objects(msg, smallText, l_colors[WHITE])
-      textRect.center = ( (x+(w/2)), (y+(h/2)) )
       
    # Initialize pygame
    pygame.init()
@@ -284,7 +282,11 @@ def MakeServer():
    pushed_back = False
    just_accessed = True
    # Declare the Surface
-   DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+   screenInfo = pygame.display.Info()
+   DISPLAYSURF = pygame.Surface((1600,900))
+   window = pygame.display.set_mode((screenInfo.current_w,screenInfo.current_h), pygame.FULLSCREEN)
+   xScale = 1600.0 / float(screenInfo.current_w)
+   yScale = 900.0 / float(screenInfo.current_h)
 
    thread = []
    clients = []
@@ -448,7 +450,8 @@ def MakeServer():
             print("MOUSEBUTTONDOWN")
             print(str(l_boot_spots)) # still exists
             x_mouse_position_main, y_mouse_position_main = pygame.mouse.get_pos()
-            
+            x_mouse_position_main *= xScale
+            y_mouse_position_main *= yScale
             # clicked start server
             if x_start_server_button <= x_mouse_position_main <= x_start_server_button + 150 and y_start_server_button <= y_mouse_position_main <= y_start_server_button + 75 and servername != "":
                waiting_for_players = True
@@ -539,6 +542,7 @@ def MakeServer():
          # if x_start_server_button <= x_mouse_position_main <= x_mouse_position_main + 150 and y_start_server_button <= y_mouse_position_main <= y_start_server_button + 75:
             # pygame.display.iconify()
             # begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients)
+      newSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), window)
       pygame.display.update()
       
 if __name__ == '__main__':
