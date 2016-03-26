@@ -573,7 +573,7 @@ def displayMessage(image, map, DISPLAYSURF, turnState, l_playerNames, battles = 
          for countryConquered in battles[0]:
             DISPLAYSURF.blit(TURN_READOUT_FONT.render(countryConquered, True, VICTOR_COLOR),(150,140 + y_offset))
             y_offset += 25
-         y_offset = 25
+         y_offset = 30
          for countryLost in battles[1]:
             DISPLAYSURF.blit(TURN_READOUT_FONT.render(countryLost, True, DEFEND_COLOR),(435,140 + y_offset))
             y_offset += 25
@@ -1177,7 +1177,6 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames):
    global deadMap
    Won = True
    Lost = True
-   deadMap = map
    done = False
    for cont_name in map.d_continents.keys():
       for country in map.d_continents[cont_name]:
@@ -1211,7 +1210,9 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames):
                done = True
             elif over_exit and event.type == MOUSEBUTTONDOWN:
                return True
-         map = deadMap
+         if deadMap != None:
+            map = deadMap[0]
+            l_playerNames = deadMap[1]
          printMap(map, DISPLAYSURF, "Spectating", standardInfo, l_playerNames)
          if not done:
             DISPLAYSURF.fill((255, 75, 75), special_flags=BLEND_MULT)
