@@ -33,7 +33,7 @@ def MakeServer():
             return
          
          print(recv_data)
-         packet = pickle.dumps((host, servername)) 
+         packet = pickle.dumps((host, servername, len(clients) + 1)) 
          server_socket.sendto(packet, addr)
       
    def stuffAndThings(client):
@@ -135,7 +135,6 @@ def MakeServer():
          client[0].sendto(packet, client[2])
       addr = (host, 9998)
       t_become_server = threading.Thread(target=SimpleServer.serve, args=(len(clients) + 1,))
-      t_become_server.daemon = True
       t_become_server.start()
       server_socket.close()
       serversocket.close()
@@ -486,6 +485,7 @@ def MakeServer():
                   for client in temp_client_set:
                      if client[1] == boot_spot[2]: # check to see if the names match
                         packet = pickle.dumps((False, [], booted))
+                        time.sleep(0.1)
                         client[0].sendto(packet, client[2])
                         clients.remove(client)
                         for player in clients:

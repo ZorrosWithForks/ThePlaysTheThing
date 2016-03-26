@@ -15,10 +15,9 @@ import clientJoined
 
 def LoginClient():
    def displayMessage(image):
-      OK_COORDS = (450,650)
+      OK_COORDS = (650,650)
       clickedOK = False
       while not clickedOK:
-         print("looping")
          curr_x, curr_y = pygame.mouse.get_pos()
          curr_x *= xScale
          curr_y *= yScale
@@ -39,9 +38,8 @@ def LoginClient():
          LOGIN_TOP_SURFACE.blit(UP_ARROW, (arrow_x_pos, up_arrow_y_pos))
          #button("Refresh",refresh_x_pos,refresh_y_pos,200,100,REFRESH_BUTTON_PRESSED,REFRESH_BUTTON_UNPRESSED)
          #pushed_back = button("Back",x_back_button,y_back_button,75,50,BACK_BUTTON_PRESSED,BACK_BUTTON_UNPRESSED)
-         LOGIN_TOP_SURFACE.blit(image, (0, 0))
+         LOGIN_TOP_SURFACE.blit(image, (280, 0))
          LOGIN_TOP_SURFACE.blit(OK_LIT if over_ok else OK_UNLIT, OK_COORDS)
-         print("blitted stuffs")
          newSurface = pygame.transform.scale(LOGIN_TOP_SURFACE,(screenInfo.current_w, screenInfo.current_h), window)
          pygame.display.update()
 
@@ -77,29 +75,29 @@ def LoginClient():
 
    # Program functions
    def joinGame(ip):
-      print("attempting to join " + ip)
+      #print("attempting to join " + ip)
       s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       addr = (ip, 9999)
       s.settimeout(1)
-      #try:
-      s.connect(addr)
-      s.settimeout(None)
-      s.sendto(username.encode('ascii'), addr)
-      print("joined")
-      # put here? something that will tell if it has been booted. if so, return to the main menu
-      full = clientJoined.LoginClient(username, s)
-      if full:
-         print("Returned true")
-         displayMessage(MESSAGE)
-      print("returned from clientJoined")
-      s.close()
-      del l_servers[:]
-      client_socket.sendto(data.encode('ascii'), address)
-      # except:
-         # print("Failed somewhere")
-         # s.close()
-         # del l_servers[:]
-         # client_socket.sendto(data.encode('ascii'), address)
+      try:
+         s.connect(addr)
+         s.settimeout(None)
+         s.sendto(username.encode('ascii'), addr)
+         print("joined")
+         full = clientJoined.LoginClient(username, s)
+         if full:
+            #print("Returned true")
+            displayMessage(FULL_MESSAGE)
+         #print("returned from clientJoined")
+         s.close()
+         del l_servers[:]
+         client_socket.sendto(data.encode('ascii'), address)
+      except:
+         print("Failed somewhere")
+         displayMessage(CRASH_MESSAGE)
+         s.close()
+         del l_servers[:]
+         client_socket.sendto(data.encode('ascii'), address)
       
    def display_servers(x_panel_position, y_panel_position, y_offset):
       del l_join_spots[:]
@@ -108,7 +106,8 @@ def LoginClient():
         
          # display the name of the server
          LOGIN_TOP_SURFACE.blit(SERVER_FONT.render(str(server[1]), True, (0,0,0)), (x_panel_position + 50, y_panel_position + 25 + y_offset))
-         LOGIN_TOP_SURFACE.blit(JOIN_BUTTON_UNPRESSED, (x_panel_position + 1100, y_panel_position + 25 + y_offset))
+         LOGIN_TOP_SURFACE.blit(SERVER_FONT.render("("+str(server[2])+"/7)", True, (0,0,0)), (x_panel_position + 1100, y_panel_position + 25 + y_offset))
+         LOGIN_TOP_SURFACE.blit(JOIN_BUTTON_UNPRESSED, (x_panel_position + 1200, y_panel_position + 25 + y_offset))
          l_join_spots.append((x_panel_position + 1100, y_panel_position + 25, server[0]))
          y_panel_position += 100
    
@@ -121,17 +120,19 @@ def LoginClient():
                server_info = pickle.loads(packet)
                if not server_info in l_servers:
                   l_servers.append(server_info)
-               print("added a server: " + server_info[0])
-               print("number of servers: " + str(l_servers))
+               #print("added a server: " + server_info[0])
+               #print("number of servers: " + str(l_servers))
                display_servers(x_panel_position, y_panel_position, y_offset)
             except:
-               print("Client tried connecting to itself")
+               None
+               #print("Client tried connecting to itself")
          else:
-            print("No recv_data")
-         print("done displaying servers")
+            #print("No recv_data")
+            None
+         #print("done displaying servers")
          
    def request(x_panel_position, y_panel_position, y_offset):
-      print("requesting servers")
+      #print("requesting servers")
       del l_servers[:]
       y_offset = 0
       client_socket.sendto(data.encode('ascii'), address)
@@ -158,6 +159,8 @@ def LoginClient():
    BACK_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_pressed.png").convert_alpha()
    NO_USERNAME_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "TypeUsername.png").convert_alpha()
    MESSAGE_COORDS = (220, 620)
+   CRASH_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoServerLost.png").convert_alpha()
+   FULL_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoGameFull.png").convert_alpha()
    #specify that shift is not pressed
    shifted = False
 
@@ -274,12 +277,12 @@ def LoginClient():
          if event.type == KEYUP:
             if event.key == K_LSHIFT or event.key == K_RSHIFT:
                shifted = False
-               print("shifted is now false")
+               #print("shifted is now false")
          if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                #end the game and close the window
                print(username)
-               print("something")
+               #print("something")
                pygame.quit()
                sys.exit()
             if event.key == K_DOWN and y_offset > -y_offset_allowed and len(l_servers) > 5:
@@ -294,7 +297,7 @@ def LoginClient():
                username = username[:-1]
             elif event.key == K_LSHIFT or event.key == K_RSHIFT:
                shifted = True
-               print("shifted")
+               #print("shifted")
             if shifted == False and len(username) < 25:
                if event.key == K_a: username += "a"
                elif event.key == K_b: username += "b"
@@ -400,7 +403,7 @@ def LoginClient():
             
             # click refresh
             if refresh_x_pos <= x_mouse_position_main <= refresh_x_pos + 200 and refresh_y_pos <= y_mouse_position_main <= refresh_y_pos + 100:
-               print("clicked refresh")
+               #print("clicked refresh")
                request(x_panel_position, y_panel_position, y_offset)
 
             # clicked join
