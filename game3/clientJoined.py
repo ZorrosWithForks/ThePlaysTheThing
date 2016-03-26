@@ -39,6 +39,8 @@ def LoginClient(username, s):
       clickedOK = False
       while not clickedOK:
          curr_x, curr_y = pygame.mouse.get_pos()
+         curr_x *= xScale
+         curr_y *= yScale
          over_ok = OK_COORDS[0] <= curr_x <= OK_COORDS[0] + 200 and OK_COORDS[1] <= curr_y <= OK_COORDS[1] + 100
          for event in pygame.event.get():
             if over_ok and event.type == MOUSEBUTTONDOWN:
@@ -56,7 +58,7 @@ def LoginClient(username, s):
             LOGIN_TOP_SURFACE.blit(BACK_BUTTON_UNPRESSED, (x_back_button,y_back_button))
          LOGIN_TOP_SURFACE.blit(image, (0, 0))
          LOGIN_TOP_SURFACE.blit(OK_LIT if over_ok else OK_UNLIT, OK_COORDS)
-         
+         newSurface = pygame.transform.scale(LOGIN_TOP_SURFACE,(screenInfo.current_w, screenInfo.current_h), window)
          pygame.display.update()
             
    def displayPlayers(x_panel_position, y_panel_position, y_offset):
@@ -146,7 +148,11 @@ def LoginClient(username, s):
    y_offset = 0
    
    # Declare the Surface
-   LOGIN_TOP_SURFACE = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+   screenInfo = pygame.display.Info()
+   LOGIN_TOP_SURFACE = pygame.Surface((1600,900))
+   window = pygame.display.set_mode((screenInfo.current_w,screenInfo.current_h), pygame.FULLSCREEN)
+   xScale = 1600.0 / float(screenInfo.current_w)
+   yScale = 900.0 / float(screenInfo.current_h)
    
    # try:
       # temp = s.recvfrom(2048)
@@ -160,6 +166,8 @@ def LoginClient(username, s):
    # Get the username
    while joined:
       curr_x, curr_y = pygame.mouse.get_pos()
+      curr_x *= xScale
+      curr_y *= yScale
       
       #stuffs for scrolling
       players = 0
@@ -197,6 +205,8 @@ def LoginClient(username, s):
                y_offset += 100
          if event.type == MOUSEBUTTONDOWN:
             x_mouse_position_main, y_mouse_position_main = pygame.mouse.get_pos()
+            x_mouse_position_main *= xScale
+            y_mouse_position_main *= yScale
             # clicked back button
             if x_back_button <= curr_x <= x_back_button + 75 and y_back_button <= curr_y <= y_back_button + 50:
                s.close()
@@ -240,6 +250,7 @@ def LoginClient(username, s):
          print("crashed")
          displayMessage(CRASH_MESSAGE)
       else:
+         newSurface = pygame.transform.scale(LOGIN_TOP_SURFACE,(screenInfo.current_w, screenInfo.current_h), window)
          pygame.display.update()
    print("Leaving clientJoined")   
    return False

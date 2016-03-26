@@ -16,7 +16,12 @@ pygame.font.init()
 
 pygame.init()
 
-DISPLAYSURF = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+screenInfo = pygame.display.Info()
+DISPLAYSURF = pygame.Surface((1600,900))
+window = pygame.display.set_mode((screenInfo.current_w,screenInfo.current_h), pygame.FULLSCREEN)
+xScale = 1600.0 / float(screenInfo.current_w)
+yScale = 900.0 / float(screenInfo.current_h)
+
    
 #constants representing the different resources
 IMAGE_FILE_PATH = "ImageFiles\\"
@@ -25,7 +30,8 @@ CONTINENT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 40)
 COUNTRY_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 25)
 UNIT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 35)
 MONEY_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 22)
-COUNT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 20)
+TURN_READOUT_FONT = pygame.font.Font("OldNewspaperTypes.ttf", 18)
+VICTOR_COLOR = (0, 50, 100)
 ATTACK_COLOR = (100, 0, 0)
 DEFEND_COLOR = (50, 50, 0)
 ATTACK_COUNT_COLOR = (255, 0, 0)
@@ -79,6 +85,10 @@ ATK_UR = pygame.image.load(IMAGE_FILE_PATH + "AttackUpRight.png").convert_alpha(
 ATK_DL = pygame.image.load(IMAGE_FILE_PATH + "AttackLowLeft.png").convert_alpha()
 ATK_UL = pygame.image.load(IMAGE_FILE_PATH + "AttackUpLeft.png").convert_alpha()
 ATK_DR = pygame.image.load(IMAGE_FILE_PATH + "AttackLowRight.png").convert_alpha()
+ATK_ER = pygame.image.load(IMAGE_FILE_PATH + "AttackRightEdge.png").convert_alpha()
+ATK_EU = pygame.image.load(IMAGE_FILE_PATH + "AttackTopEdge.png").convert_alpha()
+ATK_EL = pygame.image.load(IMAGE_FILE_PATH + "AttackLeftEdge.png").convert_alpha()
+ATK_ED = pygame.image.load(IMAGE_FILE_PATH + "AttackBottomEdge.png").convert_alpha()
 
 MOVE_UP = pygame.image.load(IMAGE_FILE_PATH + "MoveUp.png").convert_alpha()
 MOVE_DO = pygame.image.load(IMAGE_FILE_PATH + "MoveDown.png").convert_alpha()
@@ -88,6 +98,10 @@ MOVE_UR = pygame.image.load(IMAGE_FILE_PATH + "MoveUpRight.png").convert_alpha()
 MOVE_DL = pygame.image.load(IMAGE_FILE_PATH + "MoveDownLeft.png").convert_alpha()
 MOVE_UL = pygame.image.load(IMAGE_FILE_PATH + "MoveUpLeft.png").convert_alpha()
 MOVE_DR = pygame.image.load(IMAGE_FILE_PATH + "MoveDownRight.png").convert_alpha()
+MOVE_ER = pygame.image.load(IMAGE_FILE_PATH + "MoveRightEdge.png").convert_alpha()
+MOVE_EU = pygame.image.load(IMAGE_FILE_PATH + "MoveTopEdge.png").convert_alpha()
+MOVE_EL = pygame.image.load(IMAGE_FILE_PATH + "MoveLeftEdge.png").convert_alpha()
+MOVE_ED = pygame.image.load(IMAGE_FILE_PATH + "MoveBottomEdge.png").convert_alpha()
 
 MOUSE_OVER = pygame.image.load(IMAGE_FILE_PATH + 'MouseOver.png').convert_alpha()
 MOUSE_OVER_UNKNOWN = pygame.image.load(IMAGE_FILE_PATH + 'MouseOverUnknown.png').convert_alpha()
@@ -131,6 +145,8 @@ MOUSE_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "MouseUnlit.png").convert_alph
 
 def blitInfo(DISPLAYSURF, map, phase_info, displayUnitThings=True):
    curr_x, curr_y = pygame.mouse.get_pos()
+   curr_x *= xScale
+   curr_y *= yScale
    
    if displayUnitThings:
       if 170 <= curr_x <= 70 + 350 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120:
@@ -152,41 +168,13 @@ def blitBattle(map, DISPLAYSURF, attack_coords, defend_coords):
    blitCoords = (attack_coords[0] * TILESIZE - 50, attack_coords[1] * TILESIZE - 50)
 
    if attack_coords[0] == 0 and defend_coords[0] == map.WIDTH - 1:
-      if attack_coords[1] == 0 and attack_coords[1] == map.HEIGHT - 1:
-         DISPLAYSURF.blit(ATK_UL, blitCoords, special_flags=BLEND_ADD)
-      elif attack_coords[1] == map.HEIGHT - 1 and attack_coords[1] == 0:
-         DISPLAYSURF.blit(ATK_DR, blitCoords, special_flags=BLEND_ADD)
-      elif attack_coords[1] < defend_coords[1]:
-         DISPLAYSURF.blit(ATK_UL, blitCoords, special_flags=BLEND_ADD)
-      elif attack_coords[1] > defend_coords[1]:
-         DISPLAYSURF.blit(ATK_DL, blitCoords, special_flags=BLEND_ADD)
-      else:# attack_coords[1] == defend_coords[1]:
-         DISPLAYSURF.blit(ATK_LE, blitCoords, special_flags=BLEND_ADD)
+      DISPLAYSURF.blit(ATK_EL, blitCoords, special_flags=BLEND_ADD)
    elif attack_coords[0] == map.WIDTH - 1 and defend_coords[0] == 0:
-      if attack_coords[1] == 0 and attack_coords[1] == map.HEIGHT - 1:
-         DISPLAYSURF.blit(ATK_UR, blitCoords, special_flags=BLEND_ADD)
-      elif attack_coords[1] == map.HEIGHT - 1 and attack_coords[1] == 0:
-         DISPLAYSURF.blit(ATK_DL, blitCoords, special_flags=BLEND_ADD)
-      elif attack_coords[1] < defend_coords[1]:
-         DISPLAYSURF.blit(ATK_UR, blitCoords, special_flags=BLEND_ADD)
-      elif attack_coords[1] > defend_coords[1]:
-         DISPLAYSURF.blit(ATK_DR, blitCoords, special_flags=BLEND_ADD)
-      else:# attack_coords[1] == defend_coords[1]:
-         DISPLAYSURF.blit(ATK_RI, blitCoords, special_flags=BLEND_ADD)
+      DISPLAYSURF.blit(ATK_ER, blitCoords, special_flags=BLEND_ADD)
    elif attack_coords[1] == 0 and defend_coords[1] == map.HEIGHT - 1:
-      if attack_coords[0] < defend_coords[0]:
-         DISPLAYSURF.blit(ATK_UR, blitCoords, special_flags=BLEND_ADD)
-      elif attack_coords[0] > defend_coords[0]:
-         DISPLAYSURF.blit(ATK_UL, blitCoords, special_flags=BLEND_ADD)
-      else:# attack_coords[0] == defend_coords[0]:
-         DISPLAYSURF.blit(ATK_UP, blitCoords, special_flags=BLEND_ADD)
+      DISPLAYSURF.blit(ATK_EU, blitCoords, special_flags=BLEND_ADD)
    elif attack_coords[1] == map.HEIGHT - 1 and defend_coords[1] == 0:
-      if attack_coords[0] < defend_coords[0]:
-         DISPLAYSURF.blit(ATK_DR, blitCoords, special_flags=BLEND_ADD)
-      elif attack_coords[0] > defend_coords[0]:
-         DISPLAYSURF.blit(ATK_DL, blitCoords, special_flags=BLEND_ADD)
-      else:# attack_coords[0] == defend_coords[0]:
-         DISPLAYSURF.blit(ATK_DO, blitCoords, special_flags=BLEND_ADD)
+      DISPLAYSURF.blit(ATK_ED, blitCoords, special_flags=BLEND_ADD)
    elif attack_coords[0] == defend_coords[0]:
       if attack_coords[1] < defend_coords[1]:
          DISPLAYSURF.blit(ATK_DO, blitCoords, special_flags=BLEND_ADD)
@@ -213,41 +201,13 @@ def blitMove(map, DISPLAYSURF, source_coords, dest_coords):
    blitCoords = (source_coords[0] * TILESIZE - 50, source_coords[1] * TILESIZE - 50)
 
    if source_coords[0] == 0 and dest_coords[0] == map.WIDTH - 1:
-      if source_coords[1] == 0 and source_coords[1] == map.HEIGHT - 1:
-         DISPLAYSURF.blit(MOVE_UL, blitCoords, special_flags=BLEND_ADD)
-      elif source_coords[1] == map.HEIGHT - 1 and source_coords[1] == 0:
-         DISPLAYSURF.blit(MOVE_DR, blitCoords, special_flags=BLEND_ADD)
-      elif source_coords[1] < dest_coords[1]:
-         DISPLAYSURF.blit(MOVE_UL, blitCoords, special_flags=BLEND_ADD)
-      elif source_coords[1] > dest_coords[1]:
-         DISPLAYSURF.blit(MOVE_DL, blitCoords, special_flags=BLEND_ADD)
-      else:# source_coords[1] == dest_coords[1]:
-         DISPLAYSURF.blit(MOVE_LE, blitCoords, special_flags=BLEND_ADD)
+      DISPLAYSURF.blit(MOVE_EL, blitCoords, special_flags=BLEND_ADD)
    elif source_coords[0] == map.WIDTH - 1 and dest_coords[0] == 0:
-      if source_coords[1] == 0 and source_coords[1] == map.HEIGHT - 1:
-         DISPLAYSURF.blit(MOVE_UR, blitCoords, special_flags=BLEND_ADD)
-      elif source_coords[1] == map.HEIGHT - 1 and source_coords[1] == 0:
-         DISPLAYSURF.blit(MOVE_DL, blitCoords, special_flags=BLEND_ADD)
-      elif source_coords[1] < dest_coords[1]:
-         DISPLAYSURF.blit(MOVE_UR, blitCoords, special_flags=BLEND_ADD)
-      elif source_coords[1] > dest_coords[1]:
-         DISPLAYSURF.blit(MOVE_DR, blitCoords, special_flags=BLEND_ADD)
-      else:# source_coords[1] == dest_coords[1]:
-         DISPLAYSURF.blit(MOVE_RI, blitCoords, special_flags=BLEND_ADD)
+      DISPLAYSURF.blit(MOVE_ER, blitCoords, special_flags=BLEND_ADD)
    elif source_coords[1] == 0 and dest_coords[1] == map.HEIGHT - 1:
-      if source_coords[0] < dest_coords[0]:
-         DISPLAYSURF.blit(MOVE_UR, blitCoords, special_flags=BLEND_ADD)
-      elif source_coords[0] > dest_coords[0]:
-         DISPLAYSURF.blit(MOVE_UL, blitCoords, special_flags=BLEND_ADD)
-      else:# source_coords[0] == dest_coords[0]:
-         DISPLAYSURF.blit(MOVE_UP, blitCoords, special_flags=BLEND_ADD)
+      DISPLAYSURF.blit(MOVE_EU, blitCoords, special_flags=BLEND_ADD)
    elif source_coords[1] == map.HEIGHT - 1 and dest_coords[1] == 0:
-      if source_coords[0] < dest_coords[0]:
-         DISPLAYSURF.blit(MOVE_DR, blitCoords, special_flags=BLEND_ADD)
-      elif source_coords[0] > dest_coords[0]:
-         DISPLAYSURF.blit(MOVE_DL, blitCoords, special_flags=BLEND_ADD)
-      else:# source_coords[0] == dest_coords[0]:
-         DISPLAYSURF.blit(MOVE_DO, blitCoords, special_flags=BLEND_ADD)
+      DISPLAYSURF.blit(MOVE_ED, blitCoords, special_flags=BLEND_ADD)
    elif source_coords[0] == dest_coords[0]:
       if source_coords[1] < dest_coords[1]:
          DISPLAYSURF.blit(MOVE_DO, blitCoords, special_flags=BLEND_ADD)
@@ -323,6 +283,8 @@ def isOverButton(map, curr_x, curr_y):
 def standardInfo(map, DISPLAYSURF, params):
    #Highlight country mouse is over and display country info
    curr_x, curr_y = pygame.mouse.get_pos()
+   curr_x *= xScale
+   curr_y *= yScale
    if (curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE and map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)] != map.WATER):
       curr_country = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)]
       DISPLAYSURF.blit(MOUSE_OVER if map.d_continents[curr_country[0]][curr_country[1]].owner != None else MOUSE_OVER_UNKNOWN, (int(curr_x / TILESIZE) * TILESIZE - MARGIN, int(curr_y / TILESIZE) * TILESIZE - MARGIN), special_flags=BLEND_ADD)
@@ -546,6 +508,8 @@ def displayMessage(image, map, DISPLAYSURF, turnState, l_playerNames, battles = 
    
    while not clickedOK:
       curr_x, curr_y = pygame.mouse.get_pos()
+      curr_x *= xScale
+      curr_y *= yScale
       over_ok = OK_COORDS[0] <= curr_x <= OK_COORDS[0] + 200 and OK_COORDS[1] <= curr_y <= OK_COORDS[1] + 100
       for event in pygame.event.get():
          if over_ok and event.type == MOUSEBUTTONDOWN:
@@ -553,24 +517,25 @@ def displayMessage(image, map, DISPLAYSURF, turnState, l_playerNames, battles = 
       printMap(map, DISPLAYSURF, turnState, standardInfo, l_playerNames)
       DISPLAYSURF.blit(image, (0, 0))
       if battles != None:
-         DISPLAYSURF.blit(COUNTRY_FONT.render("Countries Conquered", True, (0,0,0)),(150,140))
-         DISPLAYSURF.blit(COUNTRY_FONT.render("Countries Lost", True, (0,0,0)),(435,140))
-         DISPLAYSURF.blit(COUNTRY_FONT.render("Attacks Failed", True, (0,0,0)),(650,140))
-         y_offset = 25
+         DISPLAYSURF.blit(COUNTRY_FONT.render("Countries Conquered", True, VICTOR_COLOR),(150,140))
+         DISPLAYSURF.blit(COUNTRY_FONT.render("Countries Lost", True, DEFEND_COLOR),(435,140))
+         DISPLAYSURF.blit(COUNTRY_FONT.render("Attacks Failed", True, ATTACK_COLOR),(650,140))
+         pygame.draw.line(DISPLAYSURF, (0,0,0), (150, 170), (850, 170), 3)
+         y_offset = 30
          for countryConquered in battles[0]:
-            DISPLAYSURF.blit(COUNTRY_FONT.render(countryConquered, True, (0,0,0)),(150,140 + y_offset))
+            DISPLAYSURF.blit(TURN_READOUT_FONT.render(countryConquered, True, VICTOR_COLOR),(150,140 + y_offset))
             y_offset += 25
          y_offset = 25
          for countryLost in battles[1]:
-            DISPLAYSURF.blit(COUNTRY_FONT.render(countryLost, True, (0,0,0)),(435,140 + y_offset))
+            DISPLAYSURF.blit(TURN_READOUT_FONT.render(countryLost, True, DEFEND_COLOR),(435,140 + y_offset))
             y_offset += 25
-         y_offset = 25
+         y_offset = 30
          for attackLost in battles[2]:
-            DISPLAYSURF.blit(COUNTRY_FONT.render(attackLost, True, (0,0,0)),(650,140 + y_offset))
-            y_offset += 25
+            DISPLAYSURF.blit(TURN_READOUT_FONT.render(attackLost, True, ATTACK_COLOR),(650,140 + y_offset))
+            y_offset += 30
       DISPLAYSURF.blit(OK_LIT if over_ok else OK_UNLIT, OK_COORDS)
       DISPLAYSURF.blit(MOUSE_LIT if over_ok else MOUSE_UNLIT, (curr_x, curr_y))
-      
+      newSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), window)
       pygame.display.update()
 
 def placeUnits(DISPLAYSURF, map, player, socket, host_address, l_playerNames):
@@ -587,6 +552,8 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address, l_playerNames):
    while placing:
        #get all the user events
        curr_x, curr_y = pygame.mouse.get_pos()
+       curr_x *= xScale
+       curr_y *= yScale
        for event in pygame.event.get():
            #if the user wants to quit
            handleGeneral(event, map, temp_map, selectedCountry)
@@ -680,6 +647,7 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address, l_playerNames):
        DISPLAYSURF.blit(MOUSE_LIT if isOverButton(map, curr_x, curr_y) and selectedCountry != None else MOUSE_UNLIT, (curr_x, curr_y))
        
        #update the display
+       newSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), window)
        pygame.display.update()
    return map
 refreshing = True
@@ -713,8 +681,12 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
       
       printMap(map, DISPLAYSURF, "Declare Attacks", standardInfo, l_playerNames)
       DISPLAYSURF.blit(WAITING, (70, map.HEIGHT * TILESIZE + 70))
-      DISPLAYSURF.blit(MOUSE_UNLIT, pygame.mouse.get_pos())
+      curr_x, curr_y = pygame.mouse.get_pos()
+      curr_x *= xScale
+      curr_y *= yScale
+      DISPLAYSURF.blit(MOUSE_UNLIT, (curr_x, curr_y))
       #update the display
+      newSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), window)
       pygame.display.update()
    print("Exited refreshing")
    if oldMap != None:
@@ -735,6 +707,8 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
    while declaring:
        #get all the user events
        curr_x, curr_y = pygame.mouse.get_pos()
+       curr_x *= xScale
+       curr_y *= yScale
        for event in pygame.event.get():
            #if the user wants to quit
            handleGeneral(event, map, selectedCountry=selectedCountry)
@@ -882,6 +856,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
        DISPLAYSURF.blit(MOUSE_LIT if isOverButton(map, curr_x, curr_y) and selectedCountry != None and selectedCountry in l_attackers else MOUSE_UNLIT, (curr_x, curr_y))
          
        #update the display
+       newSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), window)
        pygame.display.update()
    return map, l_attackers, l_defenders, oldMap[1]
 
@@ -924,9 +899,12 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
          DISPLAYSURF.blit(DEFENDER, (l_defenders[battle][0] * TILESIZE, l_defenders[battle][1] * TILESIZE), special_flags=BLEND_ADD)
          blitBattle(map, DISPLAYSURF, l_attackers[battle], l_defenders[battle])
          DISPLAYSURF.blit(ATTACKER, (l_attackers[battle][0] * TILESIZE, l_attackers[battle][1] * TILESIZE), special_flags=BLEND_ADD)
-      
-      DISPLAYSURF.blit(MOUSE_UNLIT, pygame.mouse.get_pos())
+      curr_x, curr_y = pygame.mouse.get_pos()
+      curr_x *= xScale
+      curr_y *= yScale
+      DISPLAYSURF.blit(MOUSE_UNLIT, (curr_x, curr_y))
       #update the display
+      newSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), window)
       pygame.display.update()
    print("Exited refreshing")
    if oldMap != None:
@@ -942,6 +920,8 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
    while moving:
       #get all the user events
       curr_x, curr_y = pygame.mouse.get_pos()
+      curr_x *= xScale
+      curr_y *= yScale
       for event in pygame.event.get():
          #if the user wants to quit
          handleGeneral(event, map, selectedCountry=selectedCountry)
@@ -1092,6 +1072,7 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
       DISPLAYSURF.blit(MOUSE_LIT if isOverButton(map, curr_x, curr_y) and selectedCountry != None and selectedCountry in l_senders else MOUSE_UNLIT, (curr_x, curr_y))
     
       #update the display
+      newSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), window)
       pygame.display.update()
       #fpsClock.tick(50)
    return map, l_senders, l_receivers, oldMap[1]
@@ -1130,8 +1111,12 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address, l_senders, l_receiv
          blitMove(map, DISPLAYSURF, l_senders[army], l_receivers[army])
          DISPLAYSURF.blit(SOURCE, (l_senders[army][0] * TILESIZE, l_senders[army][1] * TILESIZE), special_flags=BLEND_ADD)
       DISPLAYSURF.blit(WAITING, (70, map.HEIGHT * TILESIZE + 70))
-      DISPLAYSURF.blit(MOUSE_UNLIT, pygame.mouse.get_pos())
+      curr_x, curr_y = pygame.mouse.get_pos()
+      curr_x *= xScale
+      curr_y *= yScale
+      DISPLAYSURF.blit(MOUSE_UNLIT, (curr_x, curr_y))
       #update the display
+      newSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), window)
       pygame.display.update()
    if newMap == None:
       displayMessage(CRASH_MESSAGE, map, DISPLAYSURF, "Move Troops", l_playerNames)
@@ -1168,6 +1153,8 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames):
       
       while True:
          curr_x, curr_y = pygame.mouse.get_pos()
+         curr_x *= xScale
+         curr_y *= yScale
          over_ok = OK_COORDS[0] <= curr_x <= OK_COORDS[0] + 200 and OK_COORDS[1] <= curr_y <= OK_COORDS[1] + 100
          over_exit = EXIT_COORDS[0] <= curr_x <= EXIT_COORDS[0] + 200 and EXIT_COORDS[1] <= curr_y <= EXIT_COORDS[1] + 100
          for event in pygame.event.get():
@@ -1188,11 +1175,14 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames):
          
          DISPLAYSURF.blit(MOUSE_UNLIT, (curr_x, curr_y))
          #update the display
+         newSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), window)
          pygame.display.update()
    elif Won:
       OK_COORDS = (450,650)
       while True:
          curr_x, curr_y = pygame.mouse.get_pos()
+         curr_x *= xScale
+         curr_y *= yScale
          over_ok = OK_COORDS[0] <= curr_x <= OK_COORDS[0] + 200 and OK_COORDS[1] <= curr_y <= OK_COORDS[1] + 100
          over_exit = EXIT_COORDS[0] <= curr_x <= EXIT_COORDS[0] + 200 and EXIT_COORDS[1] <= curr_y <= EXIT_COORDS[1] + 100
          for event in pygame.event.get():
@@ -1213,6 +1203,7 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames):
          
          DISPLAYSURF.blit(MOUSE_UNLIT, (curr_x, curr_y))
          #update the display
+         newSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), window)
          pygame.display.update()
    
 def play(host_address, player_name):
