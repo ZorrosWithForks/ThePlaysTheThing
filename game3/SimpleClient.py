@@ -317,12 +317,12 @@ def standardInfo(map, DISPLAYSURF, params):
       y_offset = 180
       DISPLAYSURF.blit(CONTINENT_FONT.render("Players:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 130))
       for name in map.l_player_names:
-         DISPLAYSURF.blit(COUNTRY_FONT.render(name, True, l_playerColors[d_playerLogoIndexes[name]]), (map.WIDTH * TILESIZE + x_offset, y_offset))
+         playerName = COUNTRY_FONT.render(name, True, l_playerColors[d_playerLogoIndexes[name]])
+         DISPLAYSURF.blit(playerName, (map.WIDTH * TILESIZE + x_offset, y_offset))
          if params[1][name] > 0:
-            DISPLAYSURF.blit(COUNTRY_FONT.render(str(params[1][name]), True, l_playerColors[d_playerLogoIndexes[name]]), (map.WIDTH * TILESIZE + x_offset - 20, y_offset))
+            DISPLAYSURF.blit(COUNTRY_FONT.render("has " + str(params[1][name]), True, l_playerColors[d_playerLogoIndexes[name]]), (map.WIDTH * TILESIZE + x_offset + playerName.get_width() + 10, y_offset))
          if params != None and name not in params[0]:
-               playerName = COUNTRY_FONT.render(name, True, l_playerColors[d_playerLogoIndexes[name]])
-               pygame.draw.line(DISPLAYSURF, l_playerColors[d_playerLogoIndexes[name]], (map.WIDTH * TILESIZE + x_offset, y_offset + 17), (map.WIDTH * TILESIZE + x_offset + playerName.get_width(), y_offset + 17), 2)
+            pygame.draw.line(DISPLAYSURF, l_playerColors[d_playerLogoIndexes[name]], (map.WIDTH * TILESIZE + x_offset, y_offset + 17), (map.WIDTH * TILESIZE + x_offset + playerName.get_width(), y_offset + 17), 2)
          y_offset += 25
       y_offset += 25
       DISPLAYSURF.blit(CONTINENT_FONT.render("Continent Bonuses:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, y_offset))
