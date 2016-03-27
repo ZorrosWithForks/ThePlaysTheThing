@@ -919,8 +919,11 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
    else:
       displayMessage(CRASH_MESSAGE, map, DISPLAYSURF, "Move Troops", l_playerNames, d_playerCountries)
       return None, None, None, None, None
-   if len(oldMap) < 4:
+   if len(oldMap) == 3:
       if detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, oldMap[2]):
+         return None, None, None, None, None
+   elif len(oldMap) == 4:
+      if detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, oldMap[3]):
          return None, None, None, None, None
    while moving:
       #get all the user events
@@ -1135,6 +1138,18 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, d_playerCount
    Won = True
    Lost = True
    done = False
+   LOSS_OVERLAY = DISPLAYSURF.copy()
+   LOSS_OVERLAY.fill((255, 75, 75))
+   LOSS_OVERLAY.convert_alpha()
+   LOSS_SPECTATOR = DISPLAYSURF.copy()
+   LOSS_SPECTATOR.fill((255,200,200))
+   LOSS_SPECTATOR.convert_alpha()
+   WIN_OVERLAY = DISPLAYSURF.copy()
+   WIN_OVERLAY.fill((50, 120, 255))
+   WIN_OVERLAY.convert_alpha()
+   WIN_SPECTATOR = DISPLAYSURF.copy()
+   WIN_SPECTATOR.fill((200,230,255))
+   WIN_SPECTATOR.convert_alpha()
    for cont_name in map.d_continents.keys():
       for country in map.d_continents[cont_name]:
          if country.owner == player.user_name:
@@ -1172,11 +1187,11 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, d_playerCount
             l_playerNames = deadMap[1]
          printMap(map, DISPLAYSURF, "Spectating", standardInfo, (l_playerNames, d_playerCountries))
          if not done:
-            DISPLAYSURF.fill((255, 75, 75), special_flags=BLEND_MULT)
+            DISPLAYSURF.blit(LOSS_OVERLAY, (0, 0), special_flags=BLEND_MULT)
             DISPLAYSURF.blit(LOSER, (0, 0))
             DISPLAYSURF.blit(OK_LIT if over_ok else OK_UNLIT, OK_COORDS)
          else:
-            DISPLAYSURF.fill((255,200,200), special_flags=BLEND_MULT)
+            DISPLAYSURF.blit(LOSS_SPECTATOR, (0, 0), special_flags=BLEND_MULT)
             DISPLAYSURF.blit(EXIT_LIT if over_exit else EXIT_UNLIT, EXIT_COORDS)
          
          DISPLAYSURF.blit(MOUSE_UNLIT, (curr_x, curr_y))
@@ -1200,11 +1215,11 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, d_playerCount
       
          printMap(map, DISPLAYSURF, "Spectating", standardInfo, (l_playerNames, d_playerCountries))
          if not done:
-            DISPLAYSURF.fill((50, 120, 255), special_flags=BLEND_MULT)
+            DISPLAYSURF.blit(WIN_OVERLAY, (0, 0), special_flags=BLEND_MULT)
             DISPLAYSURF.blit(WINNER, (0, 0))
             DISPLAYSURF.blit(OK_LIT if over_ok else OK_UNLIT, OK_COORDS)
          else:
-            DISPLAYSURF.fill((200,230,255), special_flags=BLEND_MULT)
+            DISPLAYSURF.blit(WIN_SPECTATOR, (0, 0), special_flags=BLEND_MULT)
             DISPLAYSURF.blit(EXIT_LIT if over_exit else EXIT_UNLIT, EXIT_COORDS)
          
          DISPLAYSURF.blit(MOUSE_UNLIT, (curr_x, curr_y))
