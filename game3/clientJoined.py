@@ -35,7 +35,7 @@ def LoginClient(username, s):
    print("In clientJoined")
    
    def displayMessage(image):
-      OK_COORDS = (450,650)
+      OK_COORDS = (650,650)
       clickedOK = False
       while not clickedOK:
          curr_x, curr_y = pygame.mouse.get_pos()
@@ -56,7 +56,7 @@ def LoginClient(username, s):
             LOGIN_TOP_SURFACE.blit(BACK_BUTTON_PRESSED, (x_back_button,y_back_button))
          else:
             LOGIN_TOP_SURFACE.blit(BACK_BUTTON_UNPRESSED, (x_back_button,y_back_button))
-         LOGIN_TOP_SURFACE.blit(image, (0, 0))
+         LOGIN_TOP_SURFACE.blit(image, (280, 0))
          LOGIN_TOP_SURFACE.blit(OK_LIT if over_ok else OK_UNLIT, OK_COORDS)
          newSurface = pygame.transform.scale(LOGIN_TOP_SURFACE,(screenInfo.current_w, screenInfo.current_h), window)
          pygame.display.update()
@@ -72,14 +72,15 @@ def LoginClient(username, s):
    
    def getPlayers():
       global name
-      global joined
       global l_players
       global play
       global newServer
       while True:
          try:
-            packet = s.recv(4096)
+            packet = s.recv(8192)
             info = pickle.loads(packet)
+            print("length of info: " + str(len(info)))
+            
             if info[0]:
                newServer = (info[1], 9998)
                s.close()
@@ -88,10 +89,9 @@ def LoginClient(username, s):
             else:
                if info[2] == "boot" or info[2] == "full":
                   s.close()
-                  print("Got booted")
-                  if info[2] == "boot":
-                     joined = False
+                  #print("Got booted")
                   play = info[2]
+                  print("info is: " + str(info[2]))
                   return
                else:
                   if len(l_players) > 0:
@@ -103,7 +103,6 @@ def LoginClient(username, s):
                      
          except:
             print("Server died")
-            joined = False
             play = "crashed"
             return
       
@@ -189,7 +188,7 @@ def LoginClient(username, s):
          if event.type == KEYUP:
             if event.key == K_LSHIFT or event.key == K_RSHIFT:
                shifted = False
-               print("shifted is now false")
+               #print("shifted is now false")
          if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                #end the game and close the window
@@ -210,7 +209,7 @@ def LoginClient(username, s):
             # clicked back button
             if x_back_button <= curr_x <= x_back_button + 75 and y_back_button <= curr_y <= y_back_button + 50:
                s.close()
-               print("Clicked back button")
+               #print("Clicked back button")
                return False
                
             # clicked up arrow
@@ -238,19 +237,21 @@ def LoginClient(username, s):
          LOGIN_TOP_SURFACE.blit(BACK_BUTTON_UNPRESSED, (x_back_button,y_back_button))
       
       if play == "play":
-         print("play")
+         #print("play")
          SimpleClient.play(newServer, name)
          return False
       elif play == "boot":
          print("boot")
          displayMessage(BOOT_MESSAGE)
+         joined = False
       elif play == "full":
          return True
       elif play == "crashed":
          print("crashed")
          displayMessage(CRASH_MESSAGE)
+         joined = False
       else:
          newSurface = pygame.transform.scale(LOGIN_TOP_SURFACE,(screenInfo.current_w, screenInfo.current_h), window)
          pygame.display.update()
-   print("Leaving clientJoined")   
+   #print("Leaving clientJoined")   
    return False

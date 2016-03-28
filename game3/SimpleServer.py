@@ -14,6 +14,7 @@ import copy
 clients_lock = threading.Lock()
 th = []
 l_playerNames = []
+d_playerCountries = {}
 
 def listener(client, address, l_players):
    print("Accepted connection from: ", address)
@@ -53,6 +54,7 @@ def receivePlacements(l_players, l_dead_players, serversocket, map, address):
       except:
          l_players.remove(player)
          l_playerNames.remove(player.user_name)
+         d_playerCountries[player.user_name] = 0
          for continent in map.l_continent_names:
             for country in range(len(map.d_continents[continent])):
                if map.d_continents[continent][country].owner == player.user_name:
@@ -85,18 +87,32 @@ def receivePlacements(l_players, l_dead_players, serversocket, map, address):
    for player in tempPlayers:
       curr_connection = player.connection
       player.connection = None
-      packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=player.user_name), l_playerNames))
+      packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=player.user_name), l_playerNames, d_playerCountries))
       try:
          curr_connection.sendto(packet, address)
       except:
          l_players.remove(player)
          l_playerNames.remove(player.user_name)
+         d_playerCountries[player.user_name] = 0
          for continent in map.l_continent_names:
             for country in range(len(map.d_continents[continent])):
                if map.d_continents[continent][country].owner == player.user_name:
                   map.d_continents[continent][country].owner = "Unoccupied"
       player.connection = curr_connection
       print("Sent placements to: " + player.user_name)
+      
+   tempPlayers = copy.copy(l_dead_players)
+   
+   for i in range(len(tempPlayers)):
+      curr_connection = l_dead_players[i].connection
+      l_dead_players[i].connection = None
+      packet = pickle.dumps((map, l_playerNames, d_playerCountries))
+      try:
+         curr_connection.sendto(packet, address)
+         l_dead_players[i].connection = curr_connection
+         print("Sent placements to spectator: " + l_dead_players[i].user_name)
+      except:
+         l_dead_players.remove(l_dead_players[i])
 
       
 def resolveAttacks(defender_coords, l_attacks, map, l_players, d_attackResults):
@@ -261,7 +277,7 @@ def resolveAttacks(defender_coords, l_attacks, map, l_players, d_attackResults):
                   attacking_army.cannons = 0
                   attacking_army.champions = 0
                   numOfAttackers = 0
-            
+
       l_tempAttacks = copy.deepcopy(l_attacks)
       for player in range(len(l_tempAttacks)):
          for attack in range(len(l_tempAttacks[player][0])):
@@ -294,6 +310,7 @@ def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
       except:
          l_playerNames.remove(player.user_name)
          l_players.remove(player)
+         d_playerCountries[player.user_name] = 0
          for continent in map.l_continent_names:
             for country in range(len(map.d_continents[continent])):
                if map.d_continents[continent][country].owner == player.user_name:
@@ -329,6 +346,15 @@ def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
    
    l_temp_players = []
    for player in l_players:
+      d_playerCountries[player.user_name] = 0
+      
+   d_playerCountries["Unoccupied"] = 0
+   
+   for name, continent in map.d_continents.items():
+      for country in continent:
+         d_playerCountries[country.owner] += 1
+         
+   for player in l_players:
       for name, continent in map.d_continents.items():
          for country in continent:
             if country.owner == player.user_name and player not in l_temp_players:
@@ -339,19 +365,25 @@ def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
          l_dead_players.append(player)
    
    l_players = copy.copy(l_temp_players)
-         
+   del l_playerNames[:]
+   for player in l_players:
+      l_playerNames.append(player.user_name)
+	
+   sortPlayers(l_playerNames, d_playerCountries)
+   
    tempPlayers = copy.copy(l_players)
    
    for i in range(len(tempPlayers)):
       curr_connection = l_players[i].connection
       l_players[i].connection = None
       playerMap = Map(map_to_copy=map, copy_player_name=l_players[i].user_name)
-      packet = pickle.dumps((playerMap, l_playerNames, d_attackResults[l_players[i].user_name]))
+      packet = pickle.dumps((playerMap, l_playerNames, d_attackResults[l_players[i].user_name], d_playerCountries))
       try:
          curr_connection.sendto(packet, address)
          l_players[i].connection = curr_connection
          print("Sent final map to: " + l_players[i].user_name)
       except:
+         d_playerCountries[player.user_name] = 0
          l_playerNames.remove(player.user_name)
          l_players.remove(l_players[i])
          for continent in map.l_continent_names:
@@ -364,7 +396,7 @@ def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
    for i in range(len(tempPlayers)):
       curr_connection = l_dead_players[i].connection
       l_dead_players[i].connection = None
-      packet = pickle.dumps((map, l_playerNames))
+      packet = pickle.dumps((map, l_playerNames, d_playerCountries))
       try:
          curr_connection.sendto(packet, address)
          l_dead_players[i].connection = curr_connection
@@ -384,6 +416,7 @@ def receiveMoves(l_players, l_dead_players, serversocket, map, address):
          packet = pickle.loads(response)
          l_moves.append(packet)
       except:
+         d_playerCountries[player.user_name] = 0
          l_playerNames.remove(player.user_name)
          l_players.remove(player)
          for continent in map.l_continent_names:
@@ -437,10 +470,23 @@ def receiveMoves(l_players, l_dead_players, serversocket, map, address):
    for player in l_players:
       curr_connection = player.connection
       player.connection = None
-      packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=player.user_name), player, l_playerNames))
+      packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=player.user_name), player, l_playerNames, d_playerCountries))
       curr_connection.sendto(packet, address)
       player.connection = curr_connection
       print("Sent moves to: " + player.user_name)
+      
+   tempPlayers = copy.copy(l_dead_players)
+   
+   for i in range(len(tempPlayers)):
+      curr_connection = l_dead_players[i].connection
+      l_dead_players[i].connection = None
+      packet = pickle.dumps((map, l_playerNames, d_playerCountries))
+      try:
+         curr_connection.sendto(packet, address)
+         l_dead_players[i].connection = curr_connection
+         print("Sent final map to spectator: " + l_dead_players[i].user_name)
+      except:
+         l_dead_players.remove(l_dead_players[i])
 
 def applyContinentBonuses(l_players, map):
    for player in l_players:
@@ -455,6 +501,18 @@ def applyContinentBonuses(l_players, map):
             player.unit_counts += map.d_bonuses[continent_name]
             print("Awarding bonus for " + continent_name + " to " + player.user_name + ".")
             print(str(player.user_name) + ": " + str(player.unit_counts))
+            
+def getKey(item):
+   return item[1]
+   
+def sortPlayers(l_playerNames, d_playerCountries):
+   tempObject = []
+   for name in l_playerNames:
+      tempObject.append((name, d_playerCountries[name]))
+   sorted(tempObject, key=getKey)
+   del l_playerNames[:]
+   for name in tempObject[0]:
+      l_playerNames.append(name)
 
 def serve(player_count):   
    l_players = []
@@ -490,6 +548,7 @@ def serve(player_count):
       
    for player in l_players:
       l_playerNames.append(player.user_name)
+      d_playerCountries[player.user_name] = 1
       
    #assemble the map
    print("got map")
@@ -498,7 +557,7 @@ def serve(player_count):
    for player in l_players:
       curr_connection = player.connection
       player.connection = None
-      packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=player.user_name), player, l_playerNames))
+      packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=player.user_name), player, l_playerNames, d_playerCountries))
       curr_connection.sendto(packet, addr)
       player.connection = curr_connection
       print("Sent to: " + player.user_name)
