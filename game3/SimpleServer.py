@@ -369,7 +369,7 @@ def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
    for player in l_players:
       l_playerNames.append(player.user_name)
 	
-   sortPlayers(l_playerNames, d_playerCountries)
+   #sortPlayers(l_playerNames, d_playerCountries)
    
    tempPlayers = copy.copy(l_players)
    
