@@ -16,28 +16,6 @@ th = []
 l_playerNames = []
 d_playerCountries = {}
 
-def listener(client, address, l_players):
-   print("Accepted connection from: ", address)
-   with clients_lock:      
-      print("Added player")
-    
-   try:
-      while True:
-         None
-         #data = client.recv(1024).decode() #block waiting for data from a client
-         #if not data:
-            #break
-         #else:
-            #print(repr(data))
-            #with clients_lock:
-               #for c in clients:
-						#do something for every client
-                      #c.sendall(data.encode('ascii'))
-   finally:
-      with clients_lock:
-         #l_players.remove(client)
-         client.close()
-         
 def receivePlacements(l_players, l_dead_players, serversocket, map, address):
    l_placements = []
    
@@ -59,12 +37,6 @@ def receivePlacements(l_players, l_dead_players, serversocket, map, address):
             for country in range(len(map.d_continents[continent])):
                if map.d_continents[continent][country].owner == player.user_name:
                   map.d_continents[continent][country].owner = "Unoccupied"
-               
-               
-         
-   
-   #print("I got it! Yay!")
-
    
    for placement in l_placements:
       grand_total = 0
@@ -113,7 +85,6 @@ def receivePlacements(l_players, l_dead_players, serversocket, map, address):
          print("Sent placements to spectator: " + l_dead_players[i].user_name)
       except:
          l_dead_players.remove(l_dead_players[i])
-
       
 def resolveAttacks(defender_coords, l_attacks, map, l_players, d_attackResults):
    numOfAttackers = 2
@@ -514,7 +485,7 @@ def sortPlayers(l_playerNames, d_playerCountries):
    for name in tempObject[0]:
       l_playerNames.append(name)
 
-def serve(player_count):   
+def serve(player_count, addr):   
    l_players = []
    l_dead_players = []
    
@@ -522,18 +493,10 @@ def serve(player_count):
 
    # create a socket object
 
-   serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-
-   # get local machine name
-   temp = socket.gethostbyname_ex(socket.gethostname())[-1]
-   host = temp[-1]                           
-
-   port = 9998                                          
-
-   addr = (host, port)
+   serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
    # bind to the port
-   serversocket.bind((host, port))
+   serversocket.bind(addr)
 
    # queue up to 5 requests
    serversocket.listen(5)
@@ -566,8 +529,8 @@ def serve(player_count):
       receivePlacements(l_players, l_dead_players, serversocket, map, addr)
       l_players = receiveAttacks(l_players, l_dead_players, serversocket, map, addr)
       if len(l_players) <= 0:
+         print("Exiting server")
          break
-      print("Server: exited receiveAttacks")
       receiveMoves(l_players, l_dead_players, serversocket, map, addr)
       #temp = input("pausing the server")
    
