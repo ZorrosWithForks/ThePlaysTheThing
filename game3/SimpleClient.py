@@ -143,6 +143,9 @@ LOSER = pygame.image.load(IMAGE_FILE_PATH + "InfoDefeat.png").convert_alpha()
 MOUSE_LIT = pygame.image.load(IMAGE_FILE_PATH + "MouseLit.png").convert_alpha()
 MOUSE_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "MouseUnlit.png").convert_alpha()
 
+BACKGROUND = pygame.display.set_mode((screenInfo.current_w,screenInfo.current_h), pygame.FULLSCREEN)
+backgroundSurface = None
+
 def blitInfo(DISPLAYSURF, map, phase_info, displayUnitThings=True):
    curr_x, curr_y = pygame.mouse.get_pos()
    curr_x *= xScale
@@ -441,55 +444,63 @@ def battleInfo(map, DISPLAYSURF, params):
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.champions), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 475))
     
 def printMap(map, DISPLAYSURF, gameStage, infoDisplay, params=None):
-    #loop through each row
-    for row in range(map.HEIGHT):
-        #loop through each column in the row
-        for column in range(map.WIDTH):
-            #draw the resource at that position in the tilemap, using the correct colour
-            if (map.ll_map[row][column] != WATER):
-               DISPLAYSURF.blit(textures[d_continent_tiles[map.ll_map[row][column][0]]], (((column) % map.WIDTH) * TILESIZE, ((row) % map.HEIGHT) * TILESIZE))
+
+   DISPLAYSURF.blit(backgroundSurface, (0, 0))
+   
+   #loop through each row
+   for row in range(map.HEIGHT):
+      #loop through each column in the row
+      for column in range(map.WIDTH):
+         #draw the resource at that position in the tilemap, using the correct colour
+         if (map.ll_map[row][column] != WATER):
+            current_country = map.d_continents[map.ll_map[row][column][0]][map.ll_map[row][column][1]]
+            if current_country.owner != None:
+               DISPLAYSURF.blit(l_playerLogos[d_playerLogoIndexes[current_country.owner]], (((column) % map.WIDTH) * TILESIZE, ((row) % map.HEIGHT) * TILESIZE))
+               count = str(current_country.unit_counts.getSummaryCount())
+               DISPLAYSURF.blit(UNIT_FONT.render(count, True, (0,0,0)), (((column) % map.WIDTH) * TILESIZE + 45 - len(count) * 7, ((row) % map.HEIGHT) * TILESIZE + 25))
+
+   
+   DISPLAYSURF.blit(source=GAME_STAGE_FONT.render(gameStage, True, (0,0,0)), dest=(map.WIDTH * TILESIZE + 100, 50))
+
+   infoDisplay(map, DISPLAYSURF, params)
+
+   DISPLAYSURF.blit(source=INFO_OVERLAY, dest=(map.WIDTH * TILESIZE, 0), special_flags=BLEND_RGBA_ADD)
+
+def prepareBackground(map, DISPLAYSURF):
+   global backgroundSurface
+   #loop through each row
+   for row in range(map.HEIGHT):
+      #loop through each column in the row
+      for column in range(map.WIDTH):
+         #draw the resource at that position in the tilemap, using the correct colour
+         if (map.ll_map[row][column] != WATER):
+            DISPLAYSURF.blit(textures[d_continent_tiles[map.ll_map[row][column][0]]], (((column) % map.WIDTH) * TILESIZE, ((row) % map.HEIGHT) * TILESIZE))
   
     #loop through each row
-    for row in range(map.HEIGHT):
-        #loop through each column in the row
-        for column in range(map.WIDTH):
-            #draw the resource at that position in the tilemap, using the correct colour
-            if (map.ll_map[row][column] == WATER):
-               DISPLAYSURF.blit(t_WATER_OUTLINES[map.ll_water_mask[row][column]], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
+   for row in range(map.HEIGHT):
+      #loop through each column in the row
+      for column in range(map.WIDTH):
+         #draw the resource at that position in the tilemap, using the correct colour
+         if (map.ll_map[row][column] == WATER):
+            DISPLAYSURF.blit(t_WATER_OUTLINES[map.ll_water_mask[row][column]], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
           
     #loop through each row
-    for row in range(map.HEIGHT):
-        #loop through each column in the row
-        for column in range(map.WIDTH):
-            #draw the resource at that position in the tilemap, using the correct colour
-            if (map.ll_map[row][column] == WATER):
-               DISPLAYSURF.blit(t_WATER_TEXTURES[map.ll_water_mask[row][column]], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
+   for row in range(map.HEIGHT):
+      #loop through each column in the row
+      for column in range(map.WIDTH):
+         #draw the resource at that position in the tilemap, using the correct colour
+         if (map.ll_map[row][column] == WATER):
+            DISPLAYSURF.blit(t_WATER_TEXTURES[map.ll_water_mask[row][column]], (((column) % map.WIDTH) * TILESIZE - MARGIN, ((row) % map.HEIGHT) * TILESIZE - MARGIN))
 
-    DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
-    DISPLAYSURF.blit(MAP_FRAME, dest=(0,0))
-    DISPLAYSURF.blit(MAP_LIGHT, dest=(0,0), special_flags=BLEND_ADD)
-			   
-	 #loop through each row
-    for row in range(map.HEIGHT):
-        #loop through each column in the row
-        for column in range(map.WIDTH):
-            #draw the resource at that position in the tilemap, using the correct colour
-            if (map.ll_map[row][column] != WATER):
-               current_country = map.d_continents[map.ll_map[row][column][0]][map.ll_map[row][column][1]]
-               if current_country.owner != None:
-                  DISPLAYSURF.blit(l_playerLogos[d_playerLogoIndexes[current_country.owner]], (((column) % map.WIDTH) * TILESIZE, ((row) % map.HEIGHT) * TILESIZE))
-                  count = str(current_country.unit_counts.getSummaryCount())
-                  DISPLAYSURF.blit(UNIT_FONT.render(count, True, (0,0,0)), (((column) % map.WIDTH) * TILESIZE + 45 - len(count) * 7, ((row) % map.HEIGHT) * TILESIZE + 25))
-
-    DISPLAYSURF.blit(source=INFO_MARQUEE, dest=(map.WIDTH * TILESIZE, 0))
-    DISPLAYSURF.blit(source=GAME_STAGE_FONT.render(gameStage, True, (0,0,0)), dest=(map.WIDTH * TILESIZE + 100, 50))
-    pygame.draw.line(DISPLAYSURF, (0,0,0), (map.WIDTH * TILESIZE + 28, 112), (map.WIDTH * TILESIZE + 700, 112), 3)
-    DISPLAYSURF.blit(source=BASE_BOARD, dest=(0, map.HEIGHT * TILESIZE))
-    
-    infoDisplay(map, DISPLAYSURF, params)
-
-    DISPLAYSURF.blit(source=INFO_OVERLAY, dest=(map.WIDTH * TILESIZE, 0), special_flags=BLEND_RGBA_ADD)
-
+   DISPLAYSURF.blit(source=textures[OVERLAY], dest=(0,0), special_flags=BLEND_MULT)
+   DISPLAYSURF.blit(MAP_FRAME, dest=(0,0))
+   DISPLAYSURF.blit(MAP_LIGHT, dest=(0,0), special_flags=BLEND_ADD)
+   
+   DISPLAYSURF.blit(source=INFO_MARQUEE, dest=(map.WIDTH * TILESIZE, 0))
+   pygame.draw.line(DISPLAYSURF, (0,0,0), (map.WIDTH * TILESIZE + 28, 112), (map.WIDTH * TILESIZE + 700, 112), 3)
+   DISPLAYSURF.blit(source=BASE_BOARD, dest=(0, map.HEIGHT * TILESIZE))
+   backgroundSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), BACKGROUND)
+   backgroundSurface = backgroundSurface.convert_alpha()
 def handleGeneral(event, map, temp_map=None, selectedCountry=None):
   global map_X_offset
   global map_Y_offset
@@ -1259,6 +1270,8 @@ def play(host_address, player_name):
    for name in map.l_player_names:
       temp_index += 1
       d_playerLogoIndexes[name] = temp_index
+   
+   prepareBackground(map, DISPLAYSURF)
    
    print(player_name)
    while True:

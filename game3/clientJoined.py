@@ -82,7 +82,7 @@ def LoginClient(username, s):
             print("length of info: " + str(len(info)))
             
             if info[0]:
-               newServer = (info[1], 9998)
+               newServer = (info[1])
                s.close()
                play = "play"
                return
