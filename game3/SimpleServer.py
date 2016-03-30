@@ -340,7 +340,7 @@ def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
    for player in l_players:
       l_playerNames.append(player.user_name)
 	
-   #sortPlayers(l_playerNames, d_playerCountries)
+   sortPlayers(map.l_player_names, d_playerCountries)
    
    tempPlayers = copy.copy(l_players)
    
@@ -476,14 +476,14 @@ def applyContinentBonuses(l_players, map):
 def getKey(item):
    return item[1]
    
-def sortPlayers(l_playerNames, d_playerCountries):
+def sortPlayers(l_player_names, d_playerCountries):
    tempObject = []
-   for name in l_playerNames:
+   for name in l_player_names:
       tempObject.append((name, d_playerCountries[name]))
    sorted(tempObject, key=getKey)
-   del l_playerNames[:]
-   for name in tempObject[0]:
-      l_playerNames.append(name)
+   del l_player_names[:]
+   for name in tempObject:
+      l_player_names.append(name[0])
 
 def serve(player_count, addr):   
    l_players = []
