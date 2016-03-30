@@ -53,12 +53,6 @@ class Map:
          self.d_bonuses = {}
          for continent in self.l_continent_names:
             self.d_bonuses[continent] = len(self.d_continents[continent]) + random.randint(0, 2)
-         
-         for player_index in range(0, len(self.l_player_names)):
-            self.d_continents[self.l_continent_names[player_index]][0].owner = self.l_player_names[player_index]
-            self.d_continents[self.l_continent_names[player_index]][0].unit_counts = UnitCounts(0, 0, 0, 0)
-            self.d_continents[self.l_continent_names[player_index]][0].defense_bonus = 10
-            self.d_continents[self.l_continent_names[player_index]][0].attack_bonus = 10
       
          start = True
          temp_valid_tiles = []
@@ -101,6 +95,47 @@ class Map:
                   temp_tile = random.choice(temp_valid_tiles)
                   self.ll_map[temp_tile[0]][temp_tile[1]] = (continent, country)
                temp_valid_tiles = valid_tiles_c1
+         
+         l_start_locals1 = []
+         l_start_locals2 = []
+         for x in range(self.WIDTH):
+            for y in range(self.HEIGHT):
+               if x % 3 == 1 and y % 3 == 1 and self.ll_map[y][x] != self.WATER:
+                  l_start_locals1.append(self.ll_map[y][x])
+               elif x % 3 == 2 and y % 3 == 2 and self.ll_map[y][x] != self.WATER:
+                  l_start_locals2.append(self.ll_map[y][x])
+         
+         print("lengths for double space: " + str(len(l_start_locals1)) + str(len(l_start_locals2)))
+         if len(l_start_locals1) >= len(self.l_player_names):
+            l_locals = l_start_locals1
+            print("True for 2 space")
+         elif len(l_start_locals2) >= len(self.l_player_names):
+            l_locals = l_start_locals2
+            print("True for 2 space")
+         else:
+            l_locals = []
+            l_start_locals1 = []
+            for x in range(self.WIDTH):
+               for y in range(self.HEIGHT):
+                  if x % 2 == 1 and y % 2 == 1 and self.ll_map[y][x] != self.WATER:
+                     l_start_locals1.append(self.ll_map[y][x])
+            
+            if len(l_start_locals1) >= len(self.l_player_names):
+               l_locals = l_start_locals1
+               print("True for 1 space")
+         
+         if len(l_locals) >= len(self.l_player_names):
+            for player_index in range(0, len(self.l_player_names)):
+               self.d_continents[l_locals[player_index][0]][l_locals[player_index][1]].owner = self.l_player_names[player_index]
+               self.d_continents[l_locals[player_index][0]][l_locals[player_index][1]].unit_counts = UnitCounts(0, 0, 0, 0)
+               self.d_continents[l_locals[player_index][0]][l_locals[player_index][1]].defense_bonus = 10
+               self.d_continents[l_locals[player_index][0]][l_locals[player_index][1]].attack_bonus = 10
+         else:
+            for player_index in range(0, len(self.l_player_names)):
+               self.d_continents[self.l_continent_names[player_index]][0].owner = self.l_player_names[player_index]
+               self.d_continents[self.l_continent_names[player_index]][0].unit_counts = UnitCounts(0, 0, 0, 0)
+               self.d_continents[self.l_continent_names[player_index]][0].defense_bonus = 10
+               self.d_continents[self.l_continent_names[player_index]][0].attack_bonus = 10
       else:
          #Make copy of the map limited by player
          self.PLAYER_COUNT = map_to_copy.PLAYER_COUNT
