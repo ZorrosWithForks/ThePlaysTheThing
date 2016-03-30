@@ -130,11 +130,23 @@ def MakeServer():
          # l_boot_spots.append((x_panel_position + 1200, y_panel_position + 25
          
    def start_game():
+      port = 9998
+      valid_host = False
+      while not valid_host:
+         try:
+            testsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            testsocket.bind((host, port))
+            testsocket.close()
+            valid_host = True
+         except:
+            valid_host = False
+            port += 1
+      
+      addr = (host, port)
       for client in clients:
-         packet = pickle.dumps((True, host))
+         packet = pickle.dumps((True, addr))
          client[0].sendto(packet, client[2])
-      addr = (host, 9998)
-      t_become_server = threading.Thread(target=SimpleServer.serve, args=(len(clients) + 1,))
+      t_become_server = threading.Thread(target=SimpleServer.serve, args=(len(clients) + 1, addr))
       t_become_server.start()
       server_socket.close()
       serversocket.close()
