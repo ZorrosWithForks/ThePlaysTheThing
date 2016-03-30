@@ -1238,7 +1238,7 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, d_playerCount
          newSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), window)
          pygame.display.update()
    
-def play(addr, player_name):
+def play(host_address, player_name):
    pygame.mouse.set_visible(False)
    #set up the display
    print("Enter play")
@@ -1247,8 +1247,6 @@ def play(addr, player_name):
 
    #use list comprehension to create our tilemap
    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-   s.bind(addr)
-   host_address = addr[0]
    print("About to connect to host")
    # connection to hostname on the port.
    s.connect(host_address)                               
