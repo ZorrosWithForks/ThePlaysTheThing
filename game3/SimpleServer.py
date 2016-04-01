@@ -478,7 +478,7 @@ def getKey(item):
    
 def sortPlayers(l_playerNames, d_playerCountries):
    tempObject = []
-   for name in l_player_names:
+   for name in l_playerNames:
       tempObject.append((name, d_playerCountries[name]))
    tempObject = sorted(tempObject, key=getKey, reverse=True)
    del l_playerNames[:]

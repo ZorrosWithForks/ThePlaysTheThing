@@ -580,6 +580,8 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address, l_playerNames, d_
                      selectedCountry = [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] #Coordinates of the current selected country
                   else:
                      selectedCountry = None
+                else:
+                  selectedCountry = None
              elif selectedCountry != None:
                 curr_country = map.ll_map[selectedCountry[1]][selectedCountry[0]]
                 
@@ -746,8 +748,12 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
                            l_defenders.remove([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
                            l_attackers.remove([selectedCountry[0], selectedCountry[1]])
                            d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = None
+                     else:
+                        selectedCountry = None
                   else:
                      selectedCountry = None
+                else:
+                  selectedCountry = None
              elif selectedCountry != None:
                 curr_country = map.ll_map[selectedCountry[1]][selectedCountry[0]]
                 units = map.d_continents[curr_country[0]][curr_country[1]].unit_counts
@@ -966,11 +972,15 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
                      elif map.d_continents[curr_country[0]][curr_country[1]].owner == player.user_name:
                         l_neighbors = []
                         selectedCountry = [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]
+                     else:
+                        selectedCountry = None
                   elif map.d_continents[curr_country[0]][curr_country[1]].owner == player.user_name and selectedCountry != [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]: # if the user clicked his own country and not a selected country
                      l_neighbors = []
                      selectedCountry = [int(curr_x / TILESIZE), int(curr_y / TILESIZE)]
                   else:
                      selectedCountry = None
+               else:
+                  selectedCountry = None
             elif selectedCountry != None:
                curr_country = map.ll_map[selectedCountry[1]][selectedCountry[0]]
                units = map.d_continents[curr_country[0]][curr_country[1]].unit_counts
