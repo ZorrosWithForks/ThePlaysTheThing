@@ -12,6 +12,7 @@ from os import listdir
 # immediately upon import
 
 pygame.init()
+pygame.mixer.init(size=16)
 screenInfo = pygame.display.Info()
 MENU_SURFACE = pygame.Surface((1600,900))
 window = pygame.display.set_mode((screenInfo.current_w,screenInfo.current_h), pygame.FULLSCREEN)
@@ -28,7 +29,15 @@ EXIT_LIT = pygame.image.load(IMAGE_FILE_PATH + "ExitLit.png").convert_alpha()
 SOUND_FILE_PATH = "Sounds\\"
 SONG_END = pygame.USEREVENT + 1
 song_index = 0
-l_songs = listdir(SOUND_FILE_PATH) 
+l_songs = listdir(SOUND_FILE_PATH)
+l_bad = []
+for file in l_songs:
+   if file[-3:] not in ("mp3", "ogg"):
+      l_bad.append(file)
+
+for bad in l_bad:
+   l_songs.remove(bad)
+
 #xScale = float(screenInfo.current_w) / 1600.0
 #yScale = float(screenInfo.current_h) / 900.0
 xScale = 1600 / float(screenInfo.current_w)
