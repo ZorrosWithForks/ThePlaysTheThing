@@ -6,6 +6,7 @@ import random
 #import serverSetup
 import clientLogin
 import serverMake
+from os import listdir
 
 #^Imported libraries MUST have the function/if_MAIN thing at the end or else they will be run
 # immediately upon import
@@ -25,18 +26,29 @@ EXIT_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "Exit.png").convert_alpha()
 EXIT_LIT = pygame.image.load(IMAGE_FILE_PATH + "ExitLit.png").convert_alpha()
 
 SOUND_FILE_PATH = "Sounds\\"
-pygame.mixer.music.load(SOUND_FILE_PATH + "The Pyre.mp3")
-pygame.mixer.music.play(-1)
-
+SONG_END = pygame.USEREVENT + 1
+song_index = 0
+l_songs = listdir(SOUND_FILE_PATH) 
 #xScale = float(screenInfo.current_w) / 1600.0
 #yScale = float(screenInfo.current_h) / 900.0
 xScale = 1600 / float(screenInfo.current_w)
 yScale = 900.0 / float(screenInfo.current_h)
 
+pygame.mixer.music.set_endevent(SONG_END)
+currently_playing_song = None
+
 print(str(xScale))
 print(str(yScale))
 
+def play_next_song():
+    global l_songs
+    global song_index
+    pygame.mixer.music.load(SOUND_FILE_PATH + l_songs[song_index])
+    pygame.mixer.music.play(1)
+    song_index = (song_index + 1) % len(l_songs)
+    
 def game_intro():
+   play_next_song()
    JOIN_COORDS = (450, 400)
    NEW_COORDS = (800, 400)
    EXIT_COORDS = (670, 720)
@@ -60,6 +72,8 @@ def game_intro():
                intro = False
          if event.type == KEYDOWN and event.key == K_ESCAPE:
             intro = False
+         if event.type == SONG_END:
+            play_next_song()
             
       MENU_SURFACE.blit(MENU_BACKGROUND, (0,0))
       MENU_SURFACE.blit(JOIN_LIT if over_join else JOIN_UNLIT, JOIN_COORDS)
