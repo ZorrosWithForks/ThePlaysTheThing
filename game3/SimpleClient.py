@@ -319,11 +319,12 @@ def standardInfo(map, DISPLAYSURF, params):
       x_offset = 120
       y_offset = 180
       DISPLAYSURF.blit(CONTINENT_FONT.render("Players:", True, (0,0,0)), (map.WIDTH * TILESIZE + 100, 130))
+      l_place = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th"]
+      place_index = 0
       for name in map.l_player_names:
          playerName = COUNTRY_FONT.render(name, True, l_playerColors[d_playerLogoIndexes[name]])
-         DISPLAYSURF.blit(playerName, (map.WIDTH * TILESIZE + x_offset, y_offset))
-         if params[1][name] > 0:
-            DISPLAYSURF.blit(COUNTRY_FONT.render("has " + str(params[1][name]), True, l_playerColors[d_playerLogoIndexes[name]]), (map.WIDTH * TILESIZE + x_offset + playerName.get_width() + 10, y_offset))
+         DISPLAYSURF.blit(l_place[place_index] + " " + playerName, (map.WIDTH * TILESIZE + x_offset, y_offset))
+         place_index += 1
          if params != None and name not in params[0]:
             pygame.draw.line(DISPLAYSURF, l_playerColors[d_playerLogoIndexes[name]], (map.WIDTH * TILESIZE + x_offset, y_offset + 17), (map.WIDTH * TILESIZE + x_offset + playerName.get_width(), y_offset + 17), 2)
          y_offset += 25
