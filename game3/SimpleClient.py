@@ -66,6 +66,9 @@ t_WATER_TEXTURES = (
                      pygame.transform.rotate(WATER_TEXTURE, 270)
                    )
 
+GAME_CLOSE = pygame.image.load(IMAGE_FILE_PATH + "CloseGame.png").convert_alpha()
+GAME_MINIM = pygame.image.load(IMAGE_FILE_PATH + "MinimizeGame.png").convert_alpha()
+                   
 INFO_BUY_UNITS = pygame.image.load(IMAGE_FILE_PATH + "InfoBuyUnits.png").convert_alpha()
 INFO_ATTACK = pygame.image.load(IMAGE_FILE_PATH + "InfoAttack.png").convert_alpha()
 INFO_RESOLVE = pygame.image.load(IMAGE_FILE_PATH + "InfoBattle.png").convert_alpha()
@@ -500,6 +503,9 @@ def prepareBackground(map, DISPLAYSURF):
    DISPLAYSURF.blit(source=INFO_MARQUEE, dest=(map.WIDTH * TILESIZE, 0))
    pygame.draw.line(DISPLAYSURF, (0,0,0), (map.WIDTH * TILESIZE + 28, 112), (map.WIDTH * TILESIZE + 700, 112), 3)
    DISPLAYSURF.blit(source=BASE_BOARD, dest=(0, map.HEIGHT * TILESIZE))
+   DISPLAYSURF.blit(GAME_CLOSE, (1560,0))
+   DISPLAYSURF.blit(GAME_MINIM, (1520,0))
+   
    backgroundSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), BACKGROUND)
    backgroundSurface = backgroundSurface.convert_alpha()
 def handleGeneral(event, map, temp_map=None, selectedCountry=None):
