@@ -1,0 +1,11 @@
+set refreshing to false
+Exited properly
+Exception in thread Thread-39:
+Traceback (most recent call last):
+  File "C:\Python34\lib\threading.py", line 920, in _bootstrap_inner
+    self.run()
+  File "C:\Python34\lib\threading.py", line 868, in run
+    self._target(*self._args, **self._kwargs)
+  File "\\csmain\Classes\SE_Project\Development\16-DiningPhilosophers\Rodrick\game3\SimpleClient.py", line 688, in refresh
+    oldMap = pickle.loads(response)
+EOFError: Ran out of input

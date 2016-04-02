@@ -65,7 +65,7 @@ t_WATER_TEXTURES = (
                      pygame.transform.rotate(WATER_TEXTURE, 180),
                      pygame.transform.rotate(WATER_TEXTURE, 270)
                    )
-                   
+
 GAME_CLOSE = pygame.image.load(IMAGE_FILE_PATH + "CloseGame.png").convert_alpha()
 GAME_MINIM = pygame.image.load(IMAGE_FILE_PATH + "MinimizeGame.png").convert_alpha()
                    
