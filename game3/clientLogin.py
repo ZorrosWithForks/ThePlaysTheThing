@@ -113,7 +113,10 @@ def LoginClient():
    
    def search(x_panel_position, y_panel_position, y_offset):
       while True:
-         packet, addr = client_socket.recvfrom(4096)
+         try:
+            packet, addr = client_socket.recvfrom(4096)
+         except:
+            break
          if packet != None:
             try:
                gotAServer = True

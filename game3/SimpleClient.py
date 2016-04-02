@@ -11,6 +11,7 @@ import pickle
 from Maps import *
 import time
 import Player
+from os import listdir
 
 pygame.font.init()
 
@@ -148,6 +149,21 @@ MOUSE_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "MouseUnlit.png").convert_alph
 
 BACKGROUND = pygame.display.set_mode((screenInfo.current_w,screenInfo.current_h), pygame.FULLSCREEN)
 backgroundSurface = None
+
+SOUND_FILE_PATH = "Sounds\\"
+pygame.mixer.init(size=16)
+SONG_END = pygame.USEREVENT + 1
+pygame.mixer.music.set_endevent(SONG_END)
+l_songs = listdir(SOUND_FILE_PATH)
+l_bad = []
+
+for file in l_songs:
+   if file[-3:] not in ("mp3", "ogg"):
+      l_bad.append(file)
+
+for bad in l_bad:
+   l_songs.remove(bad)
+song_index = 0
 
 def blitInfo(DISPLAYSURF, map, phase_info, displayUnitThings=True):
    curr_x, curr_y = pygame.mouse.get_pos()
@@ -509,18 +525,27 @@ def prepareBackground(map, DISPLAYSURF):
    backgroundSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), BACKGROUND)
    backgroundSurface = backgroundSurface.convert_alpha()
 def handleGeneral(event, map, temp_map=None, selectedCountry=None):
-  global map_X_offset
-  global map_Y_offset
-  if event.type == QUIT:
+   global map_X_offset
+   global map_Y_offset
+   global song_index
+   if event.type == QUIT:
       #and the game and close the window
       pygame.quit()
       sys.exit()
-  # if a key is pressed
-  if event.type == KEYDOWN:
-      if event.key == K_ESCAPE:
-         # and the game and close the window
+         
+   if event.type == MOUSEBUTTONDOWN:
+      curr_x, curr_y = pygame.mouse.get_pos()
+      curr_x *= xScale
+      curr_y *= yScale
+      if 1520 < curr_x < 1556 and 0 < curr_y < 20:
+         pygame.display.iconify()
+      if 1560 < curr_x < 1596 and 0 < curr_y < 20:
          pygame.quit()
          sys.exit()
+   if event.type == SONG_END:
+      song_index = (song_index + 1) % len(l_songs)
+      pygame.mixer.music.load(SOUND_FILE_PATH + l_songs[song_index])
+      pygame.mixer.music.play(1)
 
 def displayMessage(image, map, DISPLAYSURF, turnState, l_playerNames, d_playerCountries, battles = None):
    OK_COORDS = (450,650)
@@ -532,6 +557,7 @@ def displayMessage(image, map, DISPLAYSURF, turnState, l_playerNames, d_playerCo
       curr_y *= yScale
       over_ok = OK_COORDS[0] <= curr_x <= OK_COORDS[0] + 200 and OK_COORDS[1] <= curr_y <= OK_COORDS[1] + 100
       for event in pygame.event.get():
+         handleGeneral(event, map)
          if over_ok and event.type == MOUSEBUTTONDOWN:
             clickedOK = True
       printMap(map, DISPLAYSURF, turnState, standardInfo, (l_playerNames, d_playerCountries))
@@ -756,7 +782,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
                         l_attackers.append([selectedCountry[0], selectedCountry[1]])
                         l_defenders.append([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
                         d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0), False, player.user_name] #[defender, attack force]
-                     elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_defenders: # if clicking the country your selected country is attacking
+                     elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_defenders and selectedCountry in l_attackers: # if clicking the country your selected country is attacking
                         index = l_attackers.index(selectedCountry)
                         if l_defenders[index] == [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] and l_attackers[index] == selectedCountry:
                            l_defenders.remove([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
@@ -1241,6 +1267,7 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, d_playerCount
          over_exit = EXIT_COORDS[0] <= curr_x <= EXIT_COORDS[0] + 200 and EXIT_COORDS[1] <= curr_y <= EXIT_COORDS[1] + 100
          for event in pygame.event.get():
             #if the user wants to quit
+            handleGeneral(event, map)
             if not done and over_ok and event.type == MOUSEBUTTONDOWN:
                done = True
             elif over_exit and event.type == MOUSEBUTTONDOWN:
@@ -1273,6 +1300,7 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, d_playerCount
          over_exit = EXIT_COORDS[0] <= curr_x <= EXIT_COORDS[0] + 200 and EXIT_COORDS[1] <= curr_y <= EXIT_COORDS[1] + 100
          for event in pygame.event.get():
             #if the user wants to quit
+            handleGeneral(event, map)
             if not done and over_ok and event.type == MOUSEBUTTONDOWN:
                done = True
             elif over_exit and event.type == MOUSEBUTTONDOWN:
@@ -1311,7 +1339,8 @@ def play(host_address, player_name):
    map, player, l_playerNames, d_playerCountries = pickle.loads(pickledResponse)
    print("Got the map")
    
-   #s.sendto(player_name.encode("ascii"), host_address)
+   pygame.mixer.music.load(SOUND_FILE_PATH + l_songs[song_index])
+   pygame.mixer.music.play(1)
 
    # Map continent names to tiles
    incrementor = 0
