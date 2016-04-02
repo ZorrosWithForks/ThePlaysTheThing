@@ -27,7 +27,7 @@ setup(
    windows = [
       {
          "script": "main_menu.py",
-         "icon_resources": [(0, "ImageFiles\\Lee_'sFace.ico")]
+         "icon_resources": [(0, "ImageFiles\\Shortcut.ico")]
       }
    ],
    data_files = myDataFiles

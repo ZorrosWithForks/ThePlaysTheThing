@@ -27,7 +27,7 @@ NEW_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "NewGame.png").convert_alpha()
 NEW_LIT = pygame.image.load(IMAGE_FILE_PATH + "NewGameLit.png").convert_alpha()
 EXIT_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "Exit.png").convert_alpha()
 EXIT_LIT = pygame.image.load(IMAGE_FILE_PATH + "ExitLit.png").convert_alpha()
-GAME_ICON = pygame.image.load(IMAGE_FILE_PATH + "Lee_'sFace.png").convert_alpha()
+GAME_ICON = pygame.image.load(IMAGE_FILE_PATH + "Shortcut.png").convert_alpha()
 
 SOUND_FILE_PATH = "Sounds\\"
 pygame.display.set_icon(GAME_ICON)
