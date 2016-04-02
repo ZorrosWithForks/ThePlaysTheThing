@@ -677,11 +677,19 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
       global oldMap
       try:
          response = socket.recv(8192)
+         socket.settimeout(0.2)
+         try:
+            response += socket.recv(8192)
+            print("Wow, we actually got extra data")
+         except:
+            pass
+         socket.settimeout(None)
+         oldMap = pickle.loads(response)
       except:
          oldMap = None
          refreshing = False
          return
-      oldMap = pickle.loads(response)
+
       refreshing = False
       print("set refreshing to false")
       return
@@ -896,10 +904,16 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
       global oldMap
       try:
          response = socket.recv(8192)
+         socket.settimeout(0.2)
+         try:
+            response += socket.recv(8192)
+            print("Wow, we actually got extra data")
+         except:
+            pass
+         socket.settimeout(None)
          oldMap = pickle.loads(response)
       except:
          oldMap = None
-      
       refreshing = False
       print("set refreshing to false")
       return
@@ -1117,6 +1131,13 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address, l_senders, l_receiv
       global newMap
       try:
          response = socket.recv(8192)
+         socket.settimeout(0.2)
+         try:
+            response += socket.recv(8192)
+            print("Wow, we actually got extra data")
+         except:
+            pass
+         socket.settimeout(None)
          newMap = pickle.loads(response)
       except:
          newMap = None
@@ -1160,6 +1181,7 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, d_playerCount
    Won = True
    Lost = True
    done = False
+   died = False
    LOSS_OVERLAY = DISPLAYSURF.copy()
    LOSS_OVERLAY.fill((255, 75, 75))
    LOSS_OVERLAY.convert_alpha()
@@ -1183,9 +1205,22 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, d_playerCount
       def refresh():
          global deadMap
          global map
+         global died
          while True:
-            response = socket.recv(8192)
-            deadMap = pickle.loads(response)
+            try:
+               response = socket.recv(8192)
+               socket.settimeout(0.2)
+               try:
+                  response += socket.recv(8192)
+               except:
+                  pass
+               socket.settimeout(None)
+               deadMap = pickle.loads(response)
+            except:
+               deadMap = None
+               displayMessage(CRASH_MESSAGE, map, DISPLAYSURF, "Spectating", l_playerNames, d_playerCountries)
+               died = True
+               return
             print("I'm dead and got a new map")
       
       t_updateScreen = threading.Thread(target=refresh)
@@ -1207,6 +1242,8 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, d_playerCount
          if deadMap != None:
             map = deadMap[0]
             l_playerNames = deadMap[1]
+         if died:
+            return True
          printMap(map, DISPLAYSURF, "Spectating", standardInfo, (l_playerNames, d_playerCountries))
          if not done:
             DISPLAYSURF.blit(LOSS_OVERLAY, (0, 0), special_flags=BLEND_MULT)
@@ -1304,10 +1341,9 @@ def play(host_address, player_name):
       map = info[0]
       player = info[1]
       l_playerNames = info[2]
-      print("Exited properly")
       #pygame.quit()
       #sys.exit()
-
+   print("Exited properly")
    s.close()
    
    pygame.mouse.set_visible(True)
