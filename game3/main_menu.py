@@ -6,7 +6,6 @@ import random
 #import serverSetup
 import clientLogin
 import serverMake
-from os import listdir
 import threading
 from threading import Thread
 import _thread
@@ -31,16 +30,7 @@ EXIT_LIT = pygame.image.load(IMAGE_FILE_PATH + "ExitLit.png").convert_alpha()
 GAME_ICON = pygame.image.load(IMAGE_FILE_PATH + "Lee_'sFace.png").convert_alpha()
 
 SOUND_FILE_PATH = "Sounds\\"
-l_songs = listdir(SOUND_FILE_PATH)
-l_bad = []
 pygame.display.set_icon(GAME_ICON)
-
-for file in l_songs:
-   if file[-3:] not in ("mp3", "ogg"):
-      l_bad.append(file)
-
-for bad in l_bad:
-   l_songs.remove(bad)
 
 #xScale = float(screenInfo.current_w) / 1600.0
 #yScale = float(screenInfo.current_h) / 900.0
@@ -51,17 +41,6 @@ currently_playing_song = None
 
 print(str(xScale))
 print(str(yScale))
-    
-def play_music():
-   pygame.mixer.init(size=16)
-   SONG_END = pygame.USEREVENT + 1
-   pygame.mixer.music.set_endevent(SONG_END)
-   song_index = 0
-   while True:
-      pygame.mixer.music.load(SOUND_FILE_PATH + l_songs[song_index])
-      pygame.mixer.music.play(1)
-      song_index = (song_index + 1) % len(l_songs)
-      pygame.event.wait()
     
 def game_intro():
    JOIN_COORDS = (450, 400)
@@ -95,10 +74,6 @@ def game_intro():
     
 in_menu = True
 in_game = False
-
-t_music = threading.Thread(target=play_music)
-t_music.daemon = True
-t_music.start()
     
 # Will need to edit the looping logic to allow quitting to return to the main menu
 game_intro()
