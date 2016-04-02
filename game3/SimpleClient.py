@@ -540,12 +540,13 @@ def handleGeneral(event, map, temp_map=None, selectedCountry=None):
       if 1520 < curr_x < 1556 and 0 < curr_y < 20:
          pygame.display.iconify()
       if 1560 < curr_x < 1596 and 0 < curr_y < 20:
-         pygame.quit()
-         sys.exit()
+         return True
    if event.type == SONG_END:
       song_index = (song_index + 1) % len(l_songs)
       pygame.mixer.music.load(SOUND_FILE_PATH + l_songs[song_index])
       pygame.mixer.music.play(1)
+      
+   return False
 
 def displayMessage(image, map, DISPLAYSURF, turnState, l_playerNames, d_playerCountries, battles = None):
    OK_COORDS = (450,650)
@@ -602,8 +603,8 @@ def placeUnits(DISPLAYSURF, map, player, socket, host_address, l_playerNames, d_
        curr_y *= yScale
        for event in pygame.event.get():
            #if the user wants to quit
-           handleGeneral(event, map, temp_map, selectedCountry)
-           
+           if handleGeneral(event, map, temp_map, selectedCountry):
+             return None
            if event.type == MOUSEBUTTONDOWN:
              if curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE:
                 curr_country = map.ll_map[int(curr_y / TILESIZE)][int(curr_x / TILESIZE)] #Continent name and country index
@@ -733,8 +734,9 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
    while refreshing:
       for event in pygame.event.get():
          #if the user wants to quit
-         handleGeneral(event, map)
-      
+         if handleGeneral(event, map):
+            return None, None, None, None
+            
       printMap(map, DISPLAYSURF, "Declare Attacks", standardInfo, (l_playerNames, d_playerCountries))
       DISPLAYSURF.blit(WAITING, (70, map.HEIGHT * TILESIZE + 70))
       curr_x, curr_y = pygame.mouse.get_pos()
@@ -767,7 +769,8 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
        curr_y *= yScale
        for event in pygame.event.get():
            #if the user wants to quit
-           handleGeneral(event, map, selectedCountry=selectedCountry)
+           if handleGeneral(event, map, selectedCountry=selectedCountry):
+             return None, None, None, None
            
            if event.type == MOUSEBUTTONDOWN:
              if curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE: # if the user clicked on the map
@@ -957,7 +960,8 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
    while refreshing:
       for event in pygame.event.get():
          #if the user wants to quit
-         handleGeneral(event, map)
+         if handleGeneral(event, map):
+            return None, None, None, None, None
 
       printMap(map, DISPLAYSURF, "Move Troops", standardInfo, (l_playerNames, d_playerCountries))
       DISPLAYSURF.blit(WAITING, (70, map.HEIGHT * TILESIZE + 70))
@@ -996,7 +1000,8 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
       curr_y *= yScale
       for event in pygame.event.get():
          #if the user wants to quit
-         handleGeneral(event, map, selectedCountry=selectedCountry)
+         if handleGeneral(event, map, selectedCountry=selectedCountry):
+            return None, None, None, None, None
       
          if event.type == MOUSEBUTTONDOWN:
             if curr_x < map.WIDTH * TILESIZE and curr_y < map.HEIGHT * TILESIZE: # if the user clicked on the map
@@ -1185,7 +1190,8 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address, l_senders, l_receiv
    while refreshing:
       for event in pygame.event.get():
          #if the user wants to quit
-         handleGeneral(event, map)
+         if handleGeneral(event, map):
+            return None
       
       printMap(map, DISPLAYSURF, "Move Troops", standardInfo, (l_playerNames, d_playerCountries))
       
@@ -1267,7 +1273,8 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, d_playerCount
          over_exit = EXIT_COORDS[0] <= curr_x <= EXIT_COORDS[0] + 200 and EXIT_COORDS[1] <= curr_y <= EXIT_COORDS[1] + 100
          for event in pygame.event.get():
             #if the user wants to quit
-            handleGeneral(event, map)
+            if handleGeneral(event, map):
+               return True
             if not done and over_ok and event.type == MOUSEBUTTONDOWN:
                done = True
             elif over_exit and event.type == MOUSEBUTTONDOWN:
@@ -1300,7 +1307,8 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, d_playerCount
          over_exit = EXIT_COORDS[0] <= curr_x <= EXIT_COORDS[0] + 200 and EXIT_COORDS[1] <= curr_y <= EXIT_COORDS[1] + 100
          for event in pygame.event.get():
             #if the user wants to quit
-            handleGeneral(event, map)
+            if handleGeneral(event, map):
+               return True
             if not done and over_ok and event.type == MOUSEBUTTONDOWN:
                done = True
             elif over_exit and event.type == MOUSEBUTTONDOWN:

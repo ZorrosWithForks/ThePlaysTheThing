@@ -189,13 +189,6 @@ def LoginClient(username, s):
             if event.key == K_LSHIFT or event.key == K_RSHIFT:
                shifted = False
                #print("shifted is now false")
-         if event.type == KEYDOWN:
-            if event.key == K_ESCAPE:
-               #end the game and close the window
-               print(name)
-               print("something")
-               pygame.quit()
-               sys.exit()
             if event.key == K_DOWN and y_offset > -y_offset_allowed and len(l_players) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
                y_offset -= 100

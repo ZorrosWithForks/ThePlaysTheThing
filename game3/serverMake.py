@@ -342,12 +342,6 @@ def MakeServer():
               shifted = False
          if event.type == KEYDOWN:
             just_accessed = False
-            if event.key == K_ESCAPE:
-               #end the game and close the window
-               print(servername)
-               print("something")
-               pygame.quit()
-               sys.exit()
             if event.key == K_BACKSPACE:
                servername = servername[:-1]
             if event.key == K_DOWN and y_offset > -y_offset_allowed and len(clients) > 5:
