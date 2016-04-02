@@ -34,11 +34,13 @@ class Map:
          # Generate the name for, and put the minimum 3 countries in, each continent
          self.d_continents = {}
          self.l_continent_names = []
+         continent_endings = ["sia", "rica", "rope", "tica", "lia", "ria", "gea", "ple"]
+         random.shuffle(continent_endings)
          for continent in range(0, self.PLAYER_COUNT + 1):
             continent_name = random.choice("AEIOU")
             continent_name += random.choice("pbwtcmnds")
             continent_name += random.choice("aeiou")
-            continent_name += random.choice(["sia", "rica", "rope", "tica", "lia"])
+            continent_name += continent_endings.pop()
             self.l_continent_names.append(continent_name)
             
             self.d_continents[continent_name] = l_countries[continent * 3:continent * 3 + 3]
