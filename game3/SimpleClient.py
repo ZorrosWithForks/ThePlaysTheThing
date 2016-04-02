@@ -65,7 +65,10 @@ t_WATER_TEXTURES = (
                      pygame.transform.rotate(WATER_TEXTURE, 180),
                      pygame.transform.rotate(WATER_TEXTURE, 270)
                    )
-
+                   
+GAME_CLOSE = pygame.image.load(IMAGE_FILE_PATH + "CloseGame.png").convert_alpha()
+GAME_MINIM = pygame.image.load(IMAGE_FILE_PATH + "MinimizeGame.png").convert_alpha()
+                   
 INFO_BUY_UNITS = pygame.image.load(IMAGE_FILE_PATH + "InfoBuyUnits.png").convert_alpha()
 INFO_ATTACK = pygame.image.load(IMAGE_FILE_PATH + "InfoAttack.png").convert_alpha()
 INFO_RESOLVE = pygame.image.load(IMAGE_FILE_PATH + "InfoBattle.png").convert_alpha()
@@ -500,19 +503,26 @@ def prepareBackground(map, DISPLAYSURF):
    DISPLAYSURF.blit(source=INFO_MARQUEE, dest=(map.WIDTH * TILESIZE, 0))
    pygame.draw.line(DISPLAYSURF, (0,0,0), (map.WIDTH * TILESIZE + 28, 112), (map.WIDTH * TILESIZE + 700, 112), 3)
    DISPLAYSURF.blit(source=BASE_BOARD, dest=(0, map.HEIGHT * TILESIZE))
+   DISPLAYSURF.blit(GAME_CLOSE, (1560,0))
+   DISPLAYSURF.blit(GAME_MINIM, (1520,0))
+   
    backgroundSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), BACKGROUND)
    backgroundSurface = backgroundSurface.convert_alpha()
 def handleGeneral(event, map, temp_map=None, selectedCountry=None):
-  global map_X_offset
-  global map_Y_offset
-  if event.type == QUIT:
+   global map_X_offset
+   global map_Y_offset
+   if event.type == QUIT:
       #and the game and close the window
       pygame.quit()
       sys.exit()
-  # if a key is pressed
-  if event.type == KEYDOWN:
-      if event.key == K_ESCAPE:
-         # and the game and close the window
+         
+   if event.type == MOUSEBUTTONDOWN:
+      curr_x, curr_y = pygame.mouse.get_pos()
+      curr_x *= xScale
+      curr_y *= yScale
+      if 1520 < curr_x < 1556 and 0 < curr_y < 20:
+         pygame.display.iconify()
+      if 1560 < curr_x < 1596 and 0 < curr_y < 20:
          pygame.quit()
          sys.exit()
 
@@ -750,7 +760,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
                         l_attackers.append([selectedCountry[0], selectedCountry[1]])
                         l_defenders.append([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
                         d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = [curr_country, UnitCounts(0, 0, 0, 0), False, player.user_name] #[defender, attack force]
-                     elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_defenders: # if clicking the country your selected country is attacking
+                     elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_defenders and selectedCountry in l_attackers: # if clicking the country your selected country is attacking
                         index = l_attackers.index(selectedCountry)
                         if l_defenders[index] == [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] and l_attackers[index] == selectedCountry:
                            l_defenders.remove([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
