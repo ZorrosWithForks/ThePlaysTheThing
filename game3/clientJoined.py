@@ -19,6 +19,8 @@ joined = True
 IMAGE_FILE_PATH = "ImageFiles\\"
 BOOT_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoBooted.png").convert_alpha()
 CRASH_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoServerLost.png").convert_alpha()
+DOWN_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "upArrow.png").convert_alpha()
+UP_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "downArrow.png").convert_alpha()
 # Position of the arrows
 arrow_x_pos = 1500
 up_arrow_y_pos = 550
