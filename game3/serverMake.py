@@ -224,8 +224,8 @@ def MakeServer():
    BACK_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_unpressed.png")
    BACK_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_pressed.png")
    WAITING_PANEL = pygame.image.load(IMAGE_FILE_PATH + "Waiting.png")
-   UP_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "upArrow.png")
-   DOWN_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "downArrow.png")
+   DOWN_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "upArrow.png")
+   UP_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "downArrow.png")
 
    BLACK = 1
    WHITE = 2

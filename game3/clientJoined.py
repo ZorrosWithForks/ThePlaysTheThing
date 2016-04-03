@@ -118,8 +118,7 @@ def LoginClient(username, s):
    LOGIN_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "waiting_background.png").convert_alpha()
    BLACK_BACKGROUND = pygame.image.load(IMAGE_FILE_PATH + "client_login_background2.png").convert_alpha()
    SERVER_BAR = pygame.image.load(IMAGE_FILE_PATH + "Server.png").convert_alpha()
-   UP_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "upArrow.png").convert_alpha()
-   DOWN_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "downArrow.png").convert_alpha()
+   UP_ARROW =  pygame.image.load(IMAGE_FILE_PATH + "downArrow.png").convert_alpha()
    BACK_BUTTON_UNPRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_unpressed.png").convert_alpha()
    BACK_BUTTON_PRESSED = pygame.image.load(IMAGE_FILE_PATH + "back_button_pressed.png").convert_alpha()
 
