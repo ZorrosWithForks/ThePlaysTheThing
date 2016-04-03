@@ -41,18 +41,24 @@ def MakeServer():
          data = client[0].recv(2048)
       except:
          print("Removing a client")
-         clients.remove(client)
-         tempClients = copy.copy(clients)
-         for player in tempClients:
-            l_playerNames = []
-            for name in clients:
-               l_playerNames.append(name[1])
-            packet = pickle.dumps((False, l_playerNames, servername))
-            try:
-               player[0].sendto(packet, player[2])
-            except:
-               clients.remove(player)
-               print("Removed client: " + player[1])
+         try:
+            clients.remove(client)
+            tempClients = copy.copy(clients)
+            for player in tempClients:
+               l_playerNames = []
+               for name in clients:
+                  l_playerNames.append(name[1])
+               packet = pickle.dumps((False, l_playerNames, servername))
+               try:
+                  player[0].sendto(packet, player[2])
+               except:
+                  try:
+                     clients.remove(player)
+                     print("Removed client: " + player[1])
+                  except:
+                     pass
+         except:
+            pass
       
    def acceptPlayers():
       while True:
@@ -504,14 +510,14 @@ def MakeServer():
                         
             # clicked up arrow
 
-            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 75 and y_offset < 0 and len(clients) > 5:
-               SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
-               y_offset += 100
+            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 75 and y_offset > -y_offset_allowed and len(clients) > 5:
+               SERVERS_AREA = DISPLAYSURF.get_clip()
+               y_offset -= 100
                
             # clicked down arrow
-            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 75 and y_offset > -y_offset_allowed and len(clients) > 5:
-               SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
-               y_offset -= 100
+            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 75 and y_offset < 0 and len(clients) > 5:
+               SERVERS_AREA = DISPLAYSURF.get_clip()
+               y_offset += 100
 
          
       # Blit the stuffs onto the screen
