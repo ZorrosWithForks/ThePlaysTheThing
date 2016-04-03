@@ -503,12 +503,13 @@ def MakeServer():
                         print("\ndeleted: " + boot_spot[2] + client[1])
                         
             # clicked up arrow
-            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 50 and y_offset < 0 and len(clients) > 5:
+
+            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 75 and y_offset < 0 and len(clients) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
                y_offset += 100
                
             # clicked down arrow
-            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 100 and y_offset > -y_offset_allowed and len(clients) > 5:
+            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 75 and y_offset > -y_offset_allowed and len(clients) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
                y_offset -= 100
 
