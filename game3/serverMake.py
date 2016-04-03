@@ -342,12 +342,6 @@ def MakeServer():
               shifted = False
          if event.type == KEYDOWN:
             just_accessed = False
-            if event.key == K_ESCAPE:
-               #end the game and close the window
-               print(servername)
-               print("something")
-               pygame.quit()
-               sys.exit()
             if event.key == K_BACKSPACE:
                servername = servername[:-1]
             if event.key == K_DOWN and y_offset > -y_offset_allowed and len(clients) > 5:
@@ -471,7 +465,7 @@ def MakeServer():
                just_accessed = False
                
             # clicked play
-            if x_play_button <= x_mouse_position_main <= x_play_button + 200 and y_play_button <= y_mouse_position_main <= y_play_button + 200 and servername != "":
+            if x_play_button <= x_mouse_position_main <= x_play_button + 200 and y_play_button <= y_mouse_position_main <= y_play_button + 200 and servername != "" and len(clients) > 0:
                start_game()
                server_socket.close()
                serversocket.close()

@@ -340,7 +340,7 @@ def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
    for player in l_players:
       l_playerNames.append(player.user_name)
 	
-   #sortPlayers(l_playerNames, d_playerCountries)
+   sortPlayers(map.l_player_names, d_playerCountries)
    
    tempPlayers = copy.copy(l_players)
    
@@ -480,10 +480,11 @@ def sortPlayers(l_playerNames, d_playerCountries):
    tempObject = []
    for name in l_playerNames:
       tempObject.append((name, d_playerCountries[name]))
-   sorted(tempObject, key=getKey)
+   tempObject = sorted(tempObject, key=getKey, reverse=True)
    del l_playerNames[:]
-   for name in tempObject[0]:
-      l_playerNames.append(name)
+   for name in tempObject:
+      l_playerNames.append(name[0])
+      print(name)
 
 def serve(player_count, addr):   
    l_players = []
