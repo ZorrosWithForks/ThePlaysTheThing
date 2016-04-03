@@ -125,7 +125,7 @@ class Map:
             if len(l_start_locals1) >= len(self.l_player_names):
                l_locals = l_start_locals1
                print("True for 1 space")
-         
+         random.shuffle(l_locals)
          if len(l_locals) >= len(self.l_player_names):
             for player_index in range(0, len(self.l_player_names)):
                self.d_continents[l_locals[player_index][0]][l_locals[player_index][1]].owner = self.l_player_names[player_index]

@@ -1,6 +1,7 @@
 #client.py
 import socket
 import os
+import copy
 import threading
 from threading import Thread
 import _thread
@@ -522,8 +523,9 @@ def prepareBackground(map, DISPLAYSURF):
    DISPLAYSURF.blit(GAME_CLOSE, (1560,0))
    DISPLAYSURF.blit(GAME_MINIM, (1520,0))
    
-   backgroundSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), BACKGROUND)
+   backgroundSurface = copy.copy(DISPLAYSURF)
    backgroundSurface = backgroundSurface.convert_alpha()
+   
 def handleGeneral(event, map, temp_map=None, selectedCountry=None):
    global map_X_offset
    global map_Y_offset
@@ -753,7 +755,8 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
       displayMessage(CRASH_MESSAGE, map, DISPLAYSURF, "Declare Attacks", l_playerNames, d_playerCountries)
       return None, None, None, None
    declaring = True
-
+   if detectGameEnd(DISPLAYSURF, map, player, socket, oldMap[1], oldMap[2]):
+      return None, None, None, None
    print("I have the map!")
    
    selectedCountry = None
@@ -982,16 +985,16 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
       map = oldMap[0]
       if len(oldMap) > 3:
          print("length is > 3")
-         displayMessage(ATTACK_RESULTS, map, DISPLAYSURF, "Move Troops", l_playerNames, oldMap[3], oldMap[2])
+         displayMessage(ATTACK_RESULTS, map, DISPLAYSURF, "Move Troops", oldMap[1], oldMap[3], oldMap[2])
          print("did not die")
    else:
       displayMessage(CRASH_MESSAGE, map, DISPLAYSURF, "Move Troops", l_playerNames, d_playerCountries)
       return None, None, None, None, None
    if len(oldMap) == 3:
-      if detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, oldMap[2]):
+      if detectGameEnd(DISPLAYSURF, map, player, socket, oldMap[1], oldMap[2]):
          return None, None, None, None, None
    elif len(oldMap) == 4:
-      if detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, oldMap[3]):
+      if detectGameEnd(DISPLAYSURF, map, player, socket, oldMap[1], oldMap[3]):
          return None, None, None, None, None
    while moving:
       #get all the user events
@@ -1209,6 +1212,8 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address, l_senders, l_receiv
       pygame.display.update()
    if newMap == None:
       displayMessage(CRASH_MESSAGE, map, DISPLAYSURF, "Move Troops", l_playerNames, d_playerCountries)
+   elif detectGameEnd(DISPLAYSURF, newMap[0], player, socket, newMap[2], newMap[3]):
+      return None
    return newMap
 
 deadMap = None
@@ -1238,6 +1243,9 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, d_playerCount
             Lost = False
          else:
             Won = False
+            
+   if len(l_playerNames) == 1:
+      Won = True
    
    if Lost:
       def refresh():
@@ -1384,6 +1392,7 @@ def play(host_address, player_name):
       map = info[0]
       player = info[1]
       l_playerNames = info[2]
+      d_playerCountries = info[3]
       #pygame.quit()
       #sys.exit()
    print("Exited properly")
