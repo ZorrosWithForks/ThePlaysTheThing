@@ -711,15 +711,19 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
       global refreshing
       global oldMap
       try:
-         response = socket.recv(8192)
+         response = socket.recv(16384)
          socket.settimeout(0.2)
          try:
-            response += socket.recv(8192)
+            response += socket.recv(16384)
             print("Wow, we actually got extra data")
          except:
             pass
          socket.settimeout(None)
-         oldMap = pickle.loads(response)
+         try:
+            oldMap = pickle.loads(response)
+         except:
+            print("(declareAttacks) Packet was: " + str(response))
+            oldMap = None
       except:
          oldMap = None
          refreshing = False
@@ -791,7 +795,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
                      elif [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] in l_defenders and selectedCountry in l_attackers: # if clicking the country your selected country is attacking
                         index = l_attackers.index(selectedCountry)
                         if l_defenders[index] == [int(curr_x / TILESIZE), int(curr_y / TILESIZE)] and l_attackers[index] == selectedCountry:
-                           l_defenders.remove([int(curr_x / TILESIZE), int(curr_y / TILESIZE)])
+                           del l_defenders[index]
                            l_attackers.remove([selectedCountry[0], selectedCountry[1]])
                            d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]] = None
                      else:
@@ -941,25 +945,29 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
       global refreshing
       global oldMap
       try:
-         response = socket.recv(8192)
+         response = socket.recv(16384)
          socket.settimeout(0.2)
          try:
-            response += socket.recv(8192)
+            response += socket.recv(16384)
             print("Wow, we actually got extra data")
          except:
             pass
          socket.settimeout(None)
-         oldMap = pickle.loads(response)
+         try:
+            oldMap = pickle.loads(response)
+         except:
+            print("(Move Troops) Packet was: " + str(response))
+            oldMap = None
       except:
          oldMap = None
       refreshing = False
-      print("set refreshing to false")
+      #print("set refreshing to false")
       return
       
    t_updateScreen = threading.Thread(target=refresh)
    t_updateScreen.daemon = True
    t_updateScreen.start()
-   print("Length of l_attackers is: " + str(len(l_attackers)))
+   #print("Length of l_attackers is: " + str(len(l_attackers)))
    while refreshing:
       for event in pygame.event.get():
          #if the user wants to quit
@@ -979,14 +987,14 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
       #update the display
       newSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), window)
       pygame.display.update()
-   print("Exited refreshing")
+   #print("Exited refreshing")
    if oldMap != None:
-      print("Have a map")
+      #print("Have a map")
       map = oldMap[0]
       if len(oldMap) > 3:
-         print("length is > 3")
+         #print("length is > 3")
          displayMessage(ATTACK_RESULTS, map, DISPLAYSURF, "Move Troops", oldMap[1], oldMap[3], oldMap[2])
-         print("did not die")
+         #print("did not die")
    else:
       displayMessage(CRASH_MESSAGE, map, DISPLAYSURF, "Move Troops", l_playerNames, d_playerCountries)
       return None, None, None, None, None
@@ -1170,20 +1178,24 @@ def getMoney(DISPLAYSURF, map, player, socket, host_address, l_senders, l_receiv
       global refreshing
       global newMap
       try:
-         response = socket.recv(8192)
+         response = socket.recv(16384)
          socket.settimeout(0.2)
          try:
-            response += socket.recv(8192)
+            response += socket.recv(16384)
             print("Wow, we actually got extra data")
          except:
             pass
          socket.settimeout(None)
-         newMap = pickle.loads(response)
+         try:
+            newMap = pickle.loads(response)
+         except:
+            print("(GetMoney) Packet was: " + str(newMap))
+            newMap = None
       except:
          newMap = None
          
       refreshing = False
-      print("set refreshing to false")
+      #print("set refreshing to false")
       return
       
    t_updateScreen = threading.Thread(target=refresh)
@@ -1254,10 +1266,10 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, d_playerCount
          global died
          while True:
             try:
-               response = socket.recv(8192)
+               response = socket.recv(16384)
                socket.settimeout(0.2)
                try:
-                  response += socket.recv(8192)
+                  response += socket.recv(16384)
                except:
                   pass
                socket.settimeout(None)

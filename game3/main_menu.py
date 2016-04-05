@@ -54,7 +54,7 @@ def game_intro():
       mouse_y *= yScale
       over_join = JOIN_COORDS[0] <= mouse_x <= JOIN_COORDS[0] + 300 and JOIN_COORDS[1] <= mouse_y <= JOIN_COORDS[1] + 300
       over_new = NEW_COORDS[0] <= mouse_x <= NEW_COORDS[0] + 300 and NEW_COORDS[1] <= mouse_y <= NEW_COORDS[1] + 300
-      over_exit = EXIT_COORDS[0] <= mouse_x <= EXIT_COORDS[0] + 200 and EXIT_COORDS[1] <= mouse_y <= EXIT_COORDS[1] + 300
+      over_exit = EXIT_COORDS[0] <= mouse_x <= EXIT_COORDS[0] + 200 and EXIT_COORDS[1] <= mouse_y <= EXIT_COORDS[1] + 100
       for event in pygame.event.get():
          #print(event)
          if event.type == MOUSEBUTTONDOWN:
