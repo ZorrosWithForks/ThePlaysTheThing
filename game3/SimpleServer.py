@@ -26,7 +26,7 @@ def receivePlacements(l_players, l_dead_players, serversocket, map, address):
    tempPlayers = copy.copy(l_players)
    for player in tempPlayers:
       try:
-         response = player.connection.recv(8192)
+         response = player.connection.recv(16384)
          placement = pickle.loads(response)
          l_placements.append(placement)
       except:
@@ -275,7 +275,7 @@ def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
    tempPlayers = copy.copy(l_players)
    for player in tempPlayers:
       try:
-         response = player.connection.recv(8192)
+         response = player.connection.recv(16384)
          packet = pickle.loads(response)
          l_attacks.append(packet)
       except:
@@ -383,7 +383,7 @@ def receiveMoves(l_players, l_dead_players, serversocket, map, address):
    tempPlayers = copy.copy(l_players)
    for player in tempPlayers:
       try:
-         response = player.connection.recv(8192)
+         response = player.connection.recv(16384)
          packet = pickle.loads(response)
          l_moves.append(packet)
       except:
@@ -438,13 +438,23 @@ def receiveMoves(l_players, l_dead_players, serversocket, map, address):
    
    applyContinentBonuses(l_players, map)
    
-   for player in l_players:
+   tempPlayers = copy.copy(l_players)
+   for player in tempPlayers:
       curr_connection = player.connection
       player.connection = None
       packet = pickle.dumps((Map(map_to_copy=map, copy_player_name=player.user_name), player, l_playerNames, d_playerCountries))
-      curr_connection.sendto(packet, address)
-      player.connection = curr_connection
-      print("Sent moves to: " + player.user_name)
+      try:
+         curr_connection.sendto(packet, address)
+         player.connection = curr_connection
+         print("Sent moves to: " + player.user_name)
+      except:
+         l_players.remove(player)
+         l_playerNames.remove(player.user_name)
+         for continent in map.l_continent_names:
+            for country in range(len(map.d_continents[continent])):
+               if map.d_continents[continent][country].owner == player.user_name:
+                  map.d_continents[continent][country].owner = "Unoccupied"
+         
       
    tempPlayers = copy.copy(l_dead_players)
    
