@@ -108,7 +108,7 @@ def LoginClient():
          LOGIN_TOP_SURFACE.blit(SERVER_FONT.render(str(server[1]), True, (0,0,0)), (x_panel_position + 50, y_panel_position + 25 + y_offset))
          LOGIN_TOP_SURFACE.blit(SERVER_FONT.render("("+str(server[2])+"/7)", True, (0,0,0)), (x_panel_position + 1100, y_panel_position + 25 + y_offset))
          LOGIN_TOP_SURFACE.blit(JOIN_BUTTON_UNPRESSED, (x_panel_position + 1200, y_panel_position + 25 + y_offset))
-         l_join_spots.append((x_panel_position + 1100, y_panel_position + 25, server[0]))
+         l_join_spots.append((x_panel_position + 1100, y_panel_position + 25 + y_offset, server[0]))
          y_panel_position += 100
    
    def search(x_panel_position, y_panel_position, y_offset):
@@ -284,11 +284,11 @@ def LoginClient():
          if event.type == KEYDOWN:
             if event.key == K_DOWN and y_offset > -y_offset_allowed and len(l_servers) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
-               y_offset -= 100
+               y_offset -= 25
                #display_servers(x_panel_position, y_panel_position, y_offset)
             if event.key == K_UP and y_offset < 0 and len(l_servers) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
-               y_offset += 100
+               y_offset += 25
                #display_servers(x_panel_position, y_panel_position, y_offset)
             if event.key == K_BACKSPACE:
                username = username[:-1]
@@ -398,38 +398,50 @@ def LoginClient():
             y_mouse_position_main *= yScale
             print(str(x_mouse_position_main) + str(y_mouse_position_main))
             
-            # click refresh
-            if refresh_x_pos <= x_mouse_position_main <= refresh_x_pos + 200 and refresh_y_pos <= y_mouse_position_main <= refresh_y_pos + 100:
-               #print("clicked refresh")
-               request(x_panel_position, y_panel_position, y_offset)
+            if event.button == 1:
+               # click refresh
+               if refresh_x_pos <= x_mouse_position_main <= refresh_x_pos + 200 and refresh_y_pos <= y_mouse_position_main <= refresh_y_pos + 100:
+                  #print("clicked refresh")
+                  request(x_panel_position, y_panel_position, y_offset)
 
-            # clicked join
-            for join_button in l_join_spots:
-               if join_button[0] <= x_mouse_position_main <= join_button[0] + 200 and join_button[1] <= y_mouse_position_main <= join_button[1] + 100:
-                  if username == "":
-                     LOGIN_TOP_SURFACE.blit(NO_USERNAME_MESSAGE, MESSAGE_COORDS)
-                  else:
-                     joinGame(join_button[2])
-                  x_mouse_position_main = 0
-                  y_mouse_position_main = 0
+               # clicked join
+               for join_button in l_join_spots:
+                  if join_button[0] <= x_mouse_position_main <= join_button[0] + 200 and join_button[1] <= y_mouse_position_main <= join_button[1] + 100:
+                     if username == "":
+                        LOGIN_TOP_SURFACE.blit(NO_USERNAME_MESSAGE, MESSAGE_COORDS)
+                     else:
+                        joinGame(join_button[2])
+                     x_mouse_position_main = 0
+                     y_mouse_position_main = 0
                   
-            # clicked back button
-            if x_back_button <= x_mouse_position_main <= x_back_button + 75 and y_back_button <= y_mouse_position_main <= y_back_button + 50:
-               client_socket.close()
-               return(True)
+               # clicked back button
+               if x_back_button <= x_mouse_position_main <= x_back_button + 75 and y_back_button <= y_mouse_position_main <= y_back_button + 50:
+                  client_socket.close()
+                  return(True)
+                  
+               # clicked up arrow
+               if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 75 and y_offset > -y_offset_allowed and len(l_servers) > 5:
+                  SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
+                  y_offset -= 25
+                  #display_servers(x_panel_position, y_panel_position, y_offset)
                
-            # clicked up arrow
-            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 75 and y_offset > -y_offset_allowed and len(l_servers) > 5:
+               
+               # clicked down arrow
+               if arrow_x_pos <= x_mouse_position_main <= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 75 and y_offset < 0 and len(l_servers) > 5:
+                  SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
+                  y_offset += 25
+                  #display_servers(x_panel_position, y_panel_position, y_offset)
+               
+            if event.button == 4 and y_offset < 0 and len(l_servers) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
-               y_offset -= 100
-               #display_servers(x_panel_position, y_panel_position, y_offset)
+               y_offset += 25
                
-               
-            # clicked down arrow
-            if arrow_x_pos <= x_mouse_position_main <= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 75 and y_offset < 0 and len(l_servers) > 5:
+            if event.button == 5 and y_offset > -y_offset_allowed and len(l_servers) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
-               y_offset += 100
-               #display_servers(x_panel_position, y_panel_position, y_offset)
+               y_offset -= 25
+               
+      if len(l_servers) <= 5:
+         y_offset = 0
                         
       # Blit the stuffs onto the screen
       username = filter.clean(username)

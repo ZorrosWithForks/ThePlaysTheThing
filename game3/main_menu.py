@@ -43,9 +43,9 @@ print(str(xScale))
 print(str(yScale))
     
 def game_intro():
-   JOIN_COORDS = (450, 400)
-   NEW_COORDS = (800, 400)
-   EXIT_COORDS = (670, 720)
+   JOIN_COORDS = (1275, 300)
+   NEW_COORDS = (25, 300)
+   EXIT_COORDS = (690, 790)
    intro = True
 
    while intro:

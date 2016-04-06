@@ -124,7 +124,7 @@ def MakeServer():
          #length of clients is 1, but boot spots countinually grows....
          DISPLAYSURF.blit(SERVER_BAR, (x_panel_position, y_panel_position + y_offset))
          #print("blitted bar")
-         l_boot_spots.append((x_panel_position + 1200, y_panel_position + 25, str(i[1])))
+         l_boot_spots.append((x_panel_position + 1200, y_panel_position + 25 + y_offset, str(i[1])))
          # display the name of the client
          DISPLAYSURF.blit(SERVER_FONT.render(str(i[1]), True, (0,0,0)), (x_panel_position + 25, y_panel_position + 25 + y_offset))
          DISPLAYSURF.blit(BOOT_BUTTON, (x_panel_position + 1200, y_panel_position + 25 + y_offset))
@@ -352,11 +352,11 @@ def MakeServer():
                servername = servername[:-1]
             if event.key == K_DOWN and y_offset > -y_offset_allowed and len(clients) > 5:
                SERVERS_AREA = DISPLAYSURF.get_clip()
-               y_offset -= 100
+               y_offset -= 25
                #display_servers(x_panel_position, y_panel_position, y_offset)
             if event.key == K_UP and y_offset < 0 and len(clients) > 5:
                SERVERS_AREA = DISPLAYSURF.get_clip()
-               y_offset += 100
+               y_offset += 25
                   #display_servers(x_panel_position, y_panel_position, y_offset)
             elif event.key == K_LSHIFT or event.key == K_RSHIFT:
                shifted = True
@@ -463,63 +463,71 @@ def MakeServer():
             x_mouse_position_main, y_mouse_position_main = pygame.mouse.get_pos()
             x_mouse_position_main *= xScale
             y_mouse_position_main *= yScale
-            # clicked start server
-            if x_start_server_button <= x_mouse_position_main <= x_start_server_button + 150 and y_start_server_button <= y_mouse_position_main <= y_start_server_button + 75 and servername != "":
-               waiting_for_players = True
-               begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients)
-            if servername=="":
-               just_accessed = False
-               
-            # clicked play
-            if x_play_button <= x_mouse_position_main <= x_play_button + 200 and y_play_button <= y_mouse_position_main <= y_play_button + 200 and servername != "" and len(clients) > 0:
-               start_game()
-               server_socket.close()
-               serversocket.close()
-               for client in clients:
-                  client[0].close()
-               return
-               
-            # clicked back
-            if x_back_button <= x_mouse_position_main <= x_back_button + 75 and y_back_button <= y_mouse_position_main <= y_back_button + 50:
-               server_socket.close()
-               serversocket.close()
-               for client in clients:
-                  client[0].close()
-               return
-               
-            # clicked boot
-            for boot_spot in l_boot_spots:
-               print(str(len(l_boot_spots)))
-               print(str(boot_spot[0]) + ' ' +str(boot_spot[1]))
-               if boot_spot[0] <= x_mouse_position_main <= boot_spot[0] + 100 and boot_spot[1] <= y_mouse_position_main <= boot_spot[1] + 50:
-                  print(boot_spot[2])
-                  temp_client_set = copy.copy(clients)
-                  for client in temp_client_set:
-                     if client[1] == boot_spot[2]: # check to see if the names match
-                        packet = pickle.dumps((False, [], booted))
-                        time.sleep(0.1)
-                        client[0].sendto(packet, client[2])
-                        clients.remove(client)
-                        for player in clients:
-                           l_playerNames = []
-                           for name in clients:
-                              l_playerNames.append(name[1])
-                           packet = pickle.dumps((False, l_playerNames, servername))
-                           player[0].sendto(packet, player[2])
-                        print("\ndeleted: " + boot_spot[2] + client[1])
+            if event.button == 1:
+               # clicked start server
+               if x_start_server_button <= x_mouse_position_main <= x_start_server_button + 150 and y_start_server_button <= y_mouse_position_main <= y_start_server_button + 75 and servername != "":
+                  waiting_for_players = True
+                  begin_serving(servername, server_socket, x_panel_position, y_panel_position, clients)
+               if servername=="":
+                  just_accessed = False
+                  
+               # clicked play
+               if x_play_button <= x_mouse_position_main <= x_play_button + 200 and y_play_button <= y_mouse_position_main <= y_play_button + 200 and servername != "" and len(clients) > 0:
+                  start_game()
+                  server_socket.close()
+                  serversocket.close()
+                  for client in clients:
+                     client[0].close()
+                  return
+                  
+               # clicked back
+               if x_back_button <= x_mouse_position_main <= x_back_button + 75 and y_back_button <= y_mouse_position_main <= y_back_button + 50:
+                  server_socket.close()
+                  serversocket.close()
+                  for client in clients:
+                     client[0].close()
+                  return
+                  
+               # clicked boot
+               for boot_spot in l_boot_spots:
+                  print(str(len(l_boot_spots)))
+                  print(str(boot_spot[0]) + ' ' +str(boot_spot[1]))
+                  if boot_spot[0] <= x_mouse_position_main <= boot_spot[0] + 100 and boot_spot[1] <= y_mouse_position_main <= boot_spot[1] + 50:
+                     print(boot_spot[2])
+                     temp_client_set = copy.copy(clients)
+                     for client in temp_client_set:
+                        if client[1] == boot_spot[2]: # check to see if the names match
+                           packet = pickle.dumps((False, [], booted))
+                           time.sleep(0.1)
+                           client[0].sendto(packet, client[2])
+                           clients.remove(client)
+                           for player in clients:
+                              l_playerNames = []
+                              for name in clients:
+                                 l_playerNames.append(name[1])
+                              packet = pickle.dumps((False, l_playerNames, servername))
+                              player[0].sendto(packet, player[2])
+                           print("\ndeleted: " + boot_spot[2] + client[1])
                         
-            # clicked up arrow
-
-            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 75 and y_offset > -y_offset_allowed and len(clients) > 5:
-               SERVERS_AREA = DISPLAYSURF.get_clip()
-               y_offset -= 100
+               # clicked up arrow
+               if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 75 and y_offset > -y_offset_allowed and len(clients) > 5:
+                  SERVERS_AREA = DISPLAYSURF.get_clip()
+                  y_offset -= 25
+                  
+               # clicked down arrow
+               if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 75 and y_offset < 0 and len(clients) > 5:
+                  SERVERS_AREA = DISPLAYSURF.get_clip()
+                  y_offset += 25
                
-            # clicked down arrow
-            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 75 and y_offset < 0 and len(clients) > 5:
+            if event.button == 4 and y_offset < 0 and len(clients) > 5:
                SERVERS_AREA = DISPLAYSURF.get_clip()
-               y_offset += 100
-
-         
+               y_offset += 25
+               
+            if event.button == 5 and y_offset > -y_offset_allowed and len(clients) > 5:
+               SERVERS_AREA = DISPLAYSURF.get_clip()
+               y_offset -= 25
+      if len(clients) <= 5:
+         y_offset = 0
       # Blit the stuffs onto the screen
       DISPLAYSURF.blit(LOGIN_BACKGROUND, (0,0))
       servername = filter.clean(servername)

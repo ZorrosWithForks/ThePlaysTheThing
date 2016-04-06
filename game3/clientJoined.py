@@ -192,29 +192,42 @@ def LoginClient(username, s):
                #print("shifted is now false")
             if event.key == K_DOWN and y_offset > -y_offset_allowed and len(l_players) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
-               y_offset -= 100
+               y_offset -= 25
             if event.key == K_UP and y_offset < 0 and len(l_players) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
-               y_offset += 100
+               y_offset += 25
          if event.type == MOUSEBUTTONDOWN:
             x_mouse_position_main, y_mouse_position_main = pygame.mouse.get_pos()
             x_mouse_position_main *= xScale
             y_mouse_position_main *= yScale
-            # clicked back button
-            if x_back_button <= curr_x <= x_back_button + 75 and y_back_button <= curr_y <= y_back_button + 50:
-               s.close()
-               #print("Clicked back button")
-               return False
+            
+            if event.button == 1:
+               # clicked back button
+               if x_back_button <= curr_x <= x_back_button + 75 and y_back_button <= curr_y <= y_back_button + 50:
+                  s.close()
+                  #print("Clicked back button")
+                  return False
+                  
+               # clicked up arrow
+               if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 75 and y_offset > -y_offset_allowed and len(l_players) > 5: # only allows me to scroll once...
+                  SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
+                  y_offset -= 25
+                  
+               # clicked down arrow
+               if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 75 and y_offset < 0 and len(l_players) > 5:
+                  SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
+                  y_offset += 25
                
-            # clicked up arrow
-            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and up_arrow_y_pos <= y_mouse_position_main <= up_arrow_y_pos + 75 and y_offset > -y_offset_allowed and len(l_players) > 5: # only allows me to scroll once...
+            if event.button == 4 and y_offset < 0 and len(l_players) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
-               y_offset -= 100
+               y_offset += 25
                
-            # clicked down arrow
-            if arrow_x_pos <= x_mouse_position_main<= arrow_x_pos + 100 and down_arrow_y_pos <= y_mouse_position_main <= down_arrow_y_pos + 75 and y_offset < 0 and len(l_players) > 5:
+            if event.button == 5 and y_offset > -y_offset_allowed and len(l_players) > 5:
                SERVERS_AREA = LOGIN_TOP_SURFACE.get_clip()
-               y_offset += 100
+               y_offset -= 25
+               
+      if len(l_players) <= 5:
+         y_offset = 0
                         
       # Blit the stuffs onto the screen
       LOGIN_TOP_SURFACE.blit(BLACK_BACKGROUND, (100, 100))

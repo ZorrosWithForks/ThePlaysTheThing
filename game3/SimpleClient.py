@@ -152,19 +152,22 @@ BACKGROUND = pygame.display.set_mode((screenInfo.current_w,screenInfo.current_h)
 backgroundSurface = None
 
 SOUND_FILE_PATH = "Sounds\\"
-pygame.mixer.init(size=16)
-SONG_END = pygame.USEREVENT + 1
-pygame.mixer.music.set_endevent(SONG_END)
-l_songs = listdir(SOUND_FILE_PATH)
-l_bad = []
+try:
+   pygame.mixer.init(size=16)
+   SONG_END = pygame.USEREVENT + 1
+   pygame.mixer.music.set_endevent(SONG_END)
+   l_songs = listdir(SOUND_FILE_PATH)
+   l_bad = []
 
-for file in l_songs:
-   if file[-3:] not in ("mp3", "ogg"):
-      l_bad.append(file)
+   for file in l_songs:
+      if file[-3:] not in ("mp3", "ogg"):
+         l_bad.append(file)
 
-for bad in l_bad:
-   l_songs.remove(bad)
-song_index = 0
+   for bad in l_bad:
+      l_songs.remove(bad)
+   song_index = 0
+except:
+   pass
 
 def blitInfo(DISPLAYSURF, map, phase_info, displayUnitThings=True):
    curr_x, curr_y = pygame.mouse.get_pos()
@@ -543,10 +546,13 @@ def handleGeneral(event, map, temp_map=None, selectedCountry=None):
          pygame.display.iconify()
       if 1560 < curr_x < 1596 and 0 < curr_y < 20:
          return True
-   if event.type == SONG_END:
-      song_index = (song_index + 1) % len(l_songs)
-      pygame.mixer.music.load(SOUND_FILE_PATH + l_songs[song_index])
-      pygame.mixer.music.play(1)
+   try:
+      if event.type == SONG_END:
+         song_index = (song_index + 1) % len(l_songs)
+         pygame.mixer.music.load(SOUND_FILE_PATH + l_songs[song_index])
+         pygame.mixer.music.play(1)
+   except:
+      pass
       
    return False
 
@@ -1276,7 +1282,6 @@ def detectGameEnd(DISPLAYSURF, map, player, socket, l_playerNames, d_playerCount
                deadMap = pickle.loads(response)
             except:
                deadMap = None
-               displayMessage(CRASH_MESSAGE, map, DISPLAYSURF, "Spectating", l_playerNames, d_playerCountries)
                died = True
                return
             print("I'm dead and got a new map")
@@ -1367,8 +1372,11 @@ def play(host_address, player_name):
    map, player, l_playerNames, d_playerCountries = pickle.loads(pickledResponse)
    print("Got the map")
    
-   pygame.mixer.music.load(SOUND_FILE_PATH + l_songs[song_index])
-   pygame.mixer.music.play(1)
+   try:
+      pygame.mixer.music.load(SOUND_FILE_PATH + l_songs[song_index])
+      pygame.mixer.music.play(1)
+   except:
+      pass
 
    # Map continent names to tiles
    incrementor = 0
