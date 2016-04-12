@@ -56,6 +56,7 @@ def receivePlacements(l_players, l_dead_players, serversocket, map, address):
       else: print("Cheaters never prosper!")
       
    tempPlayers = copy.copy(l_players)
+   sortPlayers(map.l_player_names, d_playerCountries)
    for player in tempPlayers:
       curr_connection = player.connection
       player.connection = None
@@ -64,6 +65,7 @@ def receivePlacements(l_players, l_dead_players, serversocket, map, address):
          curr_connection.sendto(packet, address)
       except:
          l_players.remove(player)
+         sortPlayers(map.l_player_names, d_playerCountries)
          l_playerNames.remove(player.user_name)
          d_playerCountries[player.user_name] = 0
          for continent in map.l_continent_names:
@@ -357,6 +359,7 @@ def receiveAttacks(l_players, l_dead_players, serversocket, map, address):
          d_playerCountries[player.user_name] = 0
          l_playerNames.remove(player.user_name)
          l_players.remove(l_players[i])
+         sortPlayers(map.l_player_names, d_playerCountries)
          for continent in map.l_continent_names:
             for country in range(len(map.d_continents[continent])):
                if map.d_continents[continent][country].owner == player.user_name:
@@ -437,7 +440,7 @@ def receiveMoves(l_players, l_dead_players, serversocket, map, address):
    
    
    applyContinentBonuses(l_players, map)
-   
+   sortPlayers(map.l_player_names, d_playerCountries)
    tempPlayers = copy.copy(l_players)
    for player in tempPlayers:
       curr_connection = player.connection
@@ -449,6 +452,7 @@ def receiveMoves(l_players, l_dead_players, serversocket, map, address):
          print("Sent moves to: " + player.user_name)
       except:
          l_players.remove(player)
+         sortPlayers(map.l_player_names, d_playerCountries)
          l_playerNames.remove(player.user_name)
          for continent in map.l_continent_names:
             for country in range(len(map.d_continents[continent])):
@@ -459,15 +463,15 @@ def receiveMoves(l_players, l_dead_players, serversocket, map, address):
    tempPlayers = copy.copy(l_dead_players)
    
    for i in range(len(tempPlayers)):
-      curr_connection = l_dead_players[i].connection
-      l_dead_players[i].connection = None
+      curr_connection = tempPlayers[i].connection
+      tempPlayers[i].connection = None
       packet = pickle.dumps((map, l_playerNames, d_playerCountries))
       try:
          curr_connection.sendto(packet, address)
-         l_dead_players[i].connection = curr_connection
-         print("Sent final map to spectator: " + l_dead_players[i].user_name)
+         tempPlayers[i].connection = curr_connection
+         print("Sent final map to spectator: " + tempPlayers[i].user_name)
       except:
-         l_dead_players.remove(l_dead_players[i])
+         l_dead_players.remove(tempPlayers[i])
 
 def applyContinentBonuses(l_players, map):
    for player in l_players:

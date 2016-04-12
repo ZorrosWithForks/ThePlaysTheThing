@@ -199,7 +199,7 @@ def MakeServer():
    y_offset = 0
    
    # Initilize bad word list
-   filter = ProfanitiesFilter(bad_things, replacements="-")
+   filter = ProfanitiesFilter(bad_things, replacements="!")
    
    # Position of the arrows
    arrow_x_pos = 1500
@@ -290,7 +290,7 @@ def MakeServer():
    y_panel_position = 100
 
    # Start server positions
-   x_start_server_button = 200
+   x_start_server_button = 138
    y_start_server_button = 800
        
    # Play string

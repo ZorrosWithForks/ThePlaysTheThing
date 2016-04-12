@@ -136,6 +136,11 @@ MOVE_MUSKETEERS = pygame.image.load(IMAGE_FILE_PATH + "MoveMusketeers.png").conv
 MOVE_CANNONS    = pygame.image.load(IMAGE_FILE_PATH + "MoveCannons.png").convert_alpha()
 MOVE_AIRSHIPS   = pygame.image.load(IMAGE_FILE_PATH + "MoveAirships.png").convert_alpha()
 
+UNIT_ATTACK_HIGHLIGHT = pygame.image.load(IMAGE_FILE_PATH + "UnitHighlightAttack.png").convert_alpha()
+UNIT_MOVE_HIGHLIGHT = pygame.image.load(IMAGE_FILE_PATH + "UnitHighlightMove.png").convert_alpha()
+ATTACK_INDICATOR = pygame.image.load(IMAGE_FILE_PATH + "AttackIndicator.png").convert_alpha()
+MOVE_INDICATOR = pygame.image.load(IMAGE_FILE_PATH + "MoveIndicator.png").convert_alpha()
+
 CRASH_MESSAGE = pygame.image.load(IMAGE_FILE_PATH + "InfoServerLost.png").convert_alpha()
 ATTACK_RESULTS = pygame.image.load(IMAGE_FILE_PATH + "AttackResults.png").convert_alpha()
 OK_UNLIT = pygame.image.load(IMAGE_FILE_PATH + "OK.png").convert_alpha()
@@ -303,9 +308,19 @@ map_Y_offset = 0
 d_continent_tiles = {}
 
 def isOverButton(map, curr_x, curr_y):
-    return ((175 + 245 <= curr_x <= 175 + 395 or 580 + 245 <= curr_x <= 580 + 395) and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120) or \
-    ((175 + 245 <= curr_x <= 175 + 395 or 580 + 245 <= curr_x <= 580 + 395) and map.HEIGHT * TILESIZE + 125 < curr_y <= map.HEIGHT * TILESIZE + 175)
-
+   return ((175 + 245 <= curr_x <= 175 + 395 or 580 + 245 <= curr_x <= 580 + 395) and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120) or \
+   ((175 + 245 <= curr_x <= 175 + 395 or 580 + 245 <= curr_x <= 580 + 395) and map.HEIGHT * TILESIZE + 125 < curr_y <= map.HEIGHT * TILESIZE + 175)
+    
+def printIndicator(image, map, DISPLAYSURF, curr_x, curr_y):
+   if 175 + 245 <= curr_x <= 175 + 395 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120:
+      DISPLAYSURF.blit(image, (map.WIDTH * TILESIZE + 25, 317), special_flags=BLEND_ADD)
+   elif 580 + 245 <= curr_x <= 580 + 395 and map.HEIGHT * TILESIZE + 70 <= curr_y <= map.HEIGHT * TILESIZE + 120:
+      DISPLAYSURF.blit(image, (map.WIDTH * TILESIZE + 25, 367), special_flags=BLEND_ADD)
+   elif 175 + 245 <= curr_x <= 175 + 395 and map.HEIGHT * TILESIZE + 125 < curr_y <= map.HEIGHT * TILESIZE + 175:
+      DISPLAYSURF.blit(image, (map.WIDTH * TILESIZE + 25, 417), special_flags=BLEND_ADD)
+   elif 580 + 245 <= curr_x <= 580 + 395 and map.HEIGHT * TILESIZE + 125 < curr_y <= map.HEIGHT * TILESIZE + 175:
+      DISPLAYSURF.blit(image, (map.WIDTH * TILESIZE + 25, 467), special_flags=BLEND_ADD)
+      
 def standardInfo(map, DISPLAYSURF, params):
    #Highlight country mouse is over and display country info
    curr_x, curr_y = pygame.mouse.get_pos()
@@ -413,7 +428,7 @@ def attackInfo(map, DISPLAYSURF, params):
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.cannons), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 425))
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].unit_counts.champions), True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 475))
    DISPLAYSURF.blit(COUNTRY_FONT.render(str(map.d_continents[defender[0]][defender[1]].defense_bonus) + "%", True, DEFEND_COLOR), (map.WIDTH * TILESIZE + 400, 525))
-    
+   
 def moveInfo(map, DISPLAYSURF, params):
    attacker = map.ll_map[params[0][1]][params[0][0]]
    defender = params[1][0]
@@ -776,6 +791,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
    l_defenders = []
    
    while declaring:
+       squishyEasterEgg = False
        #get all the user events
        curr_x, curr_y = pygame.mouse.get_pos()
        curr_x *= xScale
@@ -869,6 +885,7 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
        else:
          if [selectedCountry[0], selectedCountry[1]] in l_attackers:
             printMap(map,  DISPLAYSURF, "Declare Attacks", attackInfo, (selectedCountry, d_attacks[map.ll_map[selectedCountry[1]][selectedCountry[0]]]))
+            squishyEasterEgg = True
          else:
             printMap(map, DISPLAYSURF, "Declare Attacks", selectedInfo, selectedCountry)
        
@@ -926,11 +943,19 @@ def declareAttacks(DISPLAYSURF, map, player, socket, host_address, l_playerNames
        DISPLAYSURF.blit(SEND_MUSKETEERS, (575, map.HEIGHT * TILESIZE + 70))
        DISPLAYSURF.blit(SEND_CANNONS, (170, map.HEIGHT * TILESIZE + 125))
        DISPLAYSURF.blit(SEND_AIRSHIPS, (575, map.HEIGHT * TILESIZE + 125))
+       
+       if squishyEasterEgg:
+         DISPLAYSURF.blit(UNIT_ATTACK_HIGHLIGHT, (170, map.HEIGHT * TILESIZE + 70), special_flags=BLEND_ADD)
+         DISPLAYSURF.blit(UNIT_ATTACK_HIGHLIGHT, (575, map.HEIGHT * TILESIZE + 70), special_flags=BLEND_ADD)
+         DISPLAYSURF.blit(UNIT_ATTACK_HIGHLIGHT, (170, map.HEIGHT * TILESIZE + 125), special_flags=BLEND_ADD)
+         DISPLAYSURF.blit(UNIT_ATTACK_HIGHLIGHT, (575, map.HEIGHT * TILESIZE + 125), special_flags=BLEND_ADD)
+         printIndicator(ATTACK_INDICATOR, map, DISPLAYSURF, curr_x, curr_y)
+   
        DISPLAYSURF.blit(DONE_BUTTON if player.unit_counts > 0 else DONE_BUTTON_ACTIVE, (980, map.HEIGHT * TILESIZE + 70))
        
        blitInfo(DISPLAYSURF, map, INFO_ATTACK)
        DISPLAYSURF.blit(MOUSE_LIT if isOverButton(map, curr_x, curr_y) and selectedCountry != None and selectedCountry in l_attackers else MOUSE_UNLIT, (curr_x, curr_y))
-         
+       
        #update the display
        newSurface = pygame.transform.scale(DISPLAYSURF,(screenInfo.current_w, screenInfo.current_h), window)
        pygame.display.update()
@@ -1011,6 +1036,7 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
       if detectGameEnd(DISPLAYSURF, map, player, socket, oldMap[1], oldMap[3]):
          return None, None, None, None, None
    while moving:
+      squishyEasterEgg = False
       #get all the user events
       curr_x, curr_y = pygame.mouse.get_pos()
       curr_x *= xScale
@@ -1108,6 +1134,7 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
       else:
          if [selectedCountry[0], selectedCountry[1]] in l_senders:
             printMap(map,  DISPLAYSURF, "Move Troops", moveInfo, (selectedCountry, d_moves[map.ll_map[selectedCountry[1]][selectedCountry[0]]]))
+            squishyEasterEgg = True
          else:
             printMap(map, DISPLAYSURF, "Move Troops", selectedInfo, selectedCountry)
 
@@ -1164,6 +1191,14 @@ def moveTroops(DISPLAYSURF, map, player, socket, host_address, l_attackers, l_de
       DISPLAYSURF.blit(MOVE_MUSKETEERS, (575, map.HEIGHT * TILESIZE + 70))
       DISPLAYSURF.blit(MOVE_CANNONS, (170, map.HEIGHT * TILESIZE + 125))
       DISPLAYSURF.blit(MOVE_AIRSHIPS, (575, map.HEIGHT * TILESIZE + 125))
+      
+      if squishyEasterEgg:
+         DISPLAYSURF.blit(UNIT_MOVE_HIGHLIGHT, (170, map.HEIGHT * TILESIZE + 70), special_flags=BLEND_ADD)
+         DISPLAYSURF.blit(UNIT_MOVE_HIGHLIGHT, (575, map.HEIGHT * TILESIZE + 70), special_flags=BLEND_ADD)
+         DISPLAYSURF.blit(UNIT_MOVE_HIGHLIGHT, (170, map.HEIGHT * TILESIZE + 125), special_flags=BLEND_ADD)
+         DISPLAYSURF.blit(UNIT_MOVE_HIGHLIGHT, (575, map.HEIGHT * TILESIZE + 125), special_flags=BLEND_ADD)
+         printIndicator(MOVE_INDICATOR, map, DISPLAYSURF, curr_x, curr_y)
+         
       DISPLAYSURF.blit(DONE_BUTTON if player.unit_counts > 0 else DONE_BUTTON_ACTIVE, (980, map.HEIGHT * TILESIZE + 70))
     
       blitInfo(DISPLAYSURF, map, INFO_MOVE)
