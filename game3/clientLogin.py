@@ -115,6 +115,8 @@ def LoginClient():
       while True:
          try:
             packet, addr = client_socket.recvfrom(4096)
+         except OSError:
+            break
          except:
             pass
          try:
